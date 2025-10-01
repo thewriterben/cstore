@@ -48,33 +48,34 @@ All security measures listed in the README have been successfully implemented an
 - Strips unknown fields for security
 
 ### 4. ✅ MongoDB Sanitization (NoSQL Injection Prevention)
-**Status:** Implemented and Integrated  
+**Status:** Implemented and Integrated (Custom Express 5 Compatible)  
 **Files:**
-- Implementation: `src/middleware/security.js` (line 38)
-- Integration: `src/app.js` (line 34)
+- Implementation: `src/middleware/security.js` (lines 38-62)
+- Integration: `src/app.js` (line 38)
 
 **Details:**
-- Uses express-mongo-sanitize
+- Custom Express 5-compatible implementation
 - Removes MongoDB operators ($gt, $lt, $ne, etc.) from user input
 - Prevents NoSQL injection attacks
+- **Note:** express-mongo-sanitize has compatibility issues with Express 5 (tries to modify immutable req.query)
 
 ### 5. ✅ XSS Protection (Cross-Site Scripting Prevention)
-**Status:** NEWLY ADDED - Implemented and Integrated  
+**Status:** Implemented and Integrated (Custom Express 5 Compatible)  
 **Files:**
-- Implementation: `src/middleware/security.js` (lines 40-41)
-- Integration: `src/app.js` (line 35)
+- Implementation: `src/middleware/security.js` (lines 64-96)
+- Integration: `src/app.js` (line 39)
 
 **Details:**
-- Uses xss-clean middleware
+- Custom Express 5-compatible implementation
 - Sanitizes HTML/JavaScript from request body
-- Cleans query parameters and URL parameters
-- **This was installed in package.json but not previously integrated**
+- Removes `<script>` tags, `javascript:` protocol, and inline event handlers
+- **Note:** xss-clean is deprecated and incompatible with Express 5
 
 ### 6. ✅ HPP Protection (HTTP Parameter Pollution)
 **Status:** Implemented and Integrated  
 **Files:**
-- Implementation: `src/middleware/security.js` (lines 43-45)
-- Integration: `src/app.js` (line 36)
+- Implementation: `src/middleware/security.js` (lines 98-101)
+- Integration: `src/app.js` (line 40)
 
 **Details:**
 - Prevents duplicate parameter attacks
@@ -146,45 +147,58 @@ All security measures listed in the README have been successfully implemented an
 The security middleware is applied in the correct order in `src/app.js`:
 
 ```javascript
-// Line 32-36: Security middleware stack
+// Line 35-40: Security middleware stack
 app.use(securityHeaders);           // Set security headers first
 app.use(limiter);                   // Rate limiting
-app.use(sanitizeData);              // MongoDB sanitization
-app.use(xssClean);                  // XSS protection
+app.use(sanitizeData);              // MongoDB sanitization (custom Express 5 impl)
+app.use(xssClean);                  // XSS protection (custom Express 5 impl)
 app.use(preventParamPollution);     // HPP protection
 
-// Line 39-40: Body parser (after sanitization)
+// Line 42-44: Body parser (after sanitization)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Line 43: CORS
+// Line 46-47: CORS
 app.use(cors());
 
-// Line 46-54: Logging
+// Line 49-54: Logging
 app.use(morgan(...));
 
-// Line 58-62: Routes with validation
+// Line 60-67: Routes with validation
 app.use('/api/auth', authLimiter, authRoutes);
 // ... other routes
 
-// Line 88: Error handler (must be last)
+// Line 94: Error handler (must be last)
 app.use(errorHandler);
 ```
 
 ## Changes Made
 
-### Modified Files
+### Modified Files (Updated for Express 5 Compatibility)
 1. **src/middleware/security.js**
-   - Added `xss-clean` import
-   - Created `xssClean` middleware instance
-   - Exported `xssClean` in module.exports
+   - Implemented custom `sanitizeData` middleware (Express 5 compatible)
+   - Implemented custom `xssClean` middleware (Express 5 compatible)
+   - Removed dependencies on express-mongo-sanitize and xss-clean packages
+   - Exported both new middleware functions
 
 2. **src/app.js**
-   - Added `xssClean` to security middleware imports
-   - Integrated `xssClean` in middleware stack (line 35)
+   - Added `sanitizeData` and `xssClean` to security middleware imports
+   - Integrated both in middleware stack (lines 38-39)
 
-3. **src/services/blockchainService.js**
-   - Fixed Web3 import syntax for compatibility with web3 v4
+3. **README.md**
+   - Updated security measures list to include MongoDB sanitization and XSS protection
+   - Added note about Express 5 compatibility
+
+4. **docs/SECURITY.md**
+   - Updated MongoDB Sanitization section with custom implementation details
+   - Updated XSS Protection section with custom implementation details
+   - Updated Dependencies section to note unused packages
+
+### Rationale for Custom Implementation
+- `express-mongo-sanitize` v2.2.0 has compatibility issues with Express 5 (attempts to modify immutable req.query)
+- `xss-clean` is deprecated and incompatible with Express 5
+- Custom implementations focus on mutable req.body only
+- Query/params sanitization handled at validation layer with Joi schemas
 
 ### New Files Created
 1. **docs/SECURITY.md** (8.6 KB)
