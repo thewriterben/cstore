@@ -2,6 +2,7 @@ const Product = require('../models/Product');
 const { asyncHandler } = require('../middleware/errorHandler');
 const { AppError } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
+const recommendationService = require('../services/recommendationService');
 
 // @desc    Get all products
 // @route   GET /api/products
@@ -133,10 +134,52 @@ const deleteProduct = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc    Get product recommendations for user
+// @route   GET /api/products/recommendations
+// @access  Private
+const getRecommendations = asyncHandler(async (req, res, next) => {
+  const limit = parseInt(req.query.limit) || 10;
+  
+  const recommendations = await recommendationService.getRecommendationsForUser(
+    req.user.id,
+    limit
+  );
+
+  res.json({
+    success: true,
+    data: {
+      recommendations,
+      count: recommendations.length
+    }
+  });
+});
+
+// @desc    Get related products for a specific product
+// @route   GET /api/products/:id/related
+// @access  Public
+const getRelatedProducts = asyncHandler(async (req, res, next) => {
+  const limit = parseInt(req.query.limit) || 6;
+  
+  const relatedProducts = await recommendationService.getRelatedProducts(
+    req.params.id,
+    limit
+  );
+
+  res.json({
+    success: true,
+    data: {
+      products: relatedProducts,
+      count: relatedProducts.length
+    }
+  });
+});
+
 module.exports = {
   getProducts,
   getProduct,
   createProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  getRecommendations,
+  getRelatedProducts
 };
