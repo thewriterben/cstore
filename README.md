@@ -29,6 +29,7 @@ This version includes all core e-commerce features. While functional, additional
 - 📧 **Email Service**: Transactional emails (welcome, order confirmation, payment receipt, shipping notifications)
 - 🔗 **Enhanced Blockchain**: Webhook support, real-time monitoring, retry mechanisms
 - 📊 **Admin Dashboard API**: Complete admin endpoints for analytics, user management, and system monitoring
+- 🔐 **Multi-Signature Wallets**: Support for multi-sig wallets with configurable approval workflows
 
 #### Infrastructure
 - 🧪 **Testing Suite**: Jest tests with Supertest for authentication and products
@@ -50,7 +51,6 @@ These features are implemented but require configuration:
 - Advanced search with Elasticsearch
 - Product recommendations based on purchase history
 - Admin dashboard UI (React-based panel)
-- Multi-signature wallet support
 - Internationalization (i18n)
 
 ## Tech Stack
@@ -92,6 +92,7 @@ These features are implemented but require configuration:
 - **[API Endpoints](docs/API_ENDPOINTS.md)** - Complete API endpoint reference with examples
 - **[Authentication System](docs/AUTHENTICATION.md)** - JWT authentication and RBAC guide
 - **[API Documentation](docs/API.md)** - Detailed API documentation
+- **[Multi-Signature Wallets](docs/MULTI_SIG_WALLET.md)** - Multi-sig wallet setup and usage guide
 
 ## Getting Started
 
@@ -690,6 +691,7 @@ The following features are planned for future versions:
 - **Categories**: Full CRUD, Product Filtering
 - **Shopping Cart**: Add, Update, Remove, Validate
 - **Admin Dashboard**: Stats, Analytics, User Management, System Health
+- **Multi-Sig Wallets**: Create, Manage, Transaction Approvals
 
 See [API_ENDPOINTS.md](docs/API_ENDPOINTS.md) for complete documentation.
 
@@ -704,10 +706,11 @@ v2.1 adds significant new functionality:
 - Email notification service
 - Enhanced blockchain monitoring
 - Complete admin dashboard API
+- Multi-signature wallet support with transaction approval workflow
 
 All v2.0 endpoints remain compatible. New endpoints are additive only.
 
-**Database Migration**: No migration required. New collections (Cart) will be created automatically.
+**Database Migration**: No migration required. New collections (Cart, MultiSigWallet, TransactionApproval) will be created automatically.
 
 **Configuration**: Add email SMTP settings to `.env` file (see `.env.example`).
 
