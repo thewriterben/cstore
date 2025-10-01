@@ -12,6 +12,7 @@ const {
   limiter,
   authLimiter,
   sanitizeData,
+  xssClean,
   preventParamPollution
 } = require('./middleware/security');
 
@@ -31,6 +32,7 @@ connectDB();
 app.use(securityHeaders);
 app.use(limiter);
 app.use(sanitizeData);
+app.use(xssClean);
 app.use(preventParamPollution);
 
 // Body parser

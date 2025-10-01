@@ -1,6 +1,7 @@
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
 const hpp = require('hpp');
 
 // Security headers
@@ -37,6 +38,9 @@ const authLimiter = rateLimit({
 // Prevent NoSQL injection
 const sanitizeData = mongoSanitize();
 
+// Prevent XSS attacks
+const xssClean = xss();
+
 // Prevent HTTP parameter pollution
 const preventParamPollution = hpp({
   whitelist: ['price', 'rating', 'stock'] // Allow duplicates for these params
@@ -47,5 +51,6 @@ module.exports = {
   limiter,
   authLimiter,
   sanitizeData,
+  xssClean,
   preventParamPollution
 };
