@@ -34,6 +34,7 @@ This version includes all core e-commerce features. While functional, additional
 - 🌍 **Regional Payment Methods**: 15+ region-specific payment options (SEPA, iDEAL, Alipay, PIX, etc.)
 - 🔗 **Enhanced Blockchain**: Webhook support, real-time monitoring, retry mechanisms
 - 📊 **Admin Dashboard API**: Complete admin endpoints for analytics, user management, and system monitoring
+- ❓ **Product Q&A**: Customer questions and answers with moderation, helpful voting, and notifications
 
 #### Infrastructure
 - 🧪 **Testing Suite**: Jest tests with Supertest for authentication and products
@@ -50,8 +51,6 @@ These features are implemented but require configuration:
 - **Admin Alerts**: Configure admin email for system alerts
 
 ### ❌ Not Yet Implemented (Future Enhancements)
-
-- [ ] Customer product questions & answers
 
 ### Phase 2: Advanced Blockchain
 - [ ] Multi-signature wallet support
@@ -95,6 +94,7 @@ These features are implemented but require configuration:
 - **Regional Payments**: Discovery, Filtering, Management (Admin)
 - **Admin Dashboard**: Stats, Analytics, User Management, System Health
 - **Multi-Sig Wallets**: Create, Manage, Transaction Approvals
+- **Product Questions**: Ask, Answer, Vote Helpful, Moderation (Admin)
 
 See [API_ENDPOINTS.md](docs/API_ENDPOINTS.md) for complete documentation.
 
