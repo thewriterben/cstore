@@ -1,9 +1,11 @@
 const nodemailer = require('nodemailer');
 const logger = require('../utils/logger');
+const i18next = require('../config/i18n');
 
 /**
  * Email Service for sending transactional emails
  * Supports multiple email providers via SMTP
+ * Supports internationalization (i18n)
  */
 
 // Create reusable transporter
@@ -90,10 +92,12 @@ async function sendEmail({ to, subject, html, text }) {
  * Send welcome email to new users
  * @param {string} email - User email
  * @param {string} name - User name
+ * @param {string} language - User's preferred language (default: 'en')
  */
-async function sendWelcomeEmail(email, name) {
-  const subject = 'Welcome to CStore!';
-  const html = getWelcomeEmailTemplate(name);
+async function sendWelcomeEmail(email, name, language = 'en') {
+  const t = i18next.getFixedT(language, 'emails');
+  const subject = t('welcome.subject');
+  const html = getWelcomeEmailTemplate(name, language);
   
   return await sendEmail({ to: email, subject, html });
 }
@@ -103,11 +107,13 @@ async function sendWelcomeEmail(email, name) {
  * @param {string} email - User email
  * @param {string} name - User name
  * @param {string} verificationToken - Verification token
+ * @param {string} language - User's preferred language (default: 'en')
  */
-async function sendVerificationEmail(email, name, verificationToken) {
+async function sendVerificationEmail(email, name, verificationToken, language = 'en') {
   const verificationUrl = `${process.env.APP_URL || 'http://localhost:3000'}/api/auth/verify-email?token=${verificationToken}`;
-  const subject = 'Verify Your Email - CStore';
-  const html = getVerificationEmailTemplate(name, verificationUrl);
+  const t = i18next.getFixedT(language, 'emails');
+  const subject = t('verification.subject');
+  const html = getVerificationEmailTemplate(name, verificationUrl, language);
   
   return await sendEmail({ to: email, subject, html });
 }
@@ -117,11 +123,13 @@ async function sendVerificationEmail(email, name, verificationToken) {
  * @param {string} email - User email
  * @param {string} name - User name
  * @param {string} resetToken - Reset token
+ * @param {string} language - User's preferred language (default: 'en')
  */
-async function sendPasswordResetEmail(email, name, resetToken) {
+async function sendPasswordResetEmail(email, name, resetToken, language = 'en') {
   const resetUrl = `${process.env.APP_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
-  const subject = 'Password Reset Request - CStore';
-  const html = getPasswordResetEmailTemplate(name, resetUrl);
+  const t = i18next.getFixedT(language, 'emails');
+  const subject = t('passwordReset.subject');
+  const html = getPasswordResetEmailTemplate(name, resetUrl, language);
   
   return await sendEmail({ to: email, subject, html });
 }
@@ -130,10 +138,12 @@ async function sendPasswordResetEmail(email, name, resetToken) {
  * Send order confirmation email
  * @param {string} email - Customer email
  * @param {Object} order - Order details
+ * @param {string} language - User's preferred language (default: 'en')
  */
-async function sendOrderConfirmationEmail(email, order) {
-  const subject = `Order Confirmation #${order.orderNumber || order._id}`;
-  const html = getOrderConfirmationTemplate(order);
+async function sendOrderConfirmationEmail(email, order, language = 'en') {
+  const t = i18next.getFixedT(language, 'emails');
+  const subject = t('orderConfirmation.subject', { orderNumber: order.orderNumber || order._id });
+  const html = getOrderConfirmationTemplate(order, language);
   
   return await sendEmail({ to: email, subject, html });
 }
@@ -143,10 +153,12 @@ async function sendOrderConfirmationEmail(email, order) {
  * @param {string} email - Customer email
  * @param {Object} order - Order details
  * @param {Object} payment - Payment details
+ * @param {string} language - User's preferred language (default: 'en')
  */
-async function sendPaymentConfirmationEmail(email, order, payment) {
-  const subject = `Payment Received - Order #${order.orderNumber || order._id}`;
-  const html = getPaymentConfirmationTemplate(order, payment);
+async function sendPaymentConfirmationEmail(email, order, payment, language = 'en') {
+  const t = i18next.getFixedT(language, 'emails');
+  const subject = t('paymentConfirmation.subject', { orderNumber: order.orderNumber || order._id });
+  const html = getPaymentConfirmationTemplate(order, payment, language);
   
   return await sendEmail({ to: email, subject, html });
 }
@@ -156,10 +168,12 @@ async function sendPaymentConfirmationEmail(email, order, payment) {
  * @param {string} email - Customer email
  * @param {Object} order - Order details
  * @param {string} trackingNumber - Tracking number (optional)
+ * @param {string} language - User's preferred language (default: 'en')
  */
-async function sendShippingNotificationEmail(email, order, trackingNumber) {
-  const subject = `Your Order Has Been Shipped - Order #${order.orderNumber || order._id}`;
-  const html = getShippingNotificationTemplate(order, trackingNumber);
+async function sendShippingNotificationEmail(email, order, trackingNumber, language = 'en') {
+  const t = i18next.getFixedT(language, 'emails');
+  const subject = t('shippingNotification.subject', { orderNumber: order.orderNumber || order._id });
+  const html = getShippingNotificationTemplate(order, trackingNumber, language);
   
   return await sendEmail({ to: email, subject, html });
 }
@@ -189,7 +203,10 @@ async function sendAdminAlert(subject, message, data = {}) {
 
 // Email Templates
 
-function getWelcomeEmailTemplate(name) {
+function getWelcomeEmailTemplate(name, language = 'en') {
+  const t = i18next.getFixedT(language, 'emails');
+  const appUrl = process.env.APP_URL || 'http://localhost:3000';
+  
   return `
     <!DOCTYPE html>
     <html>
@@ -205,17 +222,17 @@ function getWelcomeEmailTemplate(name) {
     <body>
       <div class="container">
         <div class="header">
-          <h1>🪙 Welcome to CStore</h1>
+          <h1>🪙 ${t('welcome.title')}</h1>
         </div>
         <div class="content">
-          <h2>Hello ${name}!</h2>
-          <p>Thank you for joining CStore, the cryptocurrency marketplace.</p>
-          <p>You can now start browsing products and making purchases using Bitcoin, Ethereum, or USDT.</p>
+          <h2>${t('welcome.greeting', { name })}</h2>
+          <p>${t('welcome.body')}</p>
+          <p>${t('welcome.description')}</p>
           <p>
-            <a href="${process.env.APP_URL || 'http://localhost:3000'}" class="button">Browse Products</a>
+            <a href="${appUrl}" class="button">${t('welcome.button')}</a>
           </p>
-          <p>If you have any questions, feel free to reach out to our support team.</p>
-          <p>Happy shopping!</p>
+          <p>${t('welcome.footer')}</p>
+          <p>${t('welcome.closing')}</p>
         </div>
       </div>
     </body>
@@ -223,7 +240,9 @@ function getWelcomeEmailTemplate(name) {
   `;
 }
 
-function getVerificationEmailTemplate(name, verificationUrl) {
+function getVerificationEmailTemplate(name, verificationUrl, language = 'en') {
+  const t = i18next.getFixedT(language, 'emails');
+  
   return `
     <!DOCTYPE html>
     <html>
@@ -239,18 +258,18 @@ function getVerificationEmailTemplate(name, verificationUrl) {
     <body>
       <div class="container">
         <div class="header">
-          <h1>🔐 Verify Your Email</h1>
+          <h1>🔐 ${t('verification.title')}</h1>
         </div>
         <div class="content">
-          <h2>Hello ${name}!</h2>
-          <p>Please verify your email address to complete your registration.</p>
+          <h2>${t('verification.greeting', { name })}</h2>
+          <p>${t('verification.body')}</p>
           <p>
-            <a href="${verificationUrl}" class="button">Verify Email</a>
+            <a href="${verificationUrl}" class="button">${t('verification.button')}</a>
           </p>
-          <p>Or copy and paste this link into your browser:</p>
+          <p>${t('verification.linkText')}</p>
           <p><small>${verificationUrl}</small></p>
-          <p>This link will expire in 24 hours.</p>
-          <p>If you didn't create an account, you can safely ignore this email.</p>
+          <p>${t('verification.expiry')}</p>
+          <p>${t('verification.ignore')}</p>
         </div>
       </div>
     </body>
@@ -258,7 +277,9 @@ function getVerificationEmailTemplate(name, verificationUrl) {
   `;
 }
 
-function getPasswordResetEmailTemplate(name, resetUrl) {
+function getPasswordResetEmailTemplate(name, resetUrl, language = 'en') {
+  const t = i18next.getFixedT(language, 'emails');
+  
   return `
     <!DOCTYPE html>
     <html>
@@ -274,18 +295,18 @@ function getPasswordResetEmailTemplate(name, resetUrl) {
     <body>
       <div class="container">
         <div class="header">
-          <h1>🔑 Password Reset</h1>
+          <h1>🔑 ${t('passwordReset.title')}</h1>
         </div>
         <div class="content">
-          <h2>Hello ${name}!</h2>
-          <p>You requested to reset your password. Click the button below to create a new password:</p>
+          <h2>${t('passwordReset.greeting', { name })}</h2>
+          <p>${t('passwordReset.body')}</p>
           <p>
-            <a href="${resetUrl}" class="button">Reset Password</a>
+            <a href="${resetUrl}" class="button">${t('passwordReset.button')}</a>
           </p>
-          <p>Or copy and paste this link into your browser:</p>
+          <p>${t('passwordReset.linkText')}</p>
           <p><small>${resetUrl}</small></p>
-          <p>This link will expire in 1 hour.</p>
-          <p>If you didn't request a password reset, you can safely ignore this email.</p>
+          <p>${t('passwordReset.expiry')}</p>
+          <p>${t('passwordReset.ignore')}</p>
         </div>
       </div>
     </body>
@@ -293,7 +314,8 @@ function getPasswordResetEmailTemplate(name, resetUrl) {
   `;
 }
 
-function getOrderConfirmationTemplate(order) {
+function getOrderConfirmationTemplate(order, language = 'en') {
+  const t = i18next.getFixedT(language, 'emails');
   const productsList = order.items ? order.items.map(item => `
     <tr>
       <td>${item.product?.name || 'Product'}</td>
@@ -320,39 +342,39 @@ function getOrderConfirmationTemplate(order) {
     <body>
       <div class="container">
         <div class="header">
-          <h1>📦 Order Confirmation</h1>
+          <h1>📦 ${t('orderConfirmation.title')}</h1>
         </div>
         <div class="content">
-          <h2>Order #${order.orderNumber || order._id}</h2>
-          <p>Thank you for your order! Here are the details:</p>
+          <h2>${t('orderConfirmation.orderNumber', { orderNumber: order.orderNumber || order._id })}</h2>
+          <p>${t('orderConfirmation.thankYou')}</p>
           
           <table>
             <thead>
               <tr>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Price</th>
+                <th>${t('orderConfirmation.productHeader')}</th>
+                <th>${t('orderConfirmation.quantityHeader')}</th>
+                <th>${t('orderConfirmation.priceHeader')}</th>
               </tr>
             </thead>
             <tbody>
               ${productsList}
               <tr class="total">
-                <td colspan="2">Total</td>
+                <td colspan="2">${t('orderConfirmation.totalLabel')}</td>
                 <td>$${order.totalPriceUSD?.toFixed(2) || '0.00'}</td>
               </tr>
             </tbody>
           </table>
 
-          <h3>Payment Details</h3>
+          <h3>${t('orderConfirmation.paymentDetailsTitle')}</h3>
           <p>
-            <strong>Cryptocurrency:</strong> ${order.cryptocurrency}<br>
-            <strong>Amount:</strong> ${order.totalPrice} ${order.cryptocurrency}<br>
-            <strong>Payment Address:</strong> ${order.paymentAddress}
+            <strong>${t('orderConfirmation.cryptocurrency')}:</strong> ${order.cryptocurrency}<br>
+            <strong>${t('orderConfirmation.amount')}:</strong> ${order.totalPrice} ${order.cryptocurrency}<br>
+            <strong>${t('orderConfirmation.paymentAddress')}:</strong> ${order.paymentAddress}
           </p>
 
-          <p>Please send the exact amount to the address above to complete your order.</p>
+          <p>${t('orderConfirmation.instruction')}</p>
           
-          <p>Status: <strong>${order.status}</strong></p>
+          <p>${t('orderConfirmation.status')}: <strong>${order.status}</strong></p>
         </div>
       </div>
     </body>
@@ -360,7 +382,9 @@ function getOrderConfirmationTemplate(order) {
   `;
 }
 
-function getPaymentConfirmationTemplate(order, payment) {
+function getPaymentConfirmationTemplate(order, payment, language = 'en') {
+  const t = i18next.getFixedT(language, 'emails');
+  
   return `
     <!DOCTYPE html>
     <html>
@@ -375,21 +399,21 @@ function getPaymentConfirmationTemplate(order, payment) {
     <body>
       <div class="container">
         <div class="header">
-          <h1>✅ Payment Received</h1>
+          <h1>✅ ${t('paymentConfirmation.title')}</h1>
         </div>
         <div class="content">
-          <h2>Order #${order.orderNumber || order._id}</h2>
-          <p>Great news! We've received your payment.</p>
+          <h2>${t('paymentConfirmation.orderNumber', { orderNumber: order.orderNumber || order._id })}</h2>
+          <p>${t('paymentConfirmation.body')}</p>
           
-          <h3>Payment Details</h3>
+          <h3>${t('paymentConfirmation.paymentDetailsTitle')}</h3>
           <p>
-            <strong>Transaction Hash:</strong> ${payment.transactionHash}<br>
-            <strong>Amount:</strong> ${payment.amount} ${payment.cryptocurrency}<br>
-            <strong>Status:</strong> ${payment.status}
+            <strong>${t('paymentConfirmation.transactionHash')}:</strong> ${payment.transactionHash}<br>
+            <strong>${t('paymentConfirmation.amount')}:</strong> ${payment.amount} ${payment.cryptocurrency}<br>
+            <strong>${t('paymentConfirmation.status')}:</strong> ${payment.status}
           </p>
 
-          <p>Your order is now being processed and will be shipped soon.</p>
-          <p>You will receive another email when your order has been shipped.</p>
+          <p>${t('paymentConfirmation.processing')}</p>
+          <p>${t('paymentConfirmation.notification')}</p>
         </div>
       </div>
     </body>
@@ -397,7 +421,9 @@ function getPaymentConfirmationTemplate(order, payment) {
   `;
 }
 
-function getShippingNotificationTemplate(order, trackingNumber) {
+function getShippingNotificationTemplate(order, trackingNumber, language = 'en') {
+  const t = i18next.getFixedT(language, 'emails');
+  
   return `
     <!DOCTYPE html>
     <html>
@@ -412,19 +438,19 @@ function getShippingNotificationTemplate(order, trackingNumber) {
     <body>
       <div class="container">
         <div class="header">
-          <h1>🚚 Order Shipped</h1>
+          <h1>🚚 ${t('shippingNotification.title')}</h1>
         </div>
         <div class="content">
-          <h2>Order #${order.orderNumber || order._id}</h2>
-          <p>Good news! Your order has been shipped.</p>
+          <h2>${t('shippingNotification.orderNumber', { orderNumber: order.orderNumber || order._id })}</h2>
+          <p>${t('shippingNotification.body')}</p>
           
           ${trackingNumber ? `
-            <h3>Tracking Information</h3>
-            <p><strong>Tracking Number:</strong> ${trackingNumber}</p>
+            <h3>${t('shippingNotification.trackingTitle')}</h3>
+            <p><strong>${t('shippingNotification.trackingNumber')}:</strong> ${trackingNumber}</p>
           ` : ''}
 
-          <p>Your order should arrive within 5-7 business days.</p>
-          <p>Thank you for shopping with CStore!</p>
+          <p>${t('shippingNotification.delivery')}</p>
+          <p>${t('shippingNotification.closing')}</p>
         </div>
       </div>
     </body>
@@ -433,8 +459,9 @@ function getShippingNotificationTemplate(order, trackingNumber) {
 }
 
 function getAdminAlertTemplate(subject, message, data) {
+  const t = i18next.getFixedT('en', 'emails'); // Admin emails always in English
   const dataHtml = Object.keys(data).length > 0 ? `
-    <h3>Additional Data:</h3>
+    <h3>${t('adminAlert.additionalData')}</h3>
     <pre>${JSON.stringify(data, null, 2)}</pre>
   ` : '';
 
@@ -453,13 +480,13 @@ function getAdminAlertTemplate(subject, message, data) {
     <body>
       <div class="container">
         <div class="header">
-          <h1>⚠️ Admin Alert</h1>
+          <h1>⚠️ ${t('adminAlert.title')}</h1>
         </div>
         <div class="content">
           <h2>${subject}</h2>
           <p>${message}</p>
           ${dataHtml}
-          <p><small>Generated at: ${new Date().toISOString()}</small></p>
+          <p><small>${t('adminAlert.timestamp', { timestamp: new Date().toISOString() })}</small></p>
         </div>
       </div>
     </body>
