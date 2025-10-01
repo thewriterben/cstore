@@ -69,6 +69,7 @@ These features are implemented but require configuration:
 - **Helmet** - Security headers
 - **Express Rate Limit** - Rate limiting
 - **Custom Sanitization** - NoSQL injection prevention (Express 5 compatible)
+- **Custom XSS Protection** - Cross-site scripting prevention (Express 5 compatible)
 - **HPP** - HTTP parameter pollution prevention
 
 ### Blockchain
@@ -461,13 +462,15 @@ cstore/
 1. **Helmet** - Sets security-related HTTP headers
 2. **Rate Limiting** - Prevents brute force attacks (100 req/15min general, 5 req/15min auth)
 3. **Input Validation** - Comprehensive Joi schema validation
-4. **HPP Protection** - Prevents HTTP parameter pollution
-5. **JWT Authentication** - Secure token-based authentication with refresh tokens
-6. **Password Hashing** - Bcrypt with salt rounds
-7. **CORS Configuration** - Configurable cross-origin resource sharing
-8. **Error Handling** - Proper error messages without leaking sensitive details
-9. **Logging** - Winston logging for comprehensive audit trails
-10. **Role-Based Access Control** - User and Admin roles with proper authorization
+4. **MongoDB Sanitization** - Custom Express 5-compatible NoSQL injection prevention
+5. **XSS Protection** - Custom Express 5-compatible cross-site scripting prevention
+6. **HPP Protection** - Prevents HTTP parameter pollution
+7. **JWT Authentication** - Secure token-based authentication with refresh tokens
+8. **Password Hashing** - Bcrypt with salt rounds
+9. **CORS Configuration** - Configurable cross-origin resource sharing
+10. **Error Handling** - Proper error messages without leaking sensitive details
+11. **Logging** - Winston logging for comprehensive audit trails
+12. **Role-Based Access Control** - User and Admin roles with proper authorization
 
 ### Blockchain Security
 
