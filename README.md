@@ -59,7 +59,7 @@ This version includes enhancements over the basic demo:
 ### Security
 - **Helmet** - Security headers
 - **Express Rate Limit** - Rate limiting
-- **Express Mongo Sanitize** - NoSQL injection prevention
+- **Custom Sanitization** - NoSQL injection prevention (Express 5 compatible)
 - **HPP** - HTTP parameter pollution prevention
 
 ### Frontend
@@ -127,19 +127,19 @@ sudo systemctl start mongod
 
 ### Running the Application
 
-#### Development Mode (with auto-reload):
+#### Development Mode:
 ```bash
 npm run dev
 ```
 
-#### Production Mode (legacy server):
+#### Production Mode:
 ```bash
 npm start
 ```
 
-#### Production Mode (new architecture):
+#### Legacy Mode (v1.0 with in-memory storage):
 ```bash
-npm run start:new
+npm run start:legacy
 ```
 
 The application will be available at `http://localhost:3000`
@@ -405,8 +405,8 @@ cstore/
 │   ├── css/                    # Stylesheets
 │   └── js/                     # Client-side JavaScript
 ├── logs/                       # Log files (generated)
-├── server.js                   # Legacy server (v1.0)
-├── server-new.js               # New server entry point (v2.0)
+├── server-new.js               # Production server entry point (v2.0)
+├── server.js                   # Legacy server (v1.0 - in-memory storage)
 ├── Dockerfile                  # Docker configuration
 ├── docker-compose.yml          # Docker Compose setup
 ├── jest.config.js              # Jest configuration
@@ -423,7 +423,7 @@ cstore/
 1. **Helmet** - Sets security-related HTTP headers
 2. **Rate Limiting** - Prevents brute force attacks
 3. **Input Validation** - Joi schema validation
-4. **NoSQL Injection Prevention** - Express-mongo-sanitize
+4. **NoSQL Injection Prevention** - Custom sanitization middleware (Express 5 compatible)
 5. **HPP Protection** - Prevents HTTP parameter pollution
 6. **JWT Authentication** - Secure token-based auth
 7. **Password Hashing** - Bcrypt with salt rounds
@@ -575,18 +575,20 @@ The following features are planned for future versions but **are NOT currently i
 
 ## 📝 Migration from v1.0 to v2.0
 
+The v2.0 server is now the default (accessed via `npm start`).
+
 The old server (v1.0) is still available for compatibility:
 
 ```bash
-# Run old version
-npm start
+# Run legacy version (in-memory storage)
+npm run start:legacy
 
-# Run new version
-npm run start:new
+# Run production version (MongoDB persistence)
+npm start
 ```
 
-Both versions share the same frontend but v2.0 adds:
-- Database persistence
+v2.0 adds:
+- Database persistence with MongoDB
 - User authentication
 - Enhanced security
 - Better error handling
