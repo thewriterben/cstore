@@ -127,4 +127,73 @@ describe('Products API', () => {
       expect(res.body.success).toBe(false);
     });
   });
+
+  describe('GET /api/products/suggestions', () => {
+    beforeEach(async () => {
+      await Product.create([
+        {
+          name: 'Laptop Computer',
+          description: 'High performance laptop',
+          price: 0.01,
+          priceUSD: 500,
+          stock: 5
+        },
+        {
+          name: 'Laptop Stand',
+          description: 'Ergonomic laptop stand',
+          price: 0.001,
+          priceUSD: 50,
+          stock: 10
+        }
+      ]);
+    });
+
+    it('should get search suggestions', async () => {
+      const res = await request(app)
+        .get('/api/products/suggestions')
+        .query({ q: 'Lap', limit: 5 });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(Array.isArray(res.body.data.suggestions)).toBe(true);
+    });
+
+    it('should return empty array for short query', async () => {
+      const res = await request(app)
+        .get('/api/products/suggestions')
+        .query({ q: 'L' });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.suggestions).toEqual([]);
+    });
+  });
+
+  describe('POST /api/products/sync-elasticsearch', () => {
+    it('should allow admin to sync products', async () => {
+      const res = await request(app)
+        .post('/api/products/sync-elasticsearch')
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBeDefined();
+    });
+
+    it('should not allow regular user to sync products', async () => {
+      const res = await request(app)
+        .post('/api/products/sync-elasticsearch')
+        .set('Authorization', `Bearer ${userToken}`);
+
+      expect(res.statusCode).toBe(403);
+      expect(res.body.success).toBe(false);
+    });
+
+    it('should require authentication', async () => {
+      const res = await request(app)
+        .post('/api/products/sync-elasticsearch');
+
+      expect(res.statusCode).toBe(401);
+      expect(res.body.success).toBe(false);
+    });
+  });
 });

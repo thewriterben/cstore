@@ -84,8 +84,20 @@ All API responses follow this format:
   - `category` - Filter by category ID
   - `minPrice` - Minimum price in USD
   - `maxPrice` - Maximum price in USD
-  - `search` - Search term
-  - `sort` - Sort field (e.g., 'price', '-createdAt')
+  - `featured` - Filter featured products (true/false)
+  - `minRating` - Minimum average rating (0-5)
+  - `search` - Search term (uses Elasticsearch if enabled, otherwise MongoDB text search)
+  - `sort` - Sort field (e.g., 'price', '-createdAt', 'rating', 'name')
+- **Response:**
+  - Returns products with pagination info
+  - Includes `searchEngine` field: 'elasticsearch' or 'mongodb'
+  - When using Elasticsearch, products include relevance `_score`
+
+**Enhanced Search Features (when Elasticsearch is enabled):**
+- Fuzzy matching for typo tolerance
+- Multi-field search across name, description, and category
+- Better relevance ranking
+- Advanced filtering combinations
 
 ### Get Single Product
 - **GET** `/products/:id`
@@ -115,6 +127,16 @@ All API responses follow this format:
 ### Delete Product (Admin)
 - **DELETE** `/products/:id`
 - **Auth Required:** Yes (Admin)
+
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "data": {
+- **Response:**
+  ```json
+  {
+    "success": true,
 
 ---
 
