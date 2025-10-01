@@ -116,6 +116,49 @@ const schemas = {
     quantity: Joi.number().integer().min(0).required()
   }),
 
+  // Wishlist item
+  wishlistItem: Joi.object({
+    productId: Joi.string().required()
+  }),
+
+  // Multi-sig wallet
+  createMultiSigWallet: Joi.object({
+    name: Joi.string().min(3).max(100).required(),
+    cryptocurrency: Joi.string().valid('BTC', 'ETH', 'USDT').required(),
+    address: Joi.string().required(),
+    signers: Joi.array().items(Joi.object({
+      user: Joi.string().required(),
+      publicKey: Joi.string().required()
+    })).min(2).required(),
+    requiredSignatures: Joi.number().integer().min(2).required(),
+    description: Joi.string().max(500).optional().allow('')
+  }),
+
+  updateMultiSigWallet: Joi.object({
+    name: Joi.string().min(3).max(100).optional(),
+    description: Joi.string().max(500).optional().allow(''),
+    isActive: Joi.boolean().optional()
+  }),
+
+  addSigner: Joi.object({
+    email: Joi.string().email().required(),
+    publicKey: Joi.string().required()
+  }),
+
+  createTransactionApproval: Joi.object({
+    walletId: Joi.string().required(),
+    toAddress: Joi.string().required(),
+    amount: Joi.number().min(0).required(),
+    cryptocurrency: Joi.string().valid('BTC', 'ETH', 'USDT').required(),
+    description: Joi.string().max(500).optional().allow('')
+  }),
+
+  approveTransaction: Joi.object({
+    signature: Joi.string().required()
+  }),
+
+  executeTransaction: Joi.object({
+    transactionHash: Joi.string().optional().allow('')
   })
 };
 
@@ -125,6 +168,13 @@ const validateCategory = validate(schemas.createCategory);
 const validateUpdateCategory = validate(schemas.updateCategory);
 const validateCartItem = validate(schemas.cartItem);
 const validateUpdateCartItem = validate(schemas.updateCartItem);
+const validateWishlistItem = validate(schemas.wishlistItem);
+const validateCreateMultiSigWallet = validate(schemas.createMultiSigWallet);
+const validateUpdateMultiSigWallet = validate(schemas.updateMultiSigWallet);
+const validateAddSigner = validate(schemas.addSigner);
+const validateCreateTransactionApproval = validate(schemas.createTransactionApproval);
+const validateApproveTransaction = validate(schemas.approveTransaction);
+const validateExecuteTransaction = validate(schemas.executeTransaction);
 
 module.exports = { 
   validate, 
@@ -134,4 +184,11 @@ module.exports = {
   validateUpdateCategory,
   validateCartItem,
   validateUpdateCartItem,
+  validateWishlistItem,
+  validateCreateMultiSigWallet,
+  validateUpdateMultiSigWallet,
+  validateAddSigner,
+  validateCreateTransactionApproval,
+  validateApproveTransaction,
+  validateExecuteTransaction,
 };
