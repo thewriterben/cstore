@@ -128,43 +128,15 @@ All API responses follow this format:
 - **DELETE** `/products/:id`
 - **Auth Required:** Yes (Admin)
 
-### Get Search Suggestions
-- **GET** `/products/suggestions`
-- **Auth Required:** No
-- **Query Parameters:**
-  - `q` - Search query (minimum 2 characters)
-  - `limit` - Maximum suggestions to return (default: 5)
 - **Response:**
   ```json
   {
     "success": true,
     "data": {
-      "suggestions": [
-        "Laptop Computer",
-        "Laptop Stand",
-        "Laptop Bag"
-      ]
-    }
-  }
-  ```
-- **Use Case:** Autocomplete/typeahead search
-- Uses Elasticsearch if enabled, otherwise falls back to MongoDB regex search
-
-### Sync Products to Elasticsearch (Admin)
-- **POST** `/products/sync-elasticsearch`
-- **Auth Required:** Yes (Admin)
 - **Response:**
   ```json
   {
     "success": true,
-    "message": "Products synced to Elasticsearch successfully"
-  }
-  ```
-- **Use Case:** 
-  - Initial setup of Elasticsearch
-  - Bulk product imports
-  - Recovery after Elasticsearch index issues
-  - Manual sync when products are added via database directly
 
 ---
 

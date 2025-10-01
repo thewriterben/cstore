@@ -2,7 +2,6 @@ const Product = require('../models/Product');
 const { asyncHandler } = require('../middleware/errorHandler');
 const { AppError } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
-const elasticsearchService = require('../services/elasticsearchService');
 
 // @desc    Get all products
 // @route   GET /api/products
@@ -223,67 +222,6 @@ const deleteProduct = asyncHandler(async (req, res, next) => {
   });
 });
 
-// @desc    Get search suggestions (autocomplete)
-// @route   GET /api/products/suggestions
-// @access  Public
-const getSuggestions = asyncHandler(async (req, res, next) => {
-  const { q, limit = 5 } = req.query;
-
-  if (!q || q.length < 2) {
-    return res.json({
-      success: true,
-      data: { suggestions: [] }
-    });
-  }
-
-  // Use Elasticsearch if available
-  if (elasticsearchService.isEnabled() && await elasticsearchService.isAvailable()) {
-    const suggestions = await elasticsearchService.getSuggestions(q, Number(limit));
-    return res.json({
-      success: true,
-      data: { suggestions }
-    });
-  }
-
-  // Fallback: simple MongoDB regex search
-  const products = await Product.find({
-    isActive: true,
-    name: { $regex: q, $options: 'i' }
-  })
-    .select('name')
-    .limit(Number(limit));
-
-  const suggestions = products.map(p => p.name);
-
-  res.json({
-    success: true,
-    data: { suggestions }
-  });
-});
-
-// @desc    Sync products to Elasticsearch (Admin only)
-// @route   POST /api/products/sync-elasticsearch
-// @access  Private/Admin
-const syncElasticsearch = asyncHandler(async (req, res, next) => {
-  if (!elasticsearchService.isEnabled()) {
-    return res.json({
-      success: false,
-      message: 'Elasticsearch is not enabled'
-    });
-  }
-
-  const success = await elasticsearchService.syncAllProducts(Product);
-
-  if (success) {
-    return res.json({
-      success: true,
-      message: 'Products synced to Elasticsearch successfully'
-    });
-  }
-
-  res.status(500).json({
-    success: false,
-    message: 'Failed to sync products to Elasticsearch'
   });
 });
 
@@ -293,6 +231,4 @@ module.exports = {
   createProduct,
   updateProduct,
   deleteProduct,
-  getSuggestions,
-  syncElasticsearch
 };
