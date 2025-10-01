@@ -3,9 +3,9 @@ const logger = require('../utils/logger');
 
 const connectDB = async () => {
   try {
-    // Skip connection in test environment if using memory server
-    if (process.env.NODE_ENV === 'test' && process.env.SKIP_DB_CONNECTION === 'true') {
-      logger.info('Skipping database connection in test environment');
+    // Skip connection if explicitly requested
+    if (process.env.SKIP_DB_CONNECTION === 'true') {
+      logger.info('Skipping database connection (SKIP_DB_CONNECTION=true)');
       return;
     }
 
