@@ -1,7 +1,5 @@
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-// express-mongo-sanitize has compatibility issues with Express 5
-// Using custom sanitization middleware instead
 const hpp = require('hpp');
 
 // Security headers
@@ -58,6 +56,9 @@ const sanitizeData = (req, res, next) => {
   next();
 };
 
+// Prevent XSS attacks
+const xssClean = xss();
+
 // Prevent HTTP parameter pollution
 const preventParamPollution = hpp({
   whitelist: ['price', 'rating', 'stock'] // Allow duplicates for these params
@@ -68,5 +69,6 @@ module.exports = {
   limiter,
   authLimiter,
   sanitizeData,
+  xssClean,
   preventParamPollution
 };
