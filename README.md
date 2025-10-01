@@ -18,6 +18,7 @@ This version includes all core e-commerce features. While functional, additional
 - 🛡️ **Security**: Helmet, rate limiting, input validation, and sanitization
 - 📊 **Complete Database Models**: Users, Products, Orders, Payments, Categories, Reviews, Shopping Cart
 - 🔍 **Product Management**: Full CRUD operations with search, filtering, sorting, and pagination
+- 🔎 **Advanced Search**: Elasticsearch integration for fuzzy search, typo tolerance, and better relevance
 - 👤 **User Management**: User profiles and role-based access control (admin/user)
 - 📦 **Order Management**: Complete order lifecycle with status tracking
 - 💳 **Payment Processing**: Payment confirmation with blockchain verification
@@ -47,7 +48,6 @@ These features are implemented but require configuration:
 ### ❌ Not Yet Implemented (Future Enhancements)
 
 - Wishlist feature
-- Advanced search with Elasticsearch
 - Product recommendations based on purchase history
 - Admin dashboard UI (React-based panel)
 - Multi-signature wallet support
@@ -58,6 +58,7 @@ These features are implemented but require configuration:
 ### Backend
 - **Node.js** & **Express.js** - Server framework
 - **MongoDB** & **Mongoose** - Database and ODM
+- **Elasticsearch** (Optional) - Advanced search engine for fuzzy search and better relevance
 - **JWT** - Authentication
 - **Bcrypt** - Password hashing
 - **Winston** - Logging
@@ -151,6 +152,12 @@ VERIFY_BLOCKCHAIN=false
 PAYMENT_WEBHOOK_URL=https://your-domain.com/webhook
 WEBHOOK_SECRET=your-webhook-secret
 
+# Elasticsearch Configuration (Optional - for advanced search)
+ELASTICSEARCH_ENABLED=false
+ELASTICSEARCH_NODE=http://localhost:9200
+ELASTICSEARCH_USERNAME=
+ELASTICSEARCH_PASSWORD=
+
 # Initial data seeding
 SEED_DATA=true
 ```
@@ -202,6 +209,17 @@ docker-compose down
 # Start in development mode with hot-reload
 docker-compose --profile dev up -d app-dev
 ```
+
+#### With Elasticsearch (Optional):
+```bash
+# Start all services including Elasticsearch
+docker-compose --profile elasticsearch up -d
+
+# Set ELASTICSEARCH_ENABLED=true in your .env file
+# The app will automatically use Elasticsearch for advanced search
+```
+
+Note: Elasticsearch requires at least 2GB of memory. If using Docker Desktop, increase memory allocation in settings.
 
 ### Testing
 
@@ -268,13 +286,41 @@ Content-Type: application/json
 
 #### Get All Products
 ```http
-GET /api/products?page=1&limit=10&search=laptop&minPrice=100&maxPrice=1000
+GET /api/products?page=1&limit=10&search=laptop&minPrice=100&maxPrice=1000&featured=true&minRating=4
 ```
+
+Query Parameters:
+- `page` - Page number (default: 1)
+- `limit` - Items per page (default: 10)
+- `search` - Search query (uses Elasticsearch if enabled, otherwise MongoDB text search)
+- `category` - Filter by category ID
+- `minPrice` - Minimum price in USD
+- `maxPrice` - Maximum price in USD
+- `featured` - Filter featured products (true/false)
+- `minRating` - Minimum average rating (0-5)
+- `sort` - Sort field (e.g., '-createdAt', 'price', '-rating')
+
+Response includes `searchEngine` field indicating 'elasticsearch' or 'mongodb'.
 
 #### Get Single Product
 ```http
 GET /api/products/:id
 ```
+
+#### Get Search Suggestions (Autocomplete)
+```http
+GET /api/products/suggestions?q=lap&limit=5
+```
+
+Returns product name suggestions based on the query.
+
+#### Sync Products to Elasticsearch (Admin Only)
+```http
+POST /api/products/sync-elasticsearch
+Authorization: Bearer <admin-token>
+```
+
+Manually sync all products from MongoDB to Elasticsearch. Useful after bulk imports or when setting up Elasticsearch for the first time.
 
 #### Create Product (Admin Only)
 ```http
@@ -647,7 +693,7 @@ The following features are planned for future versions:
 ### Phase 1: User Experience
 - [ ] Wishlist feature
 - [ ] Product comparison
-- [ ] Advanced search with Elasticsearch
+- [x] Advanced search with Elasticsearch (v2.2)
 - [ ] Product recommendations based on purchase history
 - [ ] Customer product questions & answers
 
@@ -683,7 +729,7 @@ The following features are planned for future versions:
 ### Implemented Endpoints (v2.1)
 
 - **Authentication**: Register, Login, Get Profile, Update Password
-- **Products**: Full CRUD, Search, Filter, Pagination
+- **Products**: Full CRUD, Search, Filter, Pagination, Suggestions (Autocomplete), Elasticsearch Sync
 - **Orders**: Create, Get, List, Update Status (Admin)
 - **Payments**: Confirm, Verify, List (Admin)
 - **Reviews**: Full CRUD, Ratings, Stats, Moderation (Admin)
