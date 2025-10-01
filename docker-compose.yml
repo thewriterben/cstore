@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: cstore-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password}
+      MONGO_INITDB_DATABASE: cstore
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - cstore-network
+
+  # Application Service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: cstore-app
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      MONGODB_URI: mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-password}@mongodb:27017/cstore?authSource=admin
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      BTC_ADDRESS: ${BTC_ADDRESS}
+      ETH_ADDRESS: ${ETH_ADDRESS}
+      USDT_ADDRESS: ${USDT_ADDRESS}
+      SEED_DATA: ${SEED_DATA:-true}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - cstore-network
+
+  # Development service (optional)
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: cstore-app-dev
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      MONGODB_URI: mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-password}@mongodb:27017/cstore?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:-dev-secret}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-refresh-secret}
+      BTC_ADDRESS: ${BTC_ADDRESS}
+      ETH_ADDRESS: ${ETH_ADDRESS}
+      USDT_ADDRESS: ${USDT_ADDRESS}
+      SEED_DATA: "true"
+      LOG_LEVEL: debug
+    depends_on:
+      - mongodb
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./logs:/app/logs
+    networks:
+      - cstore-network
+    profiles:
+      - dev
+
+networks:
+  cstore-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+  mongodb_config:
