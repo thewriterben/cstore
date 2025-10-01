@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/auth');
+const { multiSigApprovalLimiter } = require('../middleware/security');
 const {
   validateCreateMultiSigWallet,
   validateUpdateMultiSigWallet,
@@ -40,7 +41,7 @@ router.route('/transactions/:id')
   .delete(cancelTransaction);
 
 router.route('/transactions/:id/approve')
-  .post(validateApproveTransaction, approveTransaction);
+  .post(multiSigApprovalLimiter, validateApproveTransaction, approveTransaction);
 
 router.route('/transactions/:id/execute')
   .post(validateExecuteTransaction, executeTransaction);
