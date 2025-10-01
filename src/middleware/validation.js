@@ -116,9 +116,6 @@ const schemas = {
     quantity: Joi.number().integer().min(0).required()
   }),
 
-  // Wishlist item
-  wishlistItem: Joi.object({
-    productId: Joi.string().required()
   })
 };
 
@@ -128,7 +125,6 @@ const validateCategory = validate(schemas.createCategory);
 const validateUpdateCategory = validate(schemas.updateCategory);
 const validateCartItem = validate(schemas.cartItem);
 const validateUpdateCartItem = validate(schemas.updateCartItem);
-const validateWishlistItem = validate(schemas.wishlistItem);
 
 module.exports = { 
   validate, 
@@ -138,5 +134,4 @@ module.exports = {
   validateUpdateCategory,
   validateCartItem,
   validateUpdateCartItem,
-  validateWishlistItem
 };
