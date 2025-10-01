@@ -43,7 +43,5 @@ module.exports = {
   securityHeaders,
   limiter,
   authLimiter,
-  sanitizeData,
-  xssClean,
   preventParamPollution
 };

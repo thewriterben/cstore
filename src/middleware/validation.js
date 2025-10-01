@@ -79,13 +79,57 @@ const schemas = {
     isActive: Joi.boolean().optional()
   }),
 
-  // Create review
-  createReview: Joi.object({
-    productId: Joi.string().required(),
+  // Create/Update review
+  review: Joi.object({
+    productId: Joi.string().optional(),
+    orderId: Joi.string().optional(),
     rating: Joi.number().integer().min(1).max(5).required(),
-    title: Joi.string().max(100).optional(),
+    title: Joi.string().max(100).optional().allow(''),
     comment: Joi.string().min(10).max(1000).required()
+  }),
+
+  // Create category
+  createCategory: Joi.object({
+    name: Joi.string().min(2).max(50).required(),
+    description: Joi.string().max(500).optional().allow(''),
+    image: Joi.string().optional().allow(''),
+    displayOrder: Joi.number().integer().min(0).optional()
+  }),
+
+  // Update category
+  updateCategory: Joi.object({
+    name: Joi.string().min(2).max(50).optional(),
+    description: Joi.string().max(500).optional().allow(''),
+    image: Joi.string().optional().allow(''),
+    isActive: Joi.boolean().optional(),
+    displayOrder: Joi.number().integer().min(0).optional()
+  }),
+
+  // Cart item
+  cartItem: Joi.object({
+    productId: Joi.string().required(),
+    quantity: Joi.number().integer().min(1).required()
+  }),
+
+  // Update cart item quantity
+  updateCartItem: Joi.object({
+    quantity: Joi.number().integer().min(0).required()
   })
 };
 
-module.exports = { validate, schemas };
+// Export validation middleware with specific schemas
+const validateReview = validate(schemas.review);
+const validateCategory = validate(schemas.createCategory);
+const validateUpdateCategory = validate(schemas.updateCategory);
+const validateCartItem = validate(schemas.cartItem);
+const validateUpdateCartItem = validate(schemas.updateCartItem);
+
+module.exports = { 
+  validate, 
+  schemas,
+  validateReview,
+  validateCategory,
+  validateUpdateCategory,
+  validateCartItem,
+  validateUpdateCartItem
+};

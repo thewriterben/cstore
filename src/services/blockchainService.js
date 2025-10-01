@@ -329,20 +329,237 @@ async function getCryptoPrice(symbol) {
  * This would typically be called by a background job
  * @param {string} paymentId - Payment document ID
  * @param {number} maxAttempts - Maximum verification attempts
+ * @param {number} intervalMs - Interval between checks in milliseconds
  * @returns {Promise<Object>} - Monitoring result
  */
-async function monitorPayment(paymentId, maxAttempts = 10) {
-  // This is a placeholder for a background job that would:
-  // 1. Fetch the payment from database
-  // 2. Verify the transaction
-  // 3. Update payment status
-  // 4. Send notifications
-  // Implementation would use a job queue like Bull or Agenda
-  logger.info(`Payment monitoring started for ${paymentId}`);
+async function monitorPayment(paymentId, maxAttempts = 10, intervalMs = 60000) {
+  try {
+    const Payment = require('../models/Payment');
+    const Order = require('../models/Order');
+    const { sendPaymentConfirmationEmail } = require('./emailService');
+
+    logger.info(`Starting payment monitoring for ${paymentId}`);
+    
+    let attempts = 0;
+    
+    while (attempts < maxAttempts) {
+      attempts++;
+      
+      // Fetch payment details
+      const payment = await Payment.findById(paymentId).populate('order');
+      
+      if (!payment) {
+        logger.error(`Payment not found: ${paymentId}`);
+        return {
+          success: false,
+          error: 'Payment not found'
+        };
+      }
+
+      // Skip if already confirmed
+      if (payment.status === 'confirmed') {
+        logger.info(`Payment already confirmed: ${paymentId}`);
+        return {
+          success: true,
+          status: 'confirmed',
+          attempts
+        };
+      }
+
+      // Verify transaction
+      const verification = await verifyTransaction(
+        payment.cryptocurrency,
+        payment.transactionHash,
+        payment.address,
+        payment.amount
+      );
+
+      if (verification.verified && verification.confirmations >= 1) {
+        // Update payment status
+        payment.status = 'confirmed';
+        payment.verificationResult = verification;
+        await payment.save();
+
+        // Update order status
+        if (payment.order) {
+          const order = await Order.findById(payment.order);
+          if (order) {
+            order.status = 'confirmed';
+            order.paymentStatus = 'confirmed';
+            await order.save();
+
+            // Send confirmation email
+            try {
+              await sendPaymentConfirmationEmail(
+                order.customerEmail,
+                order,
+                payment
+              );
+            } catch (emailError) {
+              logger.error('Failed to send payment confirmation email:', emailError);
+            }
+          }
+        }
+
+        logger.info(`Payment confirmed: ${paymentId} after ${attempts} attempts`);
+        
+        // Trigger webhook if configured
+        await triggerPaymentWebhook(payment, 'payment.confirmed');
+
+        return {
+          success: true,
+          status: 'confirmed',
+          attempts,
+          verification
+        };
+      }
+
+      // Wait before next attempt
+      if (attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, intervalMs));
+      }
+    }
+
+    logger.warn(`Payment monitoring timeout: ${paymentId} after ${maxAttempts} attempts`);
+    
+    return {
+      success: false,
+      status: 'pending',
+      attempts,
+      message: 'Max monitoring attempts reached'
+    };
+  } catch (error) {
+    logger.error('Payment monitoring error:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+/**
+ * Trigger webhook for payment events
+ * @param {Object} payment - Payment object
+ * @param {string} event - Event type
+ * @returns {Promise<Object>} - Webhook result
+ */
+async function triggerPaymentWebhook(payment, event) {
+  try {
+    const webhookUrl = process.env.PAYMENT_WEBHOOK_URL;
+    
+    if (!webhookUrl) {
+      logger.debug('No webhook URL configured');
+      return { success: false, message: 'Webhook not configured' };
+    }
+
+    const payload = {
+      event,
+      timestamp: new Date().toISOString(),
+      payment: {
+        id: payment._id,
+        orderId: payment.order,
+        cryptocurrency: payment.cryptocurrency,
+        amount: payment.amount,
+        transactionHash: payment.transactionHash,
+        status: payment.status,
+        confirmations: payment.verificationResult?.confirmations || 0
+      }
+    };
+
+    const response = await axios.post(webhookUrl, payload, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Webhook-Secret': process.env.WEBHOOK_SECRET || ''
+      },
+      timeout: 10000
+    });
+
+    logger.info(`Webhook triggered for ${event}: ${payment._id}`);
+    
+    return {
+      success: true,
+      status: response.status
+    };
+  } catch (error) {
+    logger.error('Webhook trigger error:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+/**
+ * Enhanced transaction verification with retry logic
+ * @param {string} cryptocurrency - Currency type
+ * @param {string} txHash - Transaction hash
+ * @param {string} address - Expected recipient address
+ * @param {number} amount - Expected amount
+ * @param {number} maxRetries - Maximum retry attempts
+ * @returns {Promise<Object>} - Verification result
+ */
+async function verifyTransactionWithRetry(cryptocurrency, txHash, address, amount, maxRetries = 3) {
+  let lastError = null;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      logger.info(`Transaction verification attempt ${attempt}/${maxRetries} for ${txHash}`);
+      
+      const result = await verifyTransaction(cryptocurrency, txHash, address, amount);
+      
+      if (result.verified || !result.error) {
+        return result;
+      }
+      
+      lastError = result.error;
+      
+      // Wait before retry (exponential backoff)
+      if (attempt < maxRetries) {
+        const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    } catch (error) {
+      lastError = error.message;
+      logger.error(`Verification attempt ${attempt} failed:`, error);
+      
+      if (attempt < maxRetries) {
+        const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+  
   return {
-    status: 'monitoring',
-    paymentId
+    verified: false,
+    error: lastError || 'Verification failed after all retry attempts'
   };
+}
+
+/**
+ * Get transaction status and details
+ * @param {string} cryptocurrency - Currency type
+ * @param {string} txHash - Transaction hash
+ * @returns {Promise<Object>} - Transaction status
+ */
+async function getTransactionStatus(cryptocurrency, txHash) {
+  try {
+    const result = await verifyTransaction(cryptocurrency, txHash, '', 0);
+    
+    return {
+      success: true,
+      exists: result.verified !== undefined,
+      confirmations: result.confirmations || 0,
+      timestamp: result.timestamp,
+      blockHash: result.blockHash,
+      status: result.confirmations >= 1 ? 'confirmed' : 'pending'
+    };
+  } catch (error) {
+    logger.error('Get transaction status error:', error);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
 }
 
 module.exports = {
@@ -351,5 +568,8 @@ module.exports = {
   verifyEthereumTransaction,
   verifyUSDTTransaction,
   getCryptoPrice,
-  monitorPayment
+  monitorPayment,
+  triggerPaymentWebhook,
+  verifyTransactionWithRetry,
+  getTransactionStatus
 };
