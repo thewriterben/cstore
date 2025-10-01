@@ -54,7 +54,6 @@ const paymentSchema = new mongoose.Schema({
 
 // Index for efficient queries
 paymentSchema.index({ order: 1 });
-// transactionHash index is already created by unique: true in schema
 paymentSchema.index({ status: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Payment', paymentSchema);

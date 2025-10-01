@@ -33,31 +33,6 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Custom NoSQL injection prevention middleware (Express 5 compatible)
-const sanitizeData = (req, res, next) => {
-  const sanitize = (obj) => {
-    if (!obj || typeof obj !== 'object') return obj;
-    
-    Object.keys(obj).forEach(key => {
-      // Remove keys that start with $ or contain . to prevent NoSQL injection
-      if (key.startsWith('$') || key.includes('.')) {
-        delete obj[key];
-      } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-        sanitize(obj[key]);
-      }
-    });
-    return obj;
-  };
-
-  if (req.body) sanitize(req.body);
-  if (req.query) sanitize(req.query);
-  if (req.params) sanitize(req.params);
-  
-  next();
-};
-
-// Prevent XSS attacks
-const xssClean = xss();
 
 // Prevent HTTP parameter pollution
 const preventParamPollution = hpp({
