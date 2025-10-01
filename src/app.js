@@ -15,6 +15,7 @@ const {
   xssClean,
   preventParamPollution
 } = require('./middleware/security');
+const elasticsearchService = require('./services/elasticsearchService');
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
@@ -31,6 +32,20 @@ const app = express();
 
 // Connect to database
 connectDB();
+
+// Initialize Elasticsearch if enabled
+if (process.env.ELASTICSEARCH_ENABLED === 'true') {
+  elasticsearchService.initializeClient();
+  // Create index and check availability
+  elasticsearchService.isAvailable().then(available => {
+    if (available) {
+      elasticsearchService.createProductsIndex();
+      logger.info('Elasticsearch initialized and ready for advanced search');
+    } else {
+      logger.warn('Elasticsearch is enabled but not available. Falling back to MongoDB search.');
+    }
+  });
+}
 
 // Security middleware
 app.use(securityHeaders);

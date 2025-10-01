@@ -18,6 +18,25 @@ services:
     networks:
       - cstore-network
 
+  # Elasticsearch (Optional - for advanced search)
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: cstore-elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - cstore-network
+    profiles:
+      - elasticsearch
+
   # Application Service
   app:
     build:
@@ -39,6 +58,8 @@ services:
       USDT_ADDRESS: ${USDT_ADDRESS}
       SEED_DATA: ${SEED_DATA:-true}
       LOG_LEVEL: ${LOG_LEVEL:-info}
+      ELASTICSEARCH_ENABLED: ${ELASTICSEARCH_ENABLED:-false}
+      ELASTICSEARCH_NODE: ${ELASTICSEARCH_NODE:-http://elasticsearch:9200}
     depends_on:
       - mongodb
     volumes:
@@ -67,6 +88,8 @@ services:
       USDT_ADDRESS: ${USDT_ADDRESS}
       SEED_DATA: "true"
       LOG_LEVEL: debug
+      ELASTICSEARCH_ENABLED: ${ELASTICSEARCH_ENABLED:-false}
+      ELASTICSEARCH_NODE: ${ELASTICSEARCH_NODE:-http://elasticsearch:9200}
     depends_on:
       - mongodb
     volumes:
@@ -85,3 +108,4 @@ networks:
 volumes:
   mongodb_data:
   mongodb_config:
+  elasticsearch_data:
