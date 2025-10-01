@@ -17,6 +17,7 @@ const {
   xssClean,
   preventParamPollution
 } = require('./middleware/security');
+const elasticsearchService = require('./services/elasticsearchService');
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
@@ -26,13 +27,29 @@ const paymentRoutes = require('./routes/paymentRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const cartRoutes = require('./routes/cartRoutes');
+const wishlistRoutes = require('./routes/wishlistRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const multiSigWalletRoutes = require('./routes/multiSigWalletRoutes');
 const { getCryptocurrencies } = require('./controllers/orderController');
 
 const app = express();
 
 // Connect to database
 connectDB();
+
+// Initialize Elasticsearch if enabled
+if (process.env.ELASTICSEARCH_ENABLED === 'true') {
+  elasticsearchService.initializeClient();
+  // Create index and check availability
+  elasticsearchService.isAvailable().then(available => {
+    if (available) {
+      elasticsearchService.createProductsIndex();
+      logger.info('Elasticsearch initialized and ready for advanced search');
+    } else {
+      logger.warn('Elasticsearch is enabled but not available. Falling back to MongoDB search.');
+    }
+  });
+}
 
 // Security middleware
 app.use(securityHeaders);
@@ -73,7 +90,9 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/cart', cartRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/wallets/multi-sig', multiSigWalletRoutes);
 app.get('/api/cryptocurrencies', getCryptocurrencies);
 
 // Health check

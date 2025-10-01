@@ -84,8 +84,20 @@ All API responses follow this format:
   - `category` - Filter by category ID
   - `minPrice` - Minimum price in USD
   - `maxPrice` - Maximum price in USD
-  - `search` - Search term
-  - `sort` - Sort field (e.g., 'price', '-createdAt')
+  - `featured` - Filter featured products (true/false)
+  - `minRating` - Minimum average rating (0-5)
+  - `search` - Search term (uses Elasticsearch if enabled, otherwise MongoDB text search)
+  - `sort` - Sort field (e.g., 'price', '-createdAt', 'rating', 'name')
+- **Response:**
+  - Returns products with pagination info
+  - Includes `searchEngine` field: 'elasticsearch' or 'mongodb'
+  - When using Elasticsearch, products include relevance `_score`
+
+**Enhanced Search Features (when Elasticsearch is enabled):**
+- Fuzzy matching for typo tolerance
+- Multi-field search across name, description, and category
+- Better relevance ranking
+- Advanced filtering combinations
 
 ### Get Single Product
 - **GET** `/products/:id`
@@ -115,6 +127,16 @@ All API responses follow this format:
 ### Delete Product (Admin)
 - **DELETE** `/products/:id`
 - **Auth Required:** Yes (Admin)
+
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "data": {
+- **Response:**
+  ```json
+  {
+    "success": true,
 
 ---
 
@@ -356,6 +378,33 @@ All API responses follow this format:
 
 ---
 
+## Wishlist Endpoints
+
+### Get Wishlist
+- **GET** `/wishlist`
+- **Auth Required:** Yes
+- **Returns:** User's wishlist with populated product details
+
+### Add to Wishlist
+- **POST** `/wishlist/items`
+- **Auth Required:** Yes
+- **Body:**
+  ```json
+  {
+    "productId": "product_id"
+  }
+  ```
+
+### Remove from Wishlist
+- **DELETE** `/wishlist/items/:productId`
+- **Auth Required:** Yes
+
+### Clear Wishlist
+- **DELETE** `/wishlist`
+- **Auth Required:** Yes
+
+---
+
 ## Admin Dashboard Endpoints
 
 All admin endpoints require Admin role authentication.
@@ -470,6 +519,125 @@ All admin endpoints require Admin role authentication.
 
 - General endpoints: 100 requests per 15 minutes
 - Authentication endpoints: 5 requests per 15 minutes
+
+---
+
+## Multi-Signature Wallet Endpoints
+
+### Create Multi-Sig Wallet
+- **POST** `/wallets/multi-sig`
+- **Auth Required:** Yes
+- **Body:**
+  ```json
+  {
+    "name": "Company Treasury",
+    "cryptocurrency": "BTC",
+    "address": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+    "signers": [
+      { "email": "signer1@example.com", "publicKey": "optional" },
+      { "email": "signer2@example.com" }
+    ],
+    "requiredSignatures": 2,
+    "description": "Main company treasury"
+  }
+  ```
+
+### Get All Multi-Sig Wallets
+- **GET** `/wallets/multi-sig?cryptocurrency=BTC&isActive=true`
+- **Auth Required:** Yes
+- **Query Params:**
+  - `cryptocurrency` (optional): Filter by cryptocurrency (BTC, ETH, USDT)
+  - `isActive` (optional): Filter by active status (true/false)
+
+### Get Multi-Sig Wallet by ID
+- **GET** `/wallets/multi-sig/:id`
+- **Auth Required:** Yes
+
+### Update Multi-Sig Wallet
+- **PUT** `/wallets/multi-sig/:id`
+- **Auth Required:** Yes (Owner only)
+- **Body:**
+  ```json
+  {
+    "name": "Updated Name",
+    "description": "Updated description",
+    "isActive": true
+  }
+  ```
+
+### Add Signer to Wallet
+- **POST** `/wallets/multi-sig/:id/signers`
+- **Auth Required:** Yes (Owner only)
+- **Body:**
+  ```json
+  {
+    "email": "newsigner@example.com",
+    "publicKey": "optional"
+  }
+  ```
+
+### Remove Signer from Wallet
+- **DELETE** `/wallets/multi-sig/:id/signers/:signerId`
+- **Auth Required:** Yes (Owner only)
+
+### Deactivate Wallet
+- **DELETE** `/wallets/multi-sig/:id`
+- **Auth Required:** Yes (Owner only)
+
+---
+
+## Transaction Approval Endpoints
+
+### Create Transaction Approval Request
+- **POST** `/wallets/multi-sig/transactions`
+- **Auth Required:** Yes
+- **Body:**
+  ```json
+  {
+    "walletId": "wallet-id",
+    "orderId": "order-id",
+    "amount": 0.5,
+    "toAddress": "1BitcoinEaterAddressDontSendf59kuE",
+    "description": "Payment for Order #12345"
+  }
+  ```
+
+### Get All Transaction Approvals
+- **GET** `/wallets/multi-sig/transactions?status=pending&walletId=wallet-id`
+- **Auth Required:** Yes
+- **Query Params:**
+  - `status` (optional): Filter by status (pending, approved, rejected, executed, expired)
+  - `walletId` (optional): Filter by wallet ID
+
+### Get Transaction Approval by ID
+- **GET** `/wallets/multi-sig/transactions/:id`
+- **Auth Required:** Yes
+
+### Approve or Reject Transaction
+- **POST** `/wallets/multi-sig/transactions/:id/approve`
+- **Auth Required:** Yes (Signer only)
+- **Body:**
+  ```json
+  {
+    "approved": true,
+    "signature": "optional-signature",
+    "comment": "Approved after review"
+  }
+  ```
+
+### Execute Transaction
+- **POST** `/wallets/multi-sig/transactions/:id/execute`
+- **Auth Required:** Yes
+- **Body:**
+  ```json
+  {
+    "transactionHash": "0x1234567890abcdef..."
+  }
+  ```
+
+### Cancel Transaction
+- **DELETE** `/wallets/multi-sig/transactions/:id`
+- **Auth Required:** Yes (Initiator or Owner only)
 
 ---
 
