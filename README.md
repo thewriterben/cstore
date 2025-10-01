@@ -27,6 +27,7 @@ This version includes all core e-commerce features. While functional, additional
 - ⭐ **Review & Rating System**: Complete review CRUD operations with rating aggregation
 - 📁 **Category Management**: Full category system with hierarchical support
 - 🛒 **Shopping Cart**: Persistent cart with validation and stock management
+- ❤️ **Wishlist**: Save products for later with full CRUD operations
 - 📧 **Email Service**: Transactional emails (welcome, order confirmation, payment receipt, shipping notifications)
 - 🔗 **Enhanced Blockchain**: Webhook support, real-time monitoring, retry mechanisms
 - 📊 **Admin Dashboard API**: Complete admin endpoints for analytics, user management, and system monitoring
@@ -47,7 +48,6 @@ These features are implemented but require configuration:
 
 ### ❌ Not Yet Implemented (Future Enhancements)
 
-- Wishlist feature
 - [ ] Customer product questions & answers
 
 ### Phase 2: Advanced Blockchain
