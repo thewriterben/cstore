@@ -116,6 +116,74 @@ All API responses follow this format:
 - **DELETE** `/products/:id`
 - **Auth Required:** Yes (Admin)
 
+### Get Product Recommendations
+- **GET** `/products/recommendations`
+- **Auth Required:** Yes
+- **Query Parameters:**
+  - `limit` - Maximum number of recommendations (default: 10)
+- **Description:** Returns personalized product recommendations based on user's purchase history. Uses collaborative filtering to suggest products that similar users have purchased. For new users with no purchase history, returns popular products.
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "recommendations": [
+        {
+          "_id": "product_id",
+          "name": "Product Name",
+          "description": "Product description",
+          "price": 0.001,
+          "priceUSD": 50,
+          "image": "/images/product.jpg",
+          "averageRating": 4.5,
+          "numReviews": 10,
+          "stock": 20,
+          "category": {
+            "_id": "category_id",
+            "name": "Category Name",
+            "slug": "category-slug"
+          }
+        }
+      ],
+      "count": 10
+    }
+  }
+  ```
+
+### Get Related Products
+- **GET** `/products/:id/related`
+- **Auth Required:** No
+- **Query Parameters:**
+  - `limit` - Maximum number of related products (default: 6)
+- **Description:** Returns products related to the specified product. Products are from the same category and sorted by rating.
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "products": [
+        {
+          "_id": "product_id",
+          "name": "Related Product",
+          "description": "Product description",
+          "price": 0.002,
+          "priceUSD": 100,
+          "image": "/images/product.jpg",
+          "averageRating": 4.8,
+          "numReviews": 15,
+          "stock": 10,
+          "category": {
+            "_id": "category_id",
+            "name": "Category Name",
+            "slug": "category-slug"
+          }
+        }
+      ],
+      "count": 6
+    }
+  }
+  ```
+
 ---
 
 ## Order Endpoints
