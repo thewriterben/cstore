@@ -123,6 +123,15 @@ const validateCategory = validate(schemas.createCategory);
 const validateUpdateCategory = validate(schemas.updateCategory);
 const validateCartItem = validate(schemas.cartItem);
 const validateUpdateCartItem = validate(schemas.updateCartItem);
+const validateQuestion = validate(schemas.question);
+const validateAnswer = validate(schemas.answer);
+const validateWishlistItem = validate(schemas.wishlistItem);
+const validateCreateMultiSigWallet = validate(schemas.createMultiSigWallet);
+const validateUpdateMultiSigWallet = validate(schemas.updateMultiSigWallet);
+const validateAddSigner = validate(schemas.addSigner);
+const validateCreateTransactionApproval = validate(schemas.createTransactionApproval);
+const validateApproveTransaction = validate(schemas.approveTransaction);
+const validateExecuteTransaction = validate(schemas.executeTransaction);
 
 module.exports = { 
   validate, 
@@ -132,4 +141,13 @@ module.exports = {
   validateUpdateCategory,
   validateCartItem,
   validateUpdateCartItem,
+  validateQuestion,
+  validateAnswer,
+  validateWishlistItem,
+  validateCreateMultiSigWallet,
+  validateUpdateMultiSigWallet,
+  validateAddSigner,
+  validateCreateTransactionApproval,
+  validateApproveTransaction,
+  validateExecuteTransaction
 };
