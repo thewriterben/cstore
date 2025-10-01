@@ -75,29 +75,39 @@ router.post('/register', validate(schemas.register), register);
 ### 4. MongoDB Sanitization ✅
 
 **Location:** `src/middleware/security.js`
-**Integration:** `src/app.js` line 34
+**Integration:** `src/app.js` line 38
 
-Uses `express-mongo-sanitize` to prevent NoSQL injection attacks by removing MongoDB operators from user input.
+**Express 5 Compatible:** Custom implementation (express-mongo-sanitize has compatibility issues with Express 5)
+
+Prevents NoSQL injection attacks by removing MongoDB operators from user input:
+- Removes keys starting with `$` (e.g., `$gt`, `$lt`, `$ne`, `$where`)
+- Recursively sanitizes nested objects
+- Only sanitizes mutable `req.body` (req.query/params are immutable in Express 5)
 
 **Protection against:**
 - `$gt`, `$lt`, `$ne` operators in queries
 - `$where` clauses
-- Other MongoDB-specific operators
+- All MongoDB-specific operators
 
 ### 5. XSS Protection ✅
 
 **Location:** `src/middleware/security.js`
-**Integration:** `src/app.js` line 35
+**Integration:** `src/app.js` line 39
 
-Uses `xss-clean` middleware to sanitize user input and prevent Cross-Site Scripting (XSS) attacks by:
-- Cleaning HTML/JavaScript from request body
-- Cleaning query parameters
-- Cleaning URL parameters
+**Express 5 Compatible:** Custom implementation (xss-clean is deprecated and incompatible with Express 5)
+
+Sanitizes user input to prevent Cross-Site Scripting (XSS) attacks:
+- Removes `<script>` tags from strings
+- Removes `javascript:` protocol handlers
+- Removes inline event handlers (onclick, onerror, etc.)
+- Only sanitizes mutable `req.body` (req.query/params are immutable in Express 5)
+
+**Note:** Query string and URL parameters are validated at the controller/validation layer.
 
 ### 6. HPP (HTTP Parameter Pollution) Protection ✅
 
 **Location:** `src/middleware/security.js`
-**Integration:** `src/app.js` line 36
+**Integration:** `src/app.js` line 40
 
 Protects against HTTP Parameter Pollution attacks with a whitelist:
 - Allows duplicate `price` parameters (for range queries)
@@ -253,14 +263,16 @@ Security-related npm packages:
 - `helmet` - HTTP security headers
 - `express-rate-limit` - Rate limiting
 - `joi` - Input validation
-- `express-mongo-sanitize` - NoSQL injection prevention
-- `xss-clean` - XSS attack prevention
+- `express-mongo-sanitize` - Installed but not used (incompatible with Express 5, custom implementation used)
+- `xss-clean` - Installed but not used (deprecated and incompatible with Express 5, custom implementation used)
 - `hpp` - HTTP parameter pollution prevention
 - `bcryptjs` - Password hashing
 - `jsonwebtoken` - JWT authentication
 - `cors` - CORS configuration
 - `winston` - Logging
 - `morgan` - HTTP request logging
+
+**Note:** Custom Express 5-compatible implementations are used for MongoDB sanitization and XSS protection instead of the incompatible packages.
 
 ## Verification
 
