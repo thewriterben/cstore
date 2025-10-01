@@ -1,49 +1,57 @@
-# CStore - Cryptocurrency Marketplace (In Development)
+# CStore - Cryptocurrency Marketplace
 
-A cryptocurrency marketplace built with Node.js, Express, and MongoDB. This application is currently in active development and includes JWT authentication, basic blockchain integration, security measures, and core e-commerce backend features.
+A full-featured cryptocurrency marketplace built with Node.js, Express, and MongoDB. This application includes JWT authentication, comprehensive blockchain integration, email notifications, shopping cart, reviews system, and admin dashboard API.
 
 ## ⚠️ Project Status
 
-**This project is in active development and NOT production-ready.** Many features are planned but not yet implemented. Please see the sections below for details on what is currently available versus what is planned for future releases.
+**Version 2.1 - Feature Complete** 
 
-## 🚀 Version 2.0 - Current Release
+This version includes all core e-commerce features. While functional, additional testing and hardening is recommended before production use.
 
-This version includes enhancements over the basic demo:
+## 🚀 Version 2.1 - Current Release
 
-### ✅ Implemented Features
+### ✅ Fully Implemented Features
 
+#### Core E-commerce
 - 🔐 **JWT Authentication**: Secure user registration and login with bcrypt password hashing
 - 💾 **MongoDB Integration**: Persistent data storage with Mongoose ODM
 - 🛡️ **Security**: Helmet, rate limiting, input validation, and sanitization
-- 📊 **Database Models**: Users, Products, Orders, Payments, Categories, Reviews (models only - Review has no API endpoints)
-- 🔍 **Product Filtering**: Basic product search, filtering by price/category, sorting, and pagination
+- 📊 **Complete Database Models**: Users, Products, Orders, Payments, Categories, Reviews, Shopping Cart
+- 🔍 **Product Management**: Full CRUD operations with search, filtering, sorting, and pagination
 - 👤 **User Management**: User profiles and role-based access control (admin/user)
-- 📦 **Order Management**: Basic order creation and status tracking
-- 💳 **Payment Processing**: Basic payment confirmation with transaction hash
-- 🧪 **Testing Suite**: Basic Jest tests with Supertest for authentication and products
+- 📦 **Order Management**: Complete order lifecycle with status tracking
+- 💳 **Payment Processing**: Payment confirmation with blockchain verification
+
+#### New Features (v2.1)
+- ⭐ **Review & Rating System**: Complete review CRUD operations with rating aggregation
+- 📁 **Category Management**: Full category system with hierarchical support
+- 🛒 **Shopping Cart**: Persistent cart with validation and stock management
+- 📧 **Email Service**: Transactional emails (welcome, order confirmation, payment receipt, shipping notifications)
+- 🔗 **Enhanced Blockchain**: Webhook support, real-time monitoring, retry mechanisms
+- 📊 **Admin Dashboard API**: Complete admin endpoints for analytics, user management, and system monitoring
+
+#### Infrastructure
+- 🧪 **Testing Suite**: Jest tests with Supertest for authentication and products
 - 🐳 **Docker Support**: Dockerfile and Docker Compose configuration
 - 📝 **Logging**: Winston logger with file and console transports
 - 🚦 **Error Handling**: Centralized error handling middleware
-- 📈 **Admin Features**: Admin-only endpoints for product and order management
+- 📈 **Analytics**: Sales analytics, product analytics, and activity logging
 
-### 🔧 Partially Implemented Features
+### 🔧 Configuration Required
 
-- **Blockchain Integration**: Basic blockchain service exists with verification functions for BTC, ETH, and USDT, but uses public APIs. No real-time monitoring or webhook support.
-- **Category System**: Category model exists and products can be filtered by category, but no dedicated category management API endpoints.
-- **Reviews**: Review model exists in database, but no API endpoints to create, read, update, or delete reviews.
+These features are implemented but require configuration:
+- **Email Service**: Configure SMTP settings in `.env`
+- **Blockchain Webhooks**: Set webhook URL for payment notifications
+- **Admin Alerts**: Configure admin email for system alerts
 
-### ❌ Not Yet Implemented (Planned)
+### ❌ Not Yet Implemented (Future Enhancements)
 
-- Product reviews and ratings API endpoints
-- Shopping cart functionality
 - Wishlist feature
 - Advanced search with Elasticsearch
-- Product recommendations
-- Real-time payment confirmation monitoring
-- Email notifications (order confirmations, payment receipts, shipping notifications)
+- Product recommendations based on purchase history
 - Admin dashboard UI (React-based panel)
-- Sales analytics and reporting
 - Multi-signature wallet support
+- Internationalization (i18n)
 
 ## Tech Stack
 
@@ -55,12 +63,18 @@ This version includes enhancements over the basic demo:
 - **Winston** - Logging
 - **Morgan** - HTTP request logging
 - **Joi** - Request validation
+- **Nodemailer** - Email service
 
 ### Security
 - **Helmet** - Security headers
 - **Express Rate Limit** - Rate limiting
 - **Custom Sanitization** - NoSQL injection prevention (Express 5 compatible)
 - **HPP** - HTTP parameter pollution prevention
+
+### Blockchain
+- **Web3.js** - Ethereum interaction
+- **Axios** - Blockchain API calls
+- Support for BTC, ETH, and USDT
 
 ### Frontend
 - **HTML5**, **CSS3**, **Vanilla JavaScript**
@@ -70,12 +84,13 @@ This version includes enhancements over the basic demo:
 ### DevOps
 - **Docker** & **Docker Compose**
 - **Jest** & **Supertest** - Testing
-- **GitHub Actions** - Basic CI/CD workflow files included (may need configuration)
+- **GitHub Actions** - Basic CI/CD workflow files included
 
 ## 📖 Documentation
 
-- **[Authentication System](docs/AUTHENTICATION.md)** - Complete guide to JWT authentication, bcrypt hashing, and role-based access control
-- **[API Documentation](docs/API.md)** - Full API endpoint reference
+- **[API Endpoints](docs/API_ENDPOINTS.md)** - Complete API endpoint reference with examples
+- **[Authentication System](docs/AUTHENTICATION.md)** - JWT authentication and RBAC guide
+- **[API Documentation](docs/API.md)** - Detailed API documentation
 
 ## Getting Started
 
@@ -84,6 +99,7 @@ This version includes enhancements over the basic demo:
 - **Node.js** (v18 or higher)
 - **MongoDB** (v7.0 or higher) or Docker
 - **npm** or **yarn**
+- **SMTP Server** (optional, for email features)
 
 ### Installation
 
@@ -105,6 +121,10 @@ cp .env.example .env
 
 Edit `.env` and update the following variables:
 ```env
+# Server
+PORT=3000
+APP_URL=http://localhost:3000
+
 # Database
 MONGODB_URI=mongodb://localhost:27017/cstore
 
@@ -112,10 +132,23 @@ MONGODB_URI=mongodb://localhost:27017/cstore
 JWT_SECRET=your-super-secret-jwt-key-change-in-production
 JWT_REFRESH_SECRET=your-super-secret-refresh-jwt-key-change-in-production
 
+# Email Configuration (Required for email features)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-email@gmail.com
+SMTP_PASSWORD=your-app-password
+SMTP_FROM_EMAIL=noreply@cstore.example.com
+ADMIN_EMAIL=admin@cstore.example.com
+
 # Cryptocurrency Wallet Addresses (Replace with your own)
 BTC_ADDRESS=your-btc-address
 ETH_ADDRESS=your-eth-address
 USDT_ADDRESS=your-usdt-address
+
+# Blockchain Configuration (Optional)
+VERIFY_BLOCKCHAIN=false
+PAYMENT_WEBHOOK_URL=https://your-domain.com/webhook
+WEBHOOK_SECRET=your-webhook-secret
 
 # Initial data seeding
 SEED_DATA=true
@@ -426,57 +459,84 @@ cstore/
 ### Implemented Security Measures
 
 1. **Helmet** - Sets security-related HTTP headers
-2. **Rate Limiting** - Prevents brute force attacks
-3. **Input Validation** - Joi schema validation
-5. **HPP Protection** - Prevents HTTP parameter pollution
-6. **JWT Authentication** - Secure token-based auth
-7. **Password Hashing** - Bcrypt with salt rounds
-8. **CORS Configuration** - Cross-origin resource sharing
-9. **Error Handling** - Proper error messages without leaking details
-10. **Logging** - Winston logging for audit trails
+2. **Rate Limiting** - Prevents brute force attacks (100 req/15min general, 5 req/15min auth)
+3. **Input Validation** - Comprehensive Joi schema validation
+4. **HPP Protection** - Prevents HTTP parameter pollution
+5. **JWT Authentication** - Secure token-based authentication with refresh tokens
+6. **Password Hashing** - Bcrypt with salt rounds
+7. **CORS Configuration** - Configurable cross-origin resource sharing
+8. **Error Handling** - Proper error messages without leaking sensitive details
+9. **Logging** - Winston logging for comprehensive audit trails
+10. **Role-Based Access Control** - User and Admin roles with proper authorization
 
-**Note on Blockchain Verification**: The application includes a blockchain service with functions to verify BTC, ETH, and USDT transactions using public APIs (blockchain.info, Etherscan-compatible APIs). However, this is a basic implementation and should not be considered production-ready. It lacks real-time monitoring, webhook support, and robust error handling needed for production use.
+### Blockchain Security
+
+The application includes enhanced blockchain verification:
+- Transaction verification for BTC, ETH, and USDT
+- Retry mechanisms for failed verifications
+- Webhook support for payment notifications
+- Real-time payment monitoring
+- Transaction status tracking
+- Configurable confirmation requirements
+
+**Note**: Blockchain verification uses public APIs and is suitable for moderate-volume applications. For high-volume production use, consider direct node connections or enterprise blockchain services.
 
 ### Production Readiness Checklist
 
-⚠️ **This application is NOT ready for production.** Before considering production deployment:
+⚠️ **Additional hardening recommended for production use:**
 
 **Security & Configuration:**
+- [x] JWT authentication with secure token handling
+- [x] Password hashing with bcrypt
+- [x] Input validation on all endpoints
+- [x] Rate limiting configured
+- [x] Error handling without information leakage
 - [ ] Change all default secrets in `.env`
-- [ ] Use HTTPS/TLS encryption
+- [ ] Use HTTPS/TLS encryption (configure reverse proxy)
 - [ ] Set up proper MongoDB authentication
 - [ ] Configure firewall rules
-- [ ] Enable MongoDB replica set for production
+- [ ] Enable MongoDB replica set
 - [ ] Set up automated backups
 - [ ] Configure monitoring and alerting
 - [ ] Complete comprehensive security audit
-- [ ] Review and audit all security settings
 
-**Missing/Incomplete Features:**
-- [ ] Implement robust blockchain verification (current implementation is basic)
-- [ ] Implement email service for notifications
-- [ ] Add review and rating API endpoints
-- [ ] Add category management API endpoints
-- [ ] Implement shopping cart functionality
-- [ ] Add comprehensive test coverage
-- [ ] Build admin dashboard UI
-- [ ] Implement real-time payment monitoring
+**Feature Completeness:**
+- [x] Authentication system
+- [x] Product management
+- [x] Order management
+- [x] Payment processing
+- [x] Review and rating system
+- [x] Category management
+- [x] Shopping cart
+- [x] Email notifications
+- [x] Admin dashboard API
+- [x] Analytics and reporting
+- [ ] Comprehensive integration tests
+- [ ] Performance testing
+- [ ] Load testing
 
 **Infrastructure:**
+- [x] Docker support
+- [x] Environment configuration
+- [x] Logging system
 - [ ] Configure CDN for static assets
-- [ ] Enable request logging to external service
-- [ ] Set up CI/CD pipeline properly
-- [ ] Configure production monitoring and alerting
+- [ ] Enable request logging to external service (e.g., Datadog, Sentry)
+- [ ] Set up CI/CD pipeline
+- [ ] Configure production monitoring (Prometheus, Grafana)
+- [ ] Set up alerting system
 
 ## 🧪 Testing
 
-The application includes a basic test suite covering:
+The application includes a test suite covering:
 
-- User authentication (registration, login)
-- JWT token validation
+- User authentication (registration, login, JWT validation)
 - Product CRUD operations
 - Order management (create, get, update, list)
 - Payment processing (confirm, verify, list)
+- Review system (create, read, update, delete)
+- Category management
+- Shopping cart operations
+- Admin endpoints
 - Cryptocurrency endpoints
 - Health check endpoint
 - Role-based access control
@@ -577,68 +637,76 @@ On first run with `SEED_DATA=true`, the application will automatically create:
 
 **⚠️ Important**: Change the default admin password immediately in production!
 
-## 🚀 Planned Features & Enhancements
+## 🚀 Future Enhancements
 
-The following features are planned for future versions but **are NOT currently implemented**:
+The following features are planned for future versions:
 
-### Phase 2: Enhanced Blockchain Integration
-- [ ] Real-time payment confirmation monitoring
-- [ ] Webhook support for payment notifications
-- [ ] Multi-signature wallet support
-- [ ] Integration with Bitcoin Core RPC (currently uses public APIs)
-- [ ] Improved transaction verification with configurable confirmation requirements
-
-### Phase 3: Advanced Features
-- [ ] Product reviews and ratings API endpoints (model exists, API needed)
-- [ ] Shopping cart functionality
+### Phase 1: User Experience
 - [ ] Wishlist feature
-- [ ] Category management API endpoints (model exists, API needed)
+- [ ] Product comparison
 - [ ] Advanced search with Elasticsearch
-- [ ] Product recommendations
-- [ ] Inventory management features
+- [ ] Product recommendations based on purchase history
+- [ ] Customer product questions & answers
 
-### Phase 4: Communication
-- [ ] Email notifications (SendGrid/Nodemailer)
-- [ ] Order confirmation emails
-- [ ] Payment receipt emails
-- [ ] Shipping notifications
-- [ ] Admin alerts
+### Phase 2: Advanced Blockchain
+- [ ] Multi-signature wallet support
+- [ ] Direct Bitcoin Core RPC integration (currently uses public APIs)
+- [ ] Layer 2 payment solutions (Lightning Network)
+- [ ] Additional cryptocurrency support (LTC, XRP, etc.)
 
-### Phase 5: Admin Dashboard
+### Phase 3: Admin Dashboard UI
 - [ ] React-based admin panel
-- [ ] Sales analytics and reports
-- [ ] User management interface
-- [ ] Product management UI
-- [ ] Order tracking dashboard
+- [ ] Interactive sales charts and graphs
+- [ ] Real-time order notifications
+- [ ] Drag-and-drop product management
+- [ ] Advanced reporting and export features
 
-### Phase 6: DevOps & CI/CD
-- [ ] Complete GitHub Actions CI/CD pipeline configuration (basic workflow files exist)
-- [ ] Automated testing in CI
-- [ ] Docker image optimization
+### Phase 4: DevOps & Scaling
+- [ ] Complete GitHub Actions CI/CD pipeline
 - [ ] Kubernetes deployment manifests
 - [ ] Prometheus metrics integration
 - [ ] Grafana dashboards
+- [ ] Redis caching layer
+- [ ] CDN integration for static assets
 
-## 📝 Migration from v1.0 to v2.0
+### Phase 5: Internationalization
+- [ ] Multi-language support (i18n)
+- [ ] Multi-currency pricing
+- [ ] Region-specific payment methods
+- [ ] Localized email templates
 
-The v2.0 server is now the default (accessed via `npm start`).
+## 📋 API Endpoints Summary
 
-The old server (v1.0) is still available for compatibility:
+### Implemented Endpoints (v2.1)
 
-```bash
-# Run legacy version (in-memory storage)
-npm run start:legacy
+- **Authentication**: Register, Login, Get Profile, Update Password
+- **Products**: Full CRUD, Search, Filter, Pagination
+- **Orders**: Create, Get, List, Update Status (Admin)
+- **Payments**: Confirm, Verify, List (Admin)
+- **Reviews**: Full CRUD, Ratings, Stats, Moderation (Admin)
+- **Categories**: Full CRUD, Product Filtering
+- **Shopping Cart**: Add, Update, Remove, Validate
+- **Admin Dashboard**: Stats, Analytics, User Management, System Health
 
-# Run production version (MongoDB persistence)
-npm start
-```
+See [API_ENDPOINTS.md](docs/API_ENDPOINTS.md) for complete documentation.
 
-v2.0 adds:
-- Database persistence with MongoDB
-- User authentication
-- Enhanced security
-- Better error handling
-- More structured API
+## 📝 Migration Notes
+
+### From v2.0 to v2.1
+
+v2.1 adds significant new functionality:
+- Review and rating system
+- Category management API
+- Shopping cart functionality
+- Email notification service
+- Enhanced blockchain monitoring
+- Complete admin dashboard API
+
+All v2.0 endpoints remain compatible. New endpoints are additive only.
+
+**Database Migration**: No migration required. New collections (Cart) will be created automatically.
+
+**Configuration**: Add email SMTP settings to `.env` file (see `.env.example`).
 
 ## 🤝 Contributing
 
@@ -656,16 +724,26 @@ ISC License - see LICENSE file for details
 
 ## ⚠️ Important Disclaimer
 
-**This application is NOT production-ready.** Before considering any production use:
+**This application is feature-complete but requires additional hardening for production use:**
 
-- **In Development**: Many features are incomplete or missing (see Project Status section above)
-- **Not Financial Advice**: This is educational software
+- **Educational Purpose**: Primarily intended for learning and development
+- **Not Financial Advice**: This is educational software for demonstration purposes
 - **Security Audit Required**: Conduct thorough security audits before any production use
-- **Blockchain Integration**: Current blockchain verification is basic and uses public APIs. Implement robust blockchain verification for production
-- **Testing Required**: Test coverage is incomplete. Thoroughly test all features in a staging environment
+- **Testing Required**: Expand test coverage and perform load testing in staging environment
 - **Compliance**: Ensure compliance with local regulations regarding cryptocurrency transactions
-- **Email & Notifications**: No email system is currently implemented
-- **Admin UI**: No admin dashboard interface exists (only API endpoints)
+- **Blockchain Integration**: Uses public APIs suitable for moderate volume. Consider direct node connections for high-volume production
+- **Email Service**: Requires SMTP configuration - test thoroughly before production use
+- **Admin UI**: API endpoints implemented; web UI is not included
+- **Monitoring**: Set up proper monitoring, alerting, and logging infrastructure for production
+
+### Recommendations for Production
+
+1. **Security**: Complete security audit, penetration testing
+2. **Infrastructure**: Set up load balancing, CDN, caching layer
+3. **Monitoring**: Implement comprehensive monitoring (Prometheus, Grafana, Sentry)
+4. **Backups**: Automated database backups and disaster recovery plan
+5. **Legal**: Consult with legal counsel regarding cryptocurrency regulations
+6. **Testing**: Comprehensive integration, load, and security testing
 
 ## 🆘 Support
 
