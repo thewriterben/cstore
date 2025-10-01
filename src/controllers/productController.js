@@ -222,9 +222,6 @@ const deleteProduct = asyncHandler(async (req, res, next) => {
   });
 });
 
-  });
-});
-
 module.exports = {
   getProducts,
   getProduct,
