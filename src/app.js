@@ -12,6 +12,7 @@ const {
   limiter,
   authLimiter,
   sanitizeData,
+  xssClean,
   preventParamPollution
 } = require('./middleware/security');
 
@@ -30,8 +31,6 @@ connectDB();
 // Security middleware
 app.use(securityHeaders);
 app.use(limiter);
-// Note: sanitizeData is disabled due to Express 5 compatibility issues
-// app.use(sanitizeData);
 app.use(preventParamPollution);
 
 // Body parser

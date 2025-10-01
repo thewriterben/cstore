@@ -1,6 +1,5 @@
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const mongoSanitize = require('express-mongo-sanitize');
 const hpp = require('hpp');
 
 // Security headers
@@ -34,10 +33,6 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Prevent NoSQL injection - use replaceWith instead of sanitize for Express 5 compatibility
-const sanitizeData = mongoSanitize({
-  replaceWith: '_'
-});
 
 // Prevent HTTP parameter pollution
 const preventParamPollution = hpp({
@@ -49,5 +44,6 @@ module.exports = {
   limiter,
   authLimiter,
   sanitizeData,
+  xssClean,
   preventParamPollution
 };
