@@ -2,12 +2,12 @@
   "name": "cstore",
   "version": "2.0.0",
   "description": "A production-ready cryptocurrency marketplace with real blockchain integration",
-  "main": "server.js",
+  "main": "server-new.js",
   "scripts": {
-    "start": "node server.js",
-    "start:new": "node server-new.js",
+    "start": "node server-new.js",
+    "start:legacy": "node server.js",
     "dev": "NODE_ENV=development node server-new.js",
-    "dev:old": "node server.js",
+    "dev:legacy": "node server.js",
     "test": "NODE_ENV=test jest --verbose --runInBand",
     "test:watch": "NODE_ENV=test jest --watch",
     "test:coverage": "NODE_ENV=test jest --coverage"

@@ -1,6 +1,7 @@
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const mongoSanitize = require('express-mongo-sanitize');
+// express-mongo-sanitize has compatibility issues with Express 5
+// Using custom sanitization middleware instead
 const hpp = require('hpp');
 
 // Security headers
@@ -34,8 +35,28 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Prevent NoSQL injection
-const sanitizeData = mongoSanitize();
+// Custom NoSQL injection prevention middleware (Express 5 compatible)
+const sanitizeData = (req, res, next) => {
+  const sanitize = (obj) => {
+    if (!obj || typeof obj !== 'object') return obj;
+    
+    Object.keys(obj).forEach(key => {
+      // Remove keys that start with $ or contain . to prevent NoSQL injection
+      if (key.startsWith('$') || key.includes('.')) {
+        delete obj[key];
+      } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+        sanitize(obj[key]);
+      }
+    });
+    return obj;
+  };
+
+  if (req.body) sanitize(req.body);
+  if (req.query) sanitize(req.query);
+  if (req.params) sanitize(req.params);
+  
+  next();
+};
 
 // Prevent HTTP parameter pollution
 const preventParamPollution = hpp({
