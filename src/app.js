@@ -2,9 +2,11 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const morgan = require('morgan');
+const middleware = require('i18next-http-middleware');
 require('dotenv').config();
 
 const connectDB = require('./config/database');
+const i18next = require('./config/i18n');
 const logger = require('./utils/logger');
 const { errorHandler } = require('./middleware/errorHandler');
 const {
@@ -60,6 +62,9 @@ app.use(preventParamPollution);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// i18n middleware
+app.use(middleware.handle(i18next));
+
 // CORS
 app.use(cors());
 
@@ -94,9 +99,10 @@ app.get('/api/cryptocurrencies', getCryptocurrencies);
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
-    message: 'Server is running',
+    message: req.t('message.serverRunning'),
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
+    language: req.language
   });
 });
 

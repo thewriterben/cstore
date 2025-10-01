@@ -5,6 +5,7 @@ const API_URL = window.location.origin + '/api';
 let products = [];
 let selectedProduct = null;
 let currentOrder = null;
+let currentLanguage = localStorage.getItem('language') || 'en';
 
 // Product icons mapping
 const productIcons = {
@@ -17,14 +18,41 @@ const productIcons = {
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', async () => {
+    initializeLanguage();
     await loadProducts();
     setupEventListeners();
 });
 
+// Initialize language
+function initializeLanguage() {
+    const languageSelect = document.getElementById('language-select');
+    if (languageSelect) {
+        languageSelect.value = currentLanguage;
+        languageSelect.addEventListener('change', (e) => {
+            currentLanguage = e.target.value;
+            localStorage.setItem('language', currentLanguage);
+            // Set cookie for server-side language detection
+            document.cookie = `i18next=${currentLanguage}; path=/; max-age=31536000`;
+            // Reload to apply language changes
+            window.location.reload();
+        });
+    }
+}
+
+// Get API headers with language
+function getHeaders() {
+    return {
+        'Content-Type': 'application/json',
+        'Accept-Language': currentLanguage
+    };
+}
+
 // Load products from API
 async function loadProducts() {
     try {
-        const response = await fetch(`${API_URL}/products`);
+        const response = await fetch(`${API_URL}/products?lng=${currentLanguage}`, {
+            headers: getHeaders()
+        });
         const data = await response.json();
         
         if (data.success) {
