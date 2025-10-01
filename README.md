@@ -29,7 +29,6 @@ This version includes all core e-commerce features. While functional, additional
 - 📧 **Email Service**: Transactional emails (welcome, order confirmation, payment receipt, shipping notifications)
 - 🔗 **Enhanced Blockchain**: Webhook support, real-time monitoring, retry mechanisms
 - 📊 **Admin Dashboard API**: Complete admin endpoints for analytics, user management, and system monitoring
-- 🔐 **Multi-Signature Wallets**: Support for multi-sig wallets with configurable approval workflows
 
 #### Infrastructure
 - 🧪 **Testing Suite**: Jest tests with Supertest for authentication and products
@@ -49,7 +48,6 @@ These features are implemented but require configuration:
 
 - Wishlist feature
 - Advanced search with Elasticsearch
-- Product recommendations based on purchase history
 - Admin dashboard UI (React-based panel)
 - Internationalization (i18n)
 
@@ -310,6 +308,21 @@ Content-Type: application/json
 DELETE /api/products/:id
 Authorization: Bearer <admin-token>
 ```
+
+#### Get Product Recommendations
+```http
+GET /api/products/recommendations?limit=10
+Authorization: Bearer <token>
+```
+
+Returns personalized product recommendations based on user's purchase history.
+
+#### Get Related Products
+```http
+GET /api/products/:id/related?limit=6
+```
+
+Returns products related to a specific product (same category).
 
 ### Order Endpoints
 
@@ -649,7 +662,7 @@ The following features are planned for future versions:
 - [ ] Wishlist feature
 - [ ] Product comparison
 - [ ] Advanced search with Elasticsearch
-- [ ] Product recommendations based on purchase history
+- [x] Product recommendations based on purchase history
 - [ ] Customer product questions & answers
 
 ### Phase 2: Advanced Blockchain
