@@ -398,7 +398,7 @@ cstore/
 1. **Helmet** - Sets security-related HTTP headers
 2. **Rate Limiting** - Prevents brute force attacks
 3. **Input Validation** - Joi schema validation
-4. **NoSQL Injection Prevention** - Express-mongo-sanitize
+4. **NoSQL Injection Prevention** - Disabled temporarily due to Express 5 compatibility
 5. **HPP Protection** - Prevents HTTP parameter pollution
 6. **JWT Authentication** - Secure token-based auth
 7. **Password Hashing** - Bcrypt with salt rounds
@@ -430,9 +430,51 @@ The application includes a comprehensive test suite covering:
 - User authentication (registration, login)
 - JWT token validation
 - Product CRUD operations
+- Order management (create, get, update, list)
+- Payment processing (confirm, verify, list)
+- Cryptocurrency endpoints
+- Health check endpoint
 - Role-based access control
 - Input validation
 - Error handling
+- Complete integration flows
+
+### Running Tests
+
+**Note**: Tests require MongoDB to be running. You can either:
+
+1. Install and run MongoDB locally:
+   ```bash
+   # On Ubuntu/Debian
+   sudo apt-get install mongodb
+   sudo systemctl start mongodb
+   
+   # On macOS with Homebrew
+   brew install mongodb-community
+   brew services start mongodb-community
+   ```
+
+2. Use Docker to run MongoDB:
+   ```bash
+   docker run -d -p 27017:27017 --name mongo-test mongo:latest
+   ```
+
+Then run the tests:
+
+```bash
+npm test              # Run all tests
+npm run test:watch    # Run tests in watch mode
+npm run test:coverage # Run tests with coverage report
+```
+
+### Test Files
+
+- `tests/auth.test.js` - Authentication endpoint tests
+- `tests/products.test.js` - Product management tests
+- `tests/orders.test.js` - Order management tests
+- `tests/payments.test.js` - Payment processing tests
+- `tests/crypto.test.js` - Cryptocurrency and health endpoint tests
+- `tests/integration.test.js` - End-to-end integration tests
 
 ## 🐳 Docker Deployment
 

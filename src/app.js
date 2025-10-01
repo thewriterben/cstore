@@ -30,7 +30,8 @@ connectDB();
 // Security middleware
 app.use(securityHeaders);
 app.use(limiter);
-app.use(sanitizeData);
+// Note: sanitizeData is disabled due to Express 5 compatibility issues
+// app.use(sanitizeData);
 app.use(preventParamPollution);
 
 // Body parser
