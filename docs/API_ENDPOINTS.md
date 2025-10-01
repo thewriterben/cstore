@@ -84,8 +84,20 @@ All API responses follow this format:
   - `category` - Filter by category ID
   - `minPrice` - Minimum price in USD
   - `maxPrice` - Maximum price in USD
-  - `search` - Search term
-  - `sort` - Sort field (e.g., 'price', '-createdAt')
+  - `featured` - Filter featured products (true/false)
+  - `minRating` - Minimum average rating (0-5)
+  - `search` - Search term (uses Elasticsearch if enabled, otherwise MongoDB text search)
+  - `sort` - Sort field (e.g., 'price', '-createdAt', 'rating', 'name')
+- **Response:**
+  - Returns products with pagination info
+  - Includes `searchEngine` field: 'elasticsearch' or 'mongodb'
+  - When using Elasticsearch, products include relevance `_score`
+
+**Enhanced Search Features (when Elasticsearch is enabled):**
+- Fuzzy matching for typo tolerance
+- Multi-field search across name, description, and category
+- Better relevance ranking
+- Advanced filtering combinations
 
 ### Get Single Product
 - **GET** `/products/:id`
@@ -116,73 +128,15 @@ All API responses follow this format:
 - **DELETE** `/products/:id`
 - **Auth Required:** Yes (Admin)
 
-### Get Product Recommendations
-- **GET** `/products/recommendations`
-- **Auth Required:** Yes
-- **Query Parameters:**
-  - `limit` - Maximum number of recommendations (default: 10)
-- **Description:** Returns personalized product recommendations based on user's purchase history. Uses collaborative filtering to suggest products that similar users have purchased. For new users with no purchase history, returns popular products.
 - **Response:**
   ```json
   {
     "success": true,
     "data": {
-      "recommendations": [
-        {
-          "_id": "product_id",
-          "name": "Product Name",
-          "description": "Product description",
-          "price": 0.001,
-          "priceUSD": 50,
-          "image": "/images/product.jpg",
-          "averageRating": 4.5,
-          "numReviews": 10,
-          "stock": 20,
-          "category": {
-            "_id": "category_id",
-            "name": "Category Name",
-            "slug": "category-slug"
-          }
-        }
-      ],
-      "count": 10
-    }
-  }
-  ```
-
-### Get Related Products
-- **GET** `/products/:id/related`
-- **Auth Required:** No
-- **Query Parameters:**
-  - `limit` - Maximum number of related products (default: 6)
-- **Description:** Returns products related to the specified product. Products are from the same category and sorted by rating.
 - **Response:**
   ```json
   {
     "success": true,
-    "data": {
-      "products": [
-        {
-          "_id": "product_id",
-          "name": "Related Product",
-          "description": "Product description",
-          "price": 0.002,
-          "priceUSD": 100,
-          "image": "/images/product.jpg",
-          "averageRating": 4.8,
-          "numReviews": 15,
-          "stock": 10,
-          "category": {
-            "_id": "category_id",
-            "name": "Category Name",
-            "slug": "category-slug"
-          }
-        }
-      ],
-      "count": 6
-    }
-  }
-  ```
 
 ---
 

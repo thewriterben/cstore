@@ -2,7 +2,6 @@ const Product = require('../models/Product');
 const { asyncHandler } = require('../middleware/errorHandler');
 const { AppError } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
-const recommendationService = require('../services/recommendationService');
 
 // @desc    Get all products
 // @route   GET /api/products
@@ -13,12 +12,64 @@ const getProducts = asyncHandler(async (req, res, next) => {
     search, 
     minPrice, 
     maxPrice, 
+    featured,
+    minRating,
     sort = '-createdAt',
     page = 1,
     limit = 10 
   } = req.query;
 
-  // Build query
+  // Try Elasticsearch first if enabled and available
+  if (elasticsearchService.isEnabled() && await elasticsearchService.isAvailable()) {
+    const esResults = await elasticsearchService.searchProducts({
+      search,
+      category,
+      minPrice,
+      maxPrice,
+      featured,
+      minRating,
+      sort,
+      page,
+      limit
+    });
+
+    if (esResults) {
+      // Fetch full product details from MongoDB using IDs from Elasticsearch
+      const productIds = esResults.products.map(p => p._id);
+      const products = await Product.find({ _id: { $in: productIds } })
+        .populate('category', 'name slug')
+        .lean();
+
+      // Maintain Elasticsearch order and merge scores
+      const productMap = new Map(products.map(p => [p._id.toString(), p]));
+      const orderedProducts = esResults.products
+        .map(esProduct => {
+          const product = productMap.get(esProduct._id);
+          if (product) {
+            product._score = esProduct._score;
+            return product;
+          }
+          return null;
+        })
+        .filter(p => p !== null);
+
+      return res.json({
+        success: true,
+        data: {
+          products: orderedProducts,
+          pagination: {
+            page: esResults.page,
+            limit: esResults.limit,
+            total: esResults.total,
+            pages: esResults.pages
+          },
+          searchEngine: 'elasticsearch'
+        }
+      });
+    }
+  }
+
+  // Fallback to MongoDB text search
   const query = { isActive: true };
 
   if (category) {
@@ -33,6 +84,14 @@ const getProducts = asyncHandler(async (req, res, next) => {
     query.priceUSD = {};
     if (minPrice) query.priceUSD.$gte = Number(minPrice);
     if (maxPrice) query.priceUSD.$lte = Number(maxPrice);
+  }
+
+  if (featured === 'true' || featured === true) {
+    query.featured = true;
+  }
+
+  if (minRating) {
+    query.averageRating = { $gte: Number(minRating) };
   }
 
   // Execute query with pagination
@@ -54,7 +113,8 @@ const getProducts = asyncHandler(async (req, res, next) => {
         limit: Number(limit),
         total,
         pages: Math.ceil(total / limit)
-      }
+      },
+      searchEngine: 'mongodb'
     }
   });
 });
@@ -83,6 +143,11 @@ const createProduct = asyncHandler(async (req, res, next) => {
 
   logger.info(`Product created: ${product.name} by admin ${req.user.email}`);
 
+  // Index in Elasticsearch if enabled
+  if (elasticsearchService.isEnabled()) {
+    await elasticsearchService.indexProduct(product);
+  }
+
   res.status(201).json({
     success: true,
     data: { product }
@@ -106,6 +171,22 @@ const updateProduct = asyncHandler(async (req, res, next) => {
 
   logger.info(`Product updated: ${product.name} by admin ${req.user.email}`);
 
+  // Update in Elasticsearch if enabled
+  if (elasticsearchService.isEnabled()) {
+    await elasticsearchService.updateProduct(req.params.id, {
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      priceUSD: product.priceUSD,
+      stock: product.stock,
+      isActive: product.isActive,
+      featured: product.featured,
+      averageRating: product.averageRating,
+      numReviews: product.numReviews,
+      updatedAt: product.updatedAt
+    });
+  }
+
   res.json({
     success: true,
     data: { product }
@@ -128,49 +209,19 @@ const deleteProduct = asyncHandler(async (req, res, next) => {
 
   logger.info(`Product deleted: ${product.name} by admin ${req.user.email}`);
 
+  // Update in Elasticsearch if enabled (mark as inactive)
+  if (elasticsearchService.isEnabled()) {
+    await elasticsearchService.updateProduct(req.params.id, {
+      isActive: false
+    });
+  }
+
   res.json({
     success: true,
     message: 'Product deleted successfully'
   });
 });
 
-// @desc    Get product recommendations for user
-// @route   GET /api/products/recommendations
-// @access  Private
-const getRecommendations = asyncHandler(async (req, res, next) => {
-  const limit = parseInt(req.query.limit) || 10;
-  
-  const recommendations = await recommendationService.getRecommendationsForUser(
-    req.user.id,
-    limit
-  );
-
-  res.json({
-    success: true,
-    data: {
-      recommendations,
-      count: recommendations.length
-    }
-  });
-});
-
-// @desc    Get related products for a specific product
-// @route   GET /api/products/:id/related
-// @access  Public
-const getRelatedProducts = asyncHandler(async (req, res, next) => {
-  const limit = parseInt(req.query.limit) || 6;
-  
-  const relatedProducts = await recommendationService.getRelatedProducts(
-    req.params.id,
-    limit
-  );
-
-  res.json({
-    success: true,
-    data: {
-      products: relatedProducts,
-      count: relatedProducts.length
-    }
   });
 });
 
@@ -180,6 +231,4 @@ module.exports = {
   createProduct,
   updateProduct,
   deleteProduct,
-  getRecommendations,
-  getRelatedProducts
 };
