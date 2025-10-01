@@ -27,6 +27,7 @@ This version includes all core e-commerce features. While functional, additional
 - 📁 **Category Management**: Full category system with hierarchical support
 - 🛒 **Shopping Cart**: Persistent cart with validation and stock management
 - 📧 **Email Service**: Transactional emails (welcome, order confirmation, payment receipt, shipping notifications)
+- 🌐 **Internationalization (i18n)**: Multi-language support (English, Spanish, French, German, Chinese)
 - 🔗 **Enhanced Blockchain**: Webhook support, real-time monitoring, retry mechanisms
 - 📊 **Admin Dashboard API**: Complete admin endpoints for analytics, user management, and system monitoring
 
@@ -51,7 +52,8 @@ These features are implemented but require configuration:
 - Product recommendations based on purchase history
 - Admin dashboard UI (React-based panel)
 - Multi-signature wallet support
-- Internationalization (i18n)
+- Multi-currency pricing
+- Region-specific payment methods
 
 ## Tech Stack
 
@@ -64,6 +66,7 @@ These features are implemented but require configuration:
 - **Morgan** - HTTP request logging
 - **Joi** - Request validation
 - **Nodemailer** - Email service
+- **i18next** - Internationalization (i18n)
 
 ### Security
 - **Helmet** - Security headers
@@ -92,6 +95,80 @@ These features are implemented but require configuration:
 - **[API Endpoints](docs/API_ENDPOINTS.md)** - Complete API endpoint reference with examples
 - **[Authentication System](docs/AUTHENTICATION.md)** - JWT authentication and RBAC guide
 - **[API Documentation](docs/API.md)** - Detailed API documentation
+
+## 🌐 Internationalization (i18n)
+
+The application supports multiple languages out of the box:
+
+### Supported Languages
+
+- 🇬🇧 **English (en)** - Default language
+- 🇪🇸 **Spanish (es)** - Español
+- 🇫🇷 **French (fr)** - Français
+- 🇩🇪 **German (de)** - Deutsch
+- 🇨🇳 **Chinese (zh)** - 中文 (Simplified)
+
+### Language Detection
+
+The application automatically detects the user's preferred language from:
+
+1. **Query Parameter**: `?lng=es` (highest priority)
+2. **Cookie**: `i18next=fr`
+3. **Accept-Language Header**: Browser setting
+4. **Default**: English (en)
+
+### Usage
+
+#### Frontend
+Users can select their preferred language using the language selector in the header. The selection is automatically saved in the browser.
+
+#### API Requests
+Include the language in your API requests:
+
+```javascript
+// Using query parameter
+fetch('/api/health?lng=es')
+
+// Using Accept-Language header
+fetch('/api/health', {
+  headers: {
+    'Accept-Language': 'fr'
+  }
+})
+```
+
+#### Email Notifications
+Email templates are automatically translated based on the user's language preference:
+
+```javascript
+// Send welcome email in Spanish
+await sendWelcomeEmail('user@example.com', 'Juan', 'es');
+```
+
+### Configuration
+
+Set the default language in `.env`:
+
+```env
+DEFAULT_LANGUAGE=en
+```
+
+### Translation Files
+
+Translation files are located in `/locales/{language}/`:
+
+- `translation.json` - UI text and messages
+- `emails.json` - Email template translations
+- `errors.json` - Error messages
+
+### Adding New Languages
+
+1. Create a new directory in `/locales/` (e.g., `/locales/it/` for Italian)
+2. Copy translation files from `/locales/en/` to the new directory
+3. Translate the content in the new files
+4. Add the language code to `supportedLngs` in `src/config/i18n.js`
+5. Add the language option to the frontend selector in `public/index.html`
+
 
 ## Getting Started
 
@@ -673,10 +750,10 @@ The following features are planned for future versions:
 - [ ] CDN integration for static assets
 
 ### Phase 5: Internationalization
-- [ ] Multi-language support (i18n)
+- [x] Multi-language support (i18n)
+- [x] Localized email templates
 - [ ] Multi-currency pricing
 - [ ] Region-specific payment methods
-- [ ] Localized email templates
 
 ## 📋 API Endpoints Summary
 

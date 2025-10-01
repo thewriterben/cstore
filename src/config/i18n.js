@@ -17,7 +17,7 @@ i18next
     nonExplicitSupportedLngs: false,
     
     // Namespace for translations
-    ns: ['translation', 'emails', 'errors', 'validation'],
+    ns: ['translation', 'emails', 'errors'],
     defaultNS: 'translation',
     
     // Backend options
