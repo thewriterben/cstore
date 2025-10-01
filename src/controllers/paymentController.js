@@ -4,6 +4,7 @@ const Product = require('../models/Product');
 const { asyncHandler } = require('../middleware/errorHandler');
 const { AppError } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
+const { verifyTransaction } = require('../services/blockchainService');
 
 // @desc    Confirm payment
 // @route   POST /api/payments/confirm
@@ -28,15 +29,61 @@ const confirmPayment = asyncHandler(async (req, res, next) => {
     return next(new AppError('Transaction hash already used', 400));
   }
 
+  // Verify transaction on blockchain (optional in demo mode)
+  let verificationResult = { verified: true }; // Default for demo
+  
+  if (process.env.VERIFY_BLOCKCHAIN === 'true') {
+    logger.info('Verifying transaction on blockchain...');
+    verificationResult = await verifyTransaction(
+      order.cryptocurrency,
+      transactionHash,
+      order.paymentAddress,
+      order.totalPrice
+    );
+
+    if (!verificationResult.verified) {
+      logger.warn(`Transaction verification failed: ${verificationResult.error}`);
+      
+      // Create payment record with failed status
+      await Payment.create({
+        order: order._id,
+        transactionHash,
+        cryptocurrency: order.cryptocurrency,
+        amount: order.totalPrice,
+        amountUSD: order.totalPriceUSD,
+        toAddress: order.paymentAddress,
+        fromAddress: verificationResult.fromAddress || null,
+        status: 'failed',
+        confirmations: verificationResult.confirmations || 0,
+        blockNumber: verificationResult.blockNumber || null,
+        blockHash: verificationResult.blockHash || null,
+        verificationAttempts: 1,
+        lastVerificationAt: new Date()
+      });
+
+      return next(new AppError(
+        `Payment verification failed: ${verificationResult.error}`,
+        400
+      ));
+    }
+  }
+
   // Create payment record
   const payment = await Payment.create({
     order: order._id,
     transactionHash,
     cryptocurrency: order.cryptocurrency,
-    amount: order.totalPrice,
+    amount: verificationResult.amount || order.totalPrice,
     amountUSD: order.totalPriceUSD,
     toAddress: order.paymentAddress,
-    status: 'confirmed' // In production, this would be 'pending' until verified
+    fromAddress: verificationResult.fromAddress || null,
+    status: 'confirmed',
+    confirmations: verificationResult.confirmations || 0,
+    blockNumber: verificationResult.blockNumber || null,
+    blockHash: verificationResult.blockHash || null,
+    confirmedAt: new Date(),
+    verificationAttempts: 1,
+    lastVerificationAt: new Date()
   });
 
   // Update order
@@ -58,7 +105,12 @@ const confirmPayment = asyncHandler(async (req, res, next) => {
     success: true,
     data: {
       payment,
-      order
+      order,
+      verification: verificationResult.verified ? {
+        verified: true,
+        confirmations: verificationResult.confirmations,
+        blockNumber: verificationResult.blockNumber
+      } : undefined
     }
   });
 });
@@ -114,8 +166,67 @@ const getAllPayments = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc    Verify payment manually (admin)
+// @route   POST /api/payments/:id/verify
+// @access  Private/Admin
+const verifyPayment = asyncHandler(async (req, res, next) => {
+  const payment = await Payment.findById(req.params.id).populate('order');
+
+  if (!payment) {
+    return next(new AppError('Payment not found', 404));
+  }
+
+  if (payment.status === 'confirmed') {
+    return res.json({
+      success: true,
+      message: 'Payment already confirmed',
+      data: { payment }
+    });
+  }
+
+  // Verify transaction on blockchain
+  const verificationResult = await verifyTransaction(
+    payment.cryptocurrency,
+    payment.transactionHash,
+    payment.toAddress,
+    payment.amount
+  );
+
+  // Update payment
+  payment.status = verificationResult.verified ? 'confirmed' : 'failed';
+  payment.confirmations = verificationResult.confirmations || 0;
+  payment.blockNumber = verificationResult.blockNumber || null;
+  payment.blockHash = verificationResult.blockHash || null;
+  payment.fromAddress = verificationResult.fromAddress || payment.fromAddress;
+  payment.verificationAttempts += 1;
+  payment.lastVerificationAt = new Date();
+  
+  if (verificationResult.verified) {
+    payment.confirmedAt = new Date();
+  }
+
+  await payment.save();
+
+  // Update order if payment is confirmed
+  if (verificationResult.verified && payment.order) {
+    payment.order.status = 'paid';
+    await payment.order.save();
+  }
+
+  logger.info(`Payment ${payment._id} verified by admin ${req.user.email}: ${verificationResult.verified}`);
+
+  res.json({
+    success: true,
+    data: {
+      payment,
+      verification: verificationResult
+    }
+  });
+});
+
 module.exports = {
   confirmPayment,
   getPaymentByOrder,
-  getAllPayments
+  getAllPayments,
+  verifyPayment
 };
