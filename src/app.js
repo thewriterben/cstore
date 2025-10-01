@@ -30,6 +30,8 @@ const cartRoutes = require('./routes/cartRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const multiSigWalletRoutes = require('./routes/multiSigWalletRoutes');
+const currencyRoutes = require('./routes/currencyRoutes');
+const regionalPaymentRoutes = require('./routes/regionalPaymentRoutes');
 const { getCryptocurrencies } = require('./controllers/orderController');
 
 const app = express();
@@ -93,6 +95,8 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/wallets/multi-sig', multiSigWalletRoutes);
+app.use('/api/currencies', currencyRoutes);
+app.use('/api/payments/regional', regionalPaymentRoutes);
 app.get('/api/cryptocurrencies', getCryptocurrencies);
 
 // Health check
