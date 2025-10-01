@@ -62,7 +62,7 @@ Multi-signature wallet support has been successfully implemented in the CStore c
 ### 3. Routes
 
 #### Multi-Sig Wallet Routes (`src/routes/multiSigWalletRoutes.js`)
-**18 Endpoints:**
+**18 User Endpoints:**
 
 **Wallet Management (10 endpoints):**
 - `POST /api/wallets/multi-sig` - Create wallet
@@ -77,9 +77,20 @@ Multi-signature wallet support has been successfully implemented in the CStore c
 - `POST /api/wallets/multi-sig/transactions` - Create transaction
 - `GET /api/wallets/multi-sig/transactions` - List transactions
 - `GET /api/wallets/multi-sig/transactions/:id` - Get transaction
-- `POST /api/wallets/multi-sig/transactions/:id/approve` - Approve/reject
+- `POST /api/wallets/multi-sig/transactions/:id/approve` - Approve/reject (with rate limiting)
 - `POST /api/wallets/multi-sig/transactions/:id/execute` - Execute transaction
 - `DELETE /api/wallets/multi-sig/transactions/:id` - Cancel transaction
+
+#### Admin Routes (`src/routes/adminRoutes.js`)
+**6 Admin Endpoints:**
+
+**Multi-Sig Monitoring & Management:**
+- `GET /api/admin/multi-sig/stats` - Get statistics dashboard
+- `GET /api/admin/multi-sig/wallets` - List all wallets (with pagination)
+- `GET /api/admin/multi-sig/wallets/:id` - Get wallet details with transactions
+- `PUT /api/admin/multi-sig/wallets/:id/status` - Update wallet status
+- `GET /api/admin/multi-sig/transactions` - List all transactions (with pagination)
+- `GET /api/admin/multi-sig/transactions/:id` - Get transaction details
 
 ### 4. Validation
 
@@ -256,12 +267,52 @@ npm test -- multiSigWallet.test.js
 ## Security Considerations
 
 ### Implemented
-- JWT authentication on all endpoints
-- Role-based access control
-- Duplicate approval prevention
-- Transaction hash uniqueness validation
-- Blockchain verification (optional)
-- Audit logging
+- ✅ JWT authentication on all endpoints
+- ✅ Role-based access control (owner/signer/admin permissions)
+- ✅ Duplicate approval prevention
+- ✅ Transaction hash uniqueness validation
+- ✅ Blockchain verification (optional)
+- ✅ **Rate limiting for approval requests** (50 requests/hour per IP)
+- ✅ **Enhanced security logging** with dedicated security.log file
+- ✅ **Admin monitoring endpoints** for oversight and troubleshooting
+- ✅ Comprehensive audit trail for all operations
+
+### Security Logging
+
+**Dedicated Security Log:**
+- Separate `logs/security.log` file for multi-sig operations
+- Structured JSON format with timestamps
+- 10-file rotation with 5MB per file
+- Logs all critical operations: wallet creation, transaction creation, approvals, executions
+
+**Logged Details:**
+- User IDs and emails for all actions
+- Wallet and transaction identifiers
+- Amounts, addresses, and cryptocurrency types
+- Approval counts and status changes
+- Blockchain transaction hashes and verification results
+
+### Rate Limiting
+
+**Multi-Sig Approval Limiter:**
+- Applied specifically to approval endpoint
+- Limit: 50 requests per hour per IP address
+- Prevents approval request flooding
+- Bypassed for unauthenticated requests
+
+### Admin Controls
+
+**Monitoring Capabilities:**
+- View all wallets and transactions across the platform
+- Filter by status, cryptocurrency, active state
+- Access detailed wallet configurations and transaction history
+- Update wallet active status (enable/disable)
+
+**Statistics Dashboard:**
+- Total wallets (active/inactive)
+- Transaction counts by status
+- Transaction volumes by cryptocurrency
+- Recent pending transactions requiring attention
 
 ### Recommendations for Production
 - Enable blockchain verification (`VERIFY_BLOCKCHAIN=true`)
@@ -269,7 +320,8 @@ npm test -- multiSigWallet.test.js
 - Set up monitoring for pending transactions
 - Implement email notifications for approval requests
 - Add webhook support for status updates
-- Regular audit of transaction logs
+- Regular audit of security logs (logs/security.log)
+- Monitor rate limiting metrics
 
 ## Integration Points
 
@@ -368,12 +420,16 @@ See "Future Enhancements" in MULTI_SIG_WALLET.md for roadmap.
 - [x] Comprehensive validation
 - [x] Full test coverage
 - [x] Complete documentation
+- [x] **Admin monitoring and management endpoints**
+- [x] **Rate limiting for approval operations**
+- [x] **Enhanced security logging and audit trail**
 
 ### Quality Metrics
 - **Code Coverage:** 60+ test cases
-- **Documentation:** 4 documents, 36 KB
-- **API Endpoints:** 18 new endpoints
-- **Lines of Code:** ~2,400
+- **Documentation:** 4+ documents, 45+ KB
+- **API Endpoints:** 24 total (18 user + 6 admin)
+- **Lines of Code:** ~2,700
+- **Security Features:** Rate limiting, dedicated security logs, admin oversight
 - **Zero Breaking Changes:** Fully backward compatible
 
 ## Conclusion

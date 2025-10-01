@@ -641,6 +641,76 @@ All admin endpoints require Admin role authentication.
 
 ---
 
+## Admin Multi-Sig Management Endpoints
+
+All admin multi-sig endpoints require Admin role authentication.
+
+### Get Multi-Sig Statistics
+- **GET** `/admin/multi-sig/stats`
+- **Auth Required:** Yes (Admin)
+- **Returns:** Comprehensive statistics about wallets and transactions
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "wallets": { "total": 50, "active": 45, "inactive": 5 },
+      "transactions": {
+        "total": 250,
+        "pending": 10,
+        "approved": 5,
+        "executed": 230,
+        "rejected": 5
+      },
+      "byCryptocurrency": [...],
+      "recentPending": [...]
+    }
+  }
+  ```
+
+### List All Multi-Sig Wallets
+- **GET** `/admin/multi-sig/wallets`
+- **Auth Required:** Yes (Admin)
+- **Query Parameters:**
+  - `isActive` (boolean): Filter by active status
+  - `cryptocurrency` (string): Filter by cryptocurrency type
+  - `page` (number): Page number (default: 1)
+  - `limit` (number): Items per page (default: 20)
+- **Returns:** Paginated list of all multi-sig wallets with owner and signer details
+
+### Get Wallet Details (Admin)
+- **GET** `/admin/multi-sig/wallets/:id`
+- **Auth Required:** Yes (Admin)
+- **Returns:** Detailed wallet information including all associated transactions
+
+### Update Wallet Status
+- **PUT** `/admin/multi-sig/wallets/:id/status`
+- **Auth Required:** Yes (Admin)
+- **Body:**
+  ```json
+  {
+    "isActive": true
+  }
+  ```
+- **Returns:** Updated wallet with new status
+
+### List All Transactions (Admin)
+- **GET** `/admin/multi-sig/transactions`
+- **Auth Required:** Yes (Admin)
+- **Query Parameters:**
+  - `status` (string): Filter by transaction status
+  - `cryptocurrency` (string): Filter by cryptocurrency
+  - `page` (number): Page number (default: 1)
+  - `limit` (number): Items per page (default: 20)
+- **Returns:** Paginated list of all multi-sig transactions with full details
+
+### Get Transaction Details (Admin)
+- **GET** `/admin/multi-sig/transactions/:id`
+- **Auth Required:** Yes (Admin)
+- **Returns:** Detailed transaction information including wallet details and all approvals
+
+---
+
 ## Pagination
 
 Paginated endpoints return the following pagination object:
