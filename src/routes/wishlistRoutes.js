@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/auth');
-const { validateWishlistItem } = require('../middleware/validation');
 const {
   getWishlist,
   addToWishlist,
@@ -13,7 +12,7 @@ const {
 router.use(protect);
 
 router.get('/', getWishlist);
-router.post('/items', validateWishlistItem, addToWishlist);
+router.post('/items', addToWishlist);
 router.delete('/items/:productId', removeFromWishlist);
 router.delete('/', clearWishlist);
 
