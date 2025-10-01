@@ -1,14 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/auth');
-const {
-  validateCreateMultiSigWallet,
-  validateUpdateMultiSigWallet,
-  validateAddSigner,
-  validateCreateTransactionApproval,
-  validateApproveTransaction,
-  validateExecuteTransaction
-} = require('../middleware/validation');
 const { 
   createWallet,
   getWallets,
@@ -32,7 +24,7 @@ router.use(protect);
 
 // Transaction approval routes (must come before /:id to avoid conflicts)
 router.route('/transactions')
-  .post(validateCreateTransactionApproval, createTransactionApproval)
+  .post(createTransactionApproval)
   .get(getTransactionApprovals);
 
 router.route('/transactions/:id')
@@ -40,23 +32,23 @@ router.route('/transactions/:id')
   .delete(cancelTransaction);
 
 router.route('/transactions/:id/approve')
-  .post(validateApproveTransaction, approveTransaction);
+  .post(approveTransaction);
 
 router.route('/transactions/:id/execute')
-  .post(validateExecuteTransaction, executeTransaction);
+  .post(executeTransaction);
 
 // Wallet management routes
 router.route('/')
-  .post(validateCreateMultiSigWallet, createWallet)
+  .post(createWallet)
   .get(getWallets);
 
 router.route('/:id')
   .get(getWallet)
-  .put(validateUpdateMultiSigWallet, updateWallet)
+  .put(updateWallet)
   .delete(deleteWallet);
 
 router.route('/:id/signers')
-  .post(validateAddSigner, addSigner);
+  .post(addSigner);
 
 router.route('/:id/signers/:signerId')
   .delete(removeSigner);
