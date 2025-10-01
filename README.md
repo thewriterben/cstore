@@ -1,26 +1,49 @@
-# CStore - Production-Ready Cryptocurrency Marketplace
+# CStore - Cryptocurrency Marketplace (In Development)
 
-A comprehensive, secure cryptocurrency marketplace built with Node.js, Express, and MongoDB. This application features real blockchain integration capabilities, JWT authentication, comprehensive security measures, and a complete e-commerce backend.
+A cryptocurrency marketplace built with Node.js, Express, and MongoDB. This application is currently in active development and includes JWT authentication, basic blockchain integration, security measures, and core e-commerce backend features.
 
-## 🚀 Version 2.0 - Production Ready
+## ⚠️ Project Status
 
-This version includes major enhancements transforming the basic demo into a production-ready application:
+**This project is in active development and NOT production-ready.** Many features are planned but not yet implemented. Please see the sections below for details on what is currently available versus what is planned for future releases.
 
-### ✨ New Features
+## 🚀 Version 2.0 - Current Release
+
+This version includes enhancements over the basic demo:
+
+### ✅ Implemented Features
 
 - 🔐 **JWT Authentication**: Secure user registration and login with bcrypt password hashing
 - 💾 **MongoDB Integration**: Persistent data storage with Mongoose ODM
-- 🛡️ **Advanced Security**: Helmet, rate limiting, input validation, and sanitization
-- 📊 **Database Models**: Users, Products, Orders, Payments, Categories, Reviews
-- 🔍 **Advanced Search**: Product filtering, sorting, and pagination
-- 👤 **User Management**: User profiles, order history, and role-based access control
-- 📦 **Order Management**: Complete order lifecycle with status tracking
-- 💳 **Payment Processing**: Transaction verification and payment tracking
-- 🧪 **Testing Suite**: Jest tests with Supertest for API testing
-- 🐳 **Docker Support**: Multi-stage Dockerfile and Docker Compose setup
+- 🛡️ **Security**: Helmet, rate limiting, input validation, and sanitization
+- 📊 **Database Models**: Users, Products, Orders, Payments, Categories, Reviews (models only - Review has no API endpoints)
+- 🔍 **Product Filtering**: Basic product search, filtering by price/category, sorting, and pagination
+- 👤 **User Management**: User profiles and role-based access control (admin/user)
+- 📦 **Order Management**: Basic order creation and status tracking
+- 💳 **Payment Processing**: Basic payment confirmation with transaction hash
+- 🧪 **Testing Suite**: Basic Jest tests with Supertest for authentication and products
+- 🐳 **Docker Support**: Dockerfile and Docker Compose configuration
 - 📝 **Logging**: Winston logger with file and console transports
-- 🚦 **Error Handling**: Centralized error handling with proper HTTP status codes
+- 🚦 **Error Handling**: Centralized error handling middleware
 - 📈 **Admin Features**: Admin-only endpoints for product and order management
+
+### 🔧 Partially Implemented Features
+
+- **Blockchain Integration**: Basic blockchain service exists with verification functions for BTC, ETH, and USDT, but uses public APIs. No real-time monitoring or webhook support.
+- **Category System**: Category model exists and products can be filtered by category, but no dedicated category management API endpoints.
+- **Reviews**: Review model exists in database, but no API endpoints to create, read, update, or delete reviews.
+
+### ❌ Not Yet Implemented (Planned)
+
+- Product reviews and ratings API endpoints
+- Shopping cart functionality
+- Wishlist feature
+- Advanced search with Elasticsearch
+- Product recommendations
+- Real-time payment confirmation monitoring
+- Email notifications (order confirmations, payment receipts, shipping notifications)
+- Admin dashboard UI (React-based panel)
+- Sales analytics and reporting
+- Multi-signature wallet support
 
 ## Tech Stack
 
@@ -47,7 +70,7 @@ This version includes major enhancements transforming the basic demo into a prod
 ### DevOps
 - **Docker** & **Docker Compose**
 - **Jest** & **Supertest** - Testing
-- **GitHub Actions** ready (CI/CD pipeline configuration)
+- **GitHub Actions** - Basic CI/CD workflow files included (may need configuration)
 
 ## Getting Started
 
@@ -360,12 +383,14 @@ cstore/
 │   │   ├── Order.js            # Order schema
 │   │   ├── Payment.js          # Payment schema
 │   │   ├── Category.js         # Category schema
-│   │   └── Review.js           # Review schema
+│   │   └── Review.js           # Review schema (no API endpoints yet)
 │   ├── routes/                 # API routes
 │   │   ├── authRoutes.js       # Auth endpoints
 │   │   ├── orderRoutes.js      # Order endpoints
 │   │   ├── paymentRoutes.js    # Payment endpoints
 │   │   └── productRoutes.js    # Product endpoints
+│   ├── services/               # Business logic services
+│   │   └── blockchainService.js # Blockchain verification (basic)
 │   ├── utils/                  # Utility functions
 │   │   ├── jwt.js              # JWT token management
 │   │   ├── logger.js           # Winston logger
@@ -406,10 +431,13 @@ cstore/
 9. **Error Handling** - Proper error messages without leaking details
 10. **Logging** - Winston logging for audit trails
 
-### Production Checklist
+**Note on Blockchain Verification**: The application includes a blockchain service with functions to verify BTC, ETH, and USDT transactions using public APIs (blockchain.info, Etherscan-compatible APIs). However, this is a basic implementation and should not be considered production-ready. It lacks real-time monitoring, webhook support, and robust error handling needed for production use.
 
-Before deploying to production:
+### Production Readiness Checklist
 
+⚠️ **This application is NOT ready for production.** Before considering production deployment:
+
+**Security & Configuration:**
 - [ ] Change all default secrets in `.env`
 - [ ] Use HTTPS/TLS encryption
 - [ ] Set up proper MongoDB authentication
@@ -417,15 +445,28 @@ Before deploying to production:
 - [ ] Enable MongoDB replica set for production
 - [ ] Set up automated backups
 - [ ] Configure monitoring and alerting
+- [ ] Complete comprehensive security audit
 - [ ] Review and audit all security settings
-- [ ] Implement real blockchain verification
-- [ ] Set up email service for notifications
+
+**Missing/Incomplete Features:**
+- [ ] Implement robust blockchain verification (current implementation is basic)
+- [ ] Implement email service for notifications
+- [ ] Add review and rating API endpoints
+- [ ] Add category management API endpoints
+- [ ] Implement shopping cart functionality
+- [ ] Add comprehensive test coverage
+- [ ] Build admin dashboard UI
+- [ ] Implement real-time payment monitoring
+
+**Infrastructure:**
 - [ ] Configure CDN for static assets
 - [ ] Enable request logging to external service
+- [ ] Set up CI/CD pipeline properly
+- [ ] Configure production monitoring and alerting
 
 ## 🧪 Testing
 
-The application includes a comprehensive test suite covering:
+The application includes a basic test suite covering:
 
 - User authentication (registration, login)
 - JWT token validation
@@ -433,6 +474,8 @@ The application includes a comprehensive test suite covering:
 - Role-based access control
 - Input validation
 - Error handling
+
+**Note**: Test coverage is not comprehensive. Many features and edge cases are not yet tested.
 
 ## 🐳 Docker Deployment
 
@@ -488,25 +531,25 @@ On first run with `SEED_DATA=true`, the application will automatically create:
 
 **⚠️ Important**: Change the default admin password immediately in production!
 
-## 🚀 Future Enhancements
+## 🚀 Planned Features & Enhancements
 
-Planned features for future versions:
+The following features are planned for future versions but **are NOT currently implemented**:
 
-### Phase 2: Real Blockchain Integration
-- [ ] Web3.js integration for Ethereum transactions
-- [ ] Bitcoin Core RPC for Bitcoin verification
-- [ ] Real-time payment confirmation
+### Phase 2: Enhanced Blockchain Integration
+- [ ] Real-time payment confirmation monitoring
 - [ ] Webhook support for payment notifications
 - [ ] Multi-signature wallet support
+- [ ] Integration with Bitcoin Core RPC (currently uses public APIs)
+- [ ] Improved transaction verification with configurable confirmation requirements
 
 ### Phase 3: Advanced Features
-- [ ] Product reviews and ratings system
+- [ ] Product reviews and ratings API endpoints (model exists, API needed)
 - [ ] Shopping cart functionality
 - [ ] Wishlist feature
-- [ ] Product categories and filters
+- [ ] Category management API endpoints (model exists, API needed)
 - [ ] Advanced search with Elasticsearch
 - [ ] Product recommendations
-- [ ] Inventory management
+- [ ] Inventory management features
 
 ### Phase 4: Communication
 - [ ] Email notifications (SendGrid/Nodemailer)
@@ -522,12 +565,12 @@ Planned features for future versions:
 - [ ] Product management UI
 - [ ] Order tracking dashboard
 
-### Phase 6: DevOps
-- [ ] GitHub Actions CI/CD pipeline
+### Phase 6: DevOps & CI/CD
+- [ ] Complete GitHub Actions CI/CD pipeline configuration (basic workflow files exist)
 - [ ] Automated testing in CI
 - [ ] Docker image optimization
 - [ ] Kubernetes deployment manifests
-- [ ] Prometheus metrics
+- [ ] Prometheus metrics integration
 - [ ] Grafana dashboards
 
 ## 📝 Migration from v1.0 to v2.0
@@ -547,7 +590,7 @@ Both versions share the same frontend but v2.0 adds:
 - User authentication
 - Enhanced security
 - Better error handling
-- Comprehensive API
+- More structured API
 
 ## 🤝 Contributing
 
@@ -563,15 +606,18 @@ Contributions are welcome! Please follow these steps:
 
 ISC License - see LICENSE file for details
 
-## ⚠️ Disclaimer
+## ⚠️ Important Disclaimer
 
-This application provides the infrastructure for a cryptocurrency marketplace. However:
+**This application is NOT production-ready.** Before considering any production use:
 
+- **In Development**: Many features are incomplete or missing (see Project Status section above)
 - **Not Financial Advice**: This is educational software
-- **Security Audit Required**: Conduct thorough security audits before production use
-- **Blockchain Integration**: Implement real blockchain verification for production
+- **Security Audit Required**: Conduct thorough security audits before any production use
+- **Blockchain Integration**: Current blockchain verification is basic and uses public APIs. Implement robust blockchain verification for production
+- **Testing Required**: Test coverage is incomplete. Thoroughly test all features in a staging environment
 - **Compliance**: Ensure compliance with local regulations regarding cryptocurrency transactions
-- **Testing**: Thoroughly test all features in a staging environment
+- **Email & Notifications**: No email system is currently implemented
+- **Admin UI**: No admin dashboard interface exists (only API endpoints)
 
 ## 🆘 Support
 
