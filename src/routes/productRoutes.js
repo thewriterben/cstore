@@ -13,7 +13,6 @@ const router = express.Router();
 
 router.get('/', getProducts);
 router.get('/:id', getProduct);
-router.get('/:id/related', getRelatedProducts);
 router.post('/', protect, authorize('admin'), validate(schemas.createProduct), createProduct);
 router.put('/:id', protect, authorize('admin'), validate(schemas.updateProduct), updateProduct);
 router.delete('/:id', protect, authorize('admin'), deleteProduct);
