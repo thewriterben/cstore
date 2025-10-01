@@ -26,6 +26,7 @@ This version includes all core e-commerce features. While functional, additional
 - ⭐ **Review & Rating System**: Complete review CRUD operations with rating aggregation
 - 📁 **Category Management**: Full category system with hierarchical support
 - 🛒 **Shopping Cart**: Persistent cart with validation and stock management
+- ❤️ **Wishlist**: Save products for later with full CRUD operations
 - 📧 **Email Service**: Transactional emails (welcome, order confirmation, payment receipt, shipping notifications)
 - 🔗 **Enhanced Blockchain**: Webhook support, real-time monitoring, retry mechanisms
 - 📊 **Admin Dashboard API**: Complete admin endpoints for analytics, user management, and system monitoring
@@ -46,7 +47,6 @@ These features are implemented but require configuration:
 
 ### ❌ Not Yet Implemented (Future Enhancements)
 
-- Wishlist feature
 - Advanced search with Elasticsearch
 - Product recommendations based on purchase history
 - Admin dashboard UI (React-based panel)
@@ -645,7 +645,7 @@ On first run with `SEED_DATA=true`, the application will automatically create:
 The following features are planned for future versions:
 
 ### Phase 1: User Experience
-- [ ] Wishlist feature
+- [x] Wishlist feature
 - [ ] Product comparison
 - [ ] Advanced search with Elasticsearch
 - [ ] Product recommendations based on purchase history

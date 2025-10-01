@@ -356,6 +356,33 @@ All API responses follow this format:
 
 ---
 
+## Wishlist Endpoints
+
+### Get Wishlist
+- **GET** `/wishlist`
+- **Auth Required:** Yes
+- **Returns:** User's wishlist with populated product details
+
+### Add to Wishlist
+- **POST** `/wishlist/items`
+- **Auth Required:** Yes
+- **Body:**
+  ```json
+  {
+    "productId": "product_id"
+  }
+  ```
+
+### Remove from Wishlist
+- **DELETE** `/wishlist/items/:productId`
+- **Auth Required:** Yes
+
+### Clear Wishlist
+- **DELETE** `/wishlist`
+- **Auth Required:** Yes
+
+---
+
 ## Admin Dashboard Endpoints
 
 All admin endpoints require Admin role authentication.
