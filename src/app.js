@@ -11,8 +11,6 @@ const {
   securityHeaders,
   limiter,
   authLimiter,
-  sanitizeData,
-  xssClean,
   preventParamPollution
 } = require('./middleware/security');
 
