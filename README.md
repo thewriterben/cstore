@@ -72,6 +72,11 @@ This version includes enhancements over the basic demo:
 - **Jest** & **Supertest** - Testing
 - **GitHub Actions** - Basic CI/CD workflow files included (may need configuration)
 
+## 📖 Documentation
+
+- **[Authentication System](docs/AUTHENTICATION.md)** - Complete guide to JWT authentication, bcrypt hashing, and role-based access control
+- **[API Documentation](docs/API.md)** - Full API endpoint reference
+
 ## Getting Started
 
 ### Prerequisites
