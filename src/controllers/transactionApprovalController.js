@@ -69,7 +69,18 @@ exports.createTransactionApproval = asyncHandler(async (req, res, next) => {
   await transactionApproval.populate('order');
   await transactionApproval.populate('metadata.initiatedBy', 'name email');
   
-  logger.info(`Transaction approval created: ${transactionApproval._id} for wallet ${walletId}`);
+  // Enhanced security logging for multi-sig operations
+  logger.logMultiSigOperation('transaction_created', {
+    transactionId: transactionApproval._id,
+    walletId,
+    userId: req.user.id,
+    userEmail: req.user.email,
+    amount,
+    cryptocurrency: wallet.cryptocurrency,
+    toAddress,
+    orderId: orderId || null,
+    requiredApprovals: wallet.requiredSignatures
+  });
   
   res.status(201).json({
     success: true,
@@ -198,9 +209,19 @@ exports.approveTransaction = asyncHandler(async (req, res, next) => {
   await transaction.populate('metadata.initiatedBy', 'name email');
   await transaction.populate('approvals.signer', 'name email');
   
-  logger.info(
-    `Transaction ${approved ? 'approved' : 'rejected'}: ${transaction._id} by user ${req.user.id}`
-  );
+  // Enhanced security logging for approval actions
+  logger.logMultiSigOperation('transaction_approval', {
+    transactionId: transaction._id,
+    walletId: transaction.wallet._id,
+    userId: req.user.id,
+    userEmail: req.user.email,
+    approved,
+    comment: comment || null,
+    currentApprovals: transaction.approvalCount,
+    requiredApprovals: transaction.requiredApprovals,
+    newStatus: transaction.status,
+    hasSignature: !!signature
+  });
   
   res.json({
     success: true,
@@ -307,7 +328,20 @@ exports.executeTransaction = asyncHandler(async (req, res, next) => {
   await transaction.populate('metadata.initiatedBy', 'name email');
   await transaction.populate('approvals.signer', 'name email');
   
-  logger.info(`Transaction executed: ${transaction._id}`);
+  // Enhanced security logging for transaction execution
+  logger.logMultiSigOperation('transaction_executed', {
+    transactionId: transaction._id,
+    walletId: transaction.wallet._id,
+    executedBy: req.user.id,
+    executedByEmail: req.user.email,
+    transactionHash,
+    amount: transaction.amount,
+    cryptocurrency: transaction.cryptocurrency,
+    toAddress: transaction.toAddress,
+    orderId: transaction.order?._id || null,
+    approvalCount: transaction.approvalCount,
+    verified: verificationResult.verified
+  });
   
   res.json({
     success: true,

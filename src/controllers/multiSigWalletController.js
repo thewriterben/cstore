@@ -57,7 +57,18 @@ exports.createWallet = asyncHandler(async (req, res, next) => {
   await wallet.populate('owner', 'name email');
   await wallet.populate('signers.user', 'name email');
   
-  logger.info(`Multi-sig wallet created: ${wallet._id} by user ${req.user.id}`);
+  // Enhanced security logging for wallet creation
+  logger.logMultiSigOperation('wallet_created', {
+    walletId: wallet._id,
+    ownerId: req.user.id,
+    ownerEmail: req.user.email,
+    name: wallet.name,
+    cryptocurrency: wallet.cryptocurrency,
+    address: wallet.address,
+    signersCount: enrichedSigners.length,
+    requiredSignatures: requiredSignatures,
+    signerEmails: enrichedSigners.map(s => s.email)
+  });
   
   res.status(201).json({
     success: true,
