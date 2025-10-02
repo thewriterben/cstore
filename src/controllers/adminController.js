@@ -590,7 +590,7 @@ exports.getAllMultiSigWallets = async (req, res, next) => {
     // Build query
     const query = {};
     if (isActive !== undefined) query.isActive = isActive === 'true';
-    if (cryptocurrency) query.cryptocurrency = cryptocurrency;
+    if (cryptocurrency) query.cryptocurrency = { $eq: cryptocurrency };
     
     // Get wallets with pagination
     const skip = (page - 1) * limit;
