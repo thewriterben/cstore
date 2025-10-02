@@ -13,7 +13,7 @@ const logFormat = winston.format.combine(
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
   format: logFormat,
-  defaultMeta: { service: 'cstore-api' },
+  defaultMeta: { service: 'cryptons-api' },
   transports: [
     // Write all logs to console
     new winston.transports.Console({
@@ -42,7 +42,7 @@ const logger = winston.createLogger({
 const securityLogger = winston.createLogger({
   level: 'info',
   format: logFormat,
-  defaultMeta: { service: 'cstore-security', category: 'multi-sig' },
+  defaultMeta: { service: 'cryptons-security', category: 'multi-sig' },
   transports: [
     new winston.transports.File({ 
       filename: path.join(__dirname, '../../logs/security.log'),

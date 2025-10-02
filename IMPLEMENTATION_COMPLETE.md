@@ -1,4 +1,4 @@
-# Implementation Complete - CStore v2.1
+# Implementation Complete - Cryptons.com v2.1
 
 ## 🎉 Implementation Status: COMPLETE
 
@@ -197,9 +197,9 @@ SMTP_PORT=587
 SMTP_SECURE=false
 SMTP_USER=your-email@gmail.com
 SMTP_PASSWORD=your-app-password
-SMTP_FROM_NAME=CStore
-SMTP_FROM_EMAIL=noreply@cstore.example.com
-ADMIN_EMAIL=admin@cstore.example.com
+SMTP_FROM_NAME=Cryptons
+SMTP_FROM_EMAIL=noreply@cryptons.com
+ADMIN_EMAIL=admin@cryptons.com
 
 # Blockchain Webhooks
 PAYMENT_WEBHOOK_URL=

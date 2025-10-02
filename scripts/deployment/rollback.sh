@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Rollback Script for CStore Application
+# Rollback Script for Cryptons Application
 # Rolls back to previous deployment version
 
 set -e
@@ -8,7 +8,7 @@ set -e
 ENVIRONMENT=${1:-"staging"}
 PREVIOUS_VERSION=${2:-""}
 
-echo "=== CStore Deployment Rollback ==="
+echo "=== Cryptons Deployment Rollback ==="
 echo "Environment: $ENVIRONMENT"
 echo "Rolling back to: ${PREVIOUS_VERSION:-'previous version'}"
 echo ""
@@ -16,7 +16,7 @@ echo ""
 # Function to rollback Kubernetes deployment
 rollback_kubernetes() {
     local environment=$1
-    local deployment_name="cstore-$environment"
+    local deployment_name="cryptons-$environment"
     
     echo "Rolling back Kubernetes deployment: $deployment_name"
     
@@ -46,7 +46,7 @@ switch_traffic() {
     echo "Switching traffic to $target_version environment"
     
     # Update service selector
-    kubectl patch service cstore-$environment -p "{\"spec\":{\"selector\":{\"version\":\"$target_version\"}}}"
+    kubectl patch service cryptons-$environment -p "{\"spec\":{\"selector\":{\"version\":\"$target_version\"}}}"
     
     echo "✓ Traffic switched to $target_version"
 }
@@ -58,13 +58,13 @@ verify_rollback() {
     
     case $environment in
         development)
-            url="https://dev.cstore.example.com"
+            url="https://dev.cryptons.com"
             ;;
         staging)
-            url="https://staging.cstore.example.com"
+            url="https://staging.cryptons.com"
             ;;
         production)
-            url="https://cstore.example.com"
+            url="https://cryptons.com"
             ;;
         *)
             echo "Unknown environment: $environment"

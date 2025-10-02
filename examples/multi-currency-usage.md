@@ -1,6 +1,6 @@
 # Multi-Currency & Regional Payments Usage Examples
 
-This document provides practical examples of using the multi-currency pricing and regional payment methods features in CStore.
+This document provides practical examples of using the multi-currency pricing and regional payment methods features in Cryptons.com.
 
 ## Table of Contents
 - [Quick Start](#quick-start)

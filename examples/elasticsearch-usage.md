@@ -1,6 +1,6 @@
 # Elasticsearch Usage Examples
 
-This document provides examples of how to use the Elasticsearch integration in CStore.
+This document provides examples of how to use the Elasticsearch integration in Cryptons.com.
 
 ## Setup
 

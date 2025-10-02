@@ -81,15 +81,15 @@ const seedData = async () => {
     logger.info(`Created ${products.length} products`);
 
     // Create admin user
-    const adminExists = await User.findOne({ email: 'admin@cstore.com' });
+    const adminExists = await User.findOne({ email: 'admin@cryptons.com' });
     if (!adminExists) {
       await User.create({
         name: 'Admin User',
-        email: 'admin@cstore.com',
+        email: 'admin@cryptons.com',
         password: 'admin123',
         role: 'admin'
       });
-      logger.info('Created admin user (email: admin@cstore.com, password: admin123)');
+      logger.info('Created admin user (email: admin@cryptons.com, password: admin123)');
     }
 
     logger.info('Database seeding completed successfully!');

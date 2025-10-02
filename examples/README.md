@@ -1,6 +1,6 @@
-# CStore Examples
+# Cryptons.com Examples
 
-This directory contains working examples demonstrating how to use various features of the CStore cryptocurrency marketplace.
+This directory contains working examples demonstrating how to use various features of the Cryptons.com cryptocurrency trading platform.
 
 ## Lightning Network Examples
 
@@ -40,7 +40,7 @@ A beautiful, responsive web interface for Lightning Network payments.
 **Usage:**
 
 ```bash
-# Start the CStore server
+# Start the Cryptons server
 npm start
 
 # Open in browser

@@ -1,6 +1,6 @@
 # Deployment Scripts
 
-This directory contains deployment automation scripts for the CStore application.
+This directory contains deployment automation scripts for the Cryptons.com application.
 
 ## Scripts
 
@@ -19,10 +19,10 @@ Performs comprehensive health checks on deployed application instances.
 ./health-check.sh http://localhost:3000
 
 # Check staging with custom timeout
-./health-check.sh https://staging.cstore.example.com 60 20
+./health-check.sh https://staging.cryptons.com 60 20
 
 # Check production
-./health-check.sh https://cstore.example.com
+./health-check.sh https://cryptons.com
 ```
 
 **Features:**
@@ -52,10 +52,10 @@ Runs basic functional tests to verify deployment success.
 ./smoke-test.sh http://localhost:3000
 
 # Test staging
-./smoke-test.sh https://staging.cstore.example.com
+./smoke-test.sh https://staging.cryptons.com
 
 # Test production
-./smoke-test.sh https://cstore.example.com
+./smoke-test.sh https://cryptons.com
 ```
 
 **Tests:**
