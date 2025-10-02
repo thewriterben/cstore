@@ -5,6 +5,7 @@ const LightningInvoice = require('../models/LightningInvoice');
 const { AppError } = require('../middleware/errorHandler');
 const { asyncHandler } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
+const QRCode = require('qrcode');
 
 /**
  * Get Lightning Network status and info
@@ -106,9 +107,28 @@ exports.createInvoice = asyncHandler(async (req, res, next) => {
 
   logger.info(`Lightning invoice created for order ${orderId}: ${invoice.paymentHash}`);
 
+  // Generate QR code for the payment request
+  let qrCodeDataUrl = null;
+  try {
+    qrCodeDataUrl = await QRCode.toDataURL(invoice.paymentRequest, {
+      errorCorrectionLevel: 'M',
+      type: 'image/png',
+      width: 300,
+      margin: 2
+    });
+  } catch (qrError) {
+    logger.warn('Failed to generate QR code:', qrError);
+    // Continue without QR code - not critical
+  }
+
   res.status(201).json({
     success: true,
-    data: { invoice }
+    data: { 
+      invoice: {
+        ...invoice,
+        qrCode: qrCodeDataUrl
+      }
+    }
   });
 });
 
