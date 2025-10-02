@@ -1,6 +1,6 @@
-# CStore - Cryptocurrency Marketplace
+# Cryptons.com - Professional Cryptocurrency Trading Platform
 
-A full-featured cryptocurrency marketplace built with Node.js, Express, and MongoDB. This application includes JWT authentication, comprehensive blockchain integration, email notifications, shopping cart, reviews system, and admin dashboard API.
+A full-featured cryptocurrency trading platform built with Node.js, Express, and MongoDB. This application includes JWT authentication, comprehensive blockchain integration, email notifications, shopping cart, reviews system, and admin dashboard API.
 
 ## ⚠️ Project Status
 
@@ -94,7 +94,7 @@ These features are implemented but require configuration:
 
 ## 🎨 Admin Dashboard
 
-The CStore platform now includes a modern React-based admin dashboard for managing your cryptocurrency marketplace.
+The Cryptons.com platform now includes a modern React-based admin dashboard for managing your cryptocurrency trading platform.
 
 ### Features
 - **Dashboard Overview**: Key metrics, sales trends, and recent orders at a glance

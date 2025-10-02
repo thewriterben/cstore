@@ -2,7 +2,7 @@
 
 ## Overview
 
-Multi-signature wallet support has been successfully implemented in the CStore cryptocurrency marketplace. This feature enables multiple parties to approve transactions before they are processed, providing enhanced security and governance for cryptocurrency payments.
+Multi-signature wallet support has been successfully implemented in the Cryptons.com cryptocurrency trading platform. This feature enables multiple parties to approve transactions before they are processed, providing enhanced security and governance for cryptocurrency payments.
 
 ## Implementation Date
 
@@ -434,7 +434,7 @@ See "Future Enhancements" in MULTI_SIG_WALLET.md for roadmap.
 
 ## Conclusion
 
-The multi-signature wallet feature is **production ready** and fully integrated with the CStore platform. It provides enhanced security for cryptocurrency transactions through configurable multi-party approval workflows while maintaining backward compatibility with existing functionality.
+The multi-signature wallet feature is **production ready** and fully integrated with the Cryptons.com platform. It provides enhanced security for cryptocurrency transactions through configurable multi-party approval workflows while maintaining backward compatibility with existing functionality.
 
 ### Next Steps for Deployment
 1. Review and test in staging environment

@@ -83,7 +83,7 @@ const Layout = ({ children }: LayoutProps) => {
     <div>
       <Toolbar>
         <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 'bold' }}>
-          CStore Admin
+          Cryptons Admin
         </Typography>
       </Toolbar>
       <Divider />

@@ -1,7 +1,7 @@
 # Internationalization (i18n) Implementation Summary
 
 ## Overview
-This document summarizes the implementation of internationalization (i18n) support in the CStore cryptocurrency marketplace application.
+This document summarizes the implementation of internationalization (i18n) support in the Cryptons.com cryptocurrency trading platform application.
 
 ## Implementation Date
 October 1, 2025
@@ -257,7 +257,7 @@ Potential improvements for future versions:
 
 ## Conclusion
 
-The i18n implementation successfully makes CStore accessible to a global audience by supporting 5 major languages. The system is extensible, allowing easy addition of new languages, and provides a seamless user experience with automatic language detection and persistent preferences.
+The i18n implementation successfully makes Cryptons.com accessible to a global audience by supporting 5 major languages. The system is extensible, allowing easy addition of new languages, and provides a seamless user experience with automatic language detection and persistent preferences.
 
 ## Resources
 

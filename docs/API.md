@@ -1,6 +1,6 @@
-# CStore API Documentation
+# Cryptons.com API Documentation
 
-Complete API documentation for the CStore Cryptocurrency Marketplace.
+Complete API documentation for the Cryptons.com Professional Cryptocurrency Trading Platform.
 
 ## Base URL
 ```
@@ -45,7 +45,7 @@ Authorization: Bearer <your_jwt_token>
 ## Default Admin Credentials
 
 For testing (change immediately in production):
-- Email: `admin@cstore.com`
+- Email: `admin@cryptons.com`
 - Password: `admin123`
 
 ---

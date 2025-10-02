@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document verifies that **all documented REST API endpoints** from the README are fully implemented, tested, and working correctly in the CStore cryptocurrency marketplace application.
+This document verifies that **all documented REST API endpoints** from the README are fully implemented, tested, and working correctly in the Cryptons.com cryptocurrency trading platform application.
 
 ## Verification Date
 

@@ -1,6 +1,6 @@
-# CStore Admin Dashboard
+# Cryptons Admin Dashboard
 
-A modern, responsive React-based admin dashboard for the CStore cryptocurrency marketplace.
+A modern, responsive React-based admin dashboard for the Cryptons.com cryptocurrency trading platform.
 
 ## Features
 
