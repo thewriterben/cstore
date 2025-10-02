@@ -36,10 +36,15 @@ This version includes all core e-commerce features. While functional, additional
 
 #### Infrastructure
 - 🧪 **Testing Suite**: Jest tests with Supertest for authentication and products
-- 🐳 **Docker Support**: Dockerfile and Docker Compose configuration
+- 🐳 **Docker Support**: Multi-stage Dockerfile and Docker Compose configuration
 - 📝 **Logging**: Winston logger with file and console transports
 - 🚦 **Error Handling**: Centralized error handling middleware
 - 📈 **Analytics**: Sales analytics, product analytics, and activity logging
+- 🔄 **CI/CD Pipeline**: Comprehensive GitHub Actions workflows for testing, building, and deployment
+- 🔒 **Security Automation**: GitLeaks, npm audit, and Trivy container scanning
+- ⚡ **Performance Testing**: K6 load testing and stress testing
+- 🚀 **Blue-Green Deployment**: Zero-downtime deployments with automatic rollback
+- 🎨 **Code Quality**: ESLint and Prettier integration
 
 ### 🔧 Configuration Required
 
@@ -64,7 +69,14 @@ These features are implemented but require configuration:
 - [ ] Advanced reporting and export features
 
 ### Phase 4: DevOps & Scaling
-- [ ] Complete GitHub Actions CI/CD pipeline
+- [x] Complete GitHub Actions CI/CD pipeline
+- [x] Multi-environment deployment (dev, staging, production)
+- [x] Blue-green deployment strategy
+- [x] Automated testing and linting
+- [x] Security scanning (npm audit, Trivy, GitLeaks)
+- [x] Performance testing with K6
+- [x] Health checks and smoke tests
+- [x] Deployment rollback capabilities
 - [ ] Kubernetes deployment manifests
 - [ ] Prometheus metrics integration
 - [ ] Grafana dashboards
@@ -112,6 +124,50 @@ All v2.0 endpoints remain compatible. New endpoints are additive only.
 **Database Migration**: No migration required. New collections (Cart, MultiSigWallet, TransactionApproval) will be created automatically.
 
 **Configuration**: Add email SMTP settings to `.env` file (see `.env.example`).
+
+## 🔄 CI/CD Pipeline
+
+The project includes a comprehensive CI/CD pipeline using GitHub Actions.
+
+### Workflows
+
+1. **CI Pipeline** (`.github/workflows/ci.yml`)
+   - Automated linting with ESLint and Prettier
+   - Jest tests with coverage reporting
+   - Security scanning (npm audit, GitLeaks, Trivy)
+   - Multi-version Node.js testing (18.x, 20.x)
+   - Docker image building and caching
+
+2. **Deployment Pipeline** (`.github/workflows/deploy.yml`)
+   - Multi-environment support (development, staging, production)
+   - Blue-green deployment strategy
+   - Automated health checks and smoke tests
+   - Gradual traffic shifting for production
+   - Automatic rollback on failure
+   - Database migration support
+
+3. **Performance Testing** (`.github/workflows/performance.yml`)
+   - K6 load testing
+   - Stress testing
+   - API benchmarking
+   - Performance regression detection
+
+### Deployment Environments
+
+- **Development**: Auto-deploy from `develop` branch
+- **Staging**: Auto-deploy from `main` branch
+- **Production**: Deploy via git tags (e.g., `v1.0.0`)
+
+### Scripts
+
+Located in `scripts/deployment/`:
+- `health-check.sh` - Application health validation
+- `smoke-test.sh` - Basic functional tests
+- `rollback.sh` - Automated rollback procedure
+
+### Documentation
+
+See [docs/CICD_PIPELINE.md](docs/CICD_PIPELINE.md) for comprehensive CI/CD documentation.
 
 ## 🤝 Contributing
 
