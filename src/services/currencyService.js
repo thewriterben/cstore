@@ -62,6 +62,15 @@ async function fetchExchangeRates(base = 'USD') {
  */
 async function updateExchangeRates(base = 'USD') {
   try {
+    // Sanitize and validate the base parameter to prevent NoSQL injection
+    if (typeof base !== 'string') {
+      throw new Error('Base currency must be a string');
+    }
+    base = base.toUpperCase();
+    if (!SUPPORTED_CURRENCIES.includes(base)) {
+      throw new Error('Unsupported base currency');
+    }
+
     const rates = await fetchExchangeRates(base);
     const updatedRates = [];
     
