@@ -122,6 +122,11 @@
     "thankYou": "感谢您的购买",
     "orderPlaced": "订单下单成功",
     "paymentReceived": "付款已收到",
-    "orderShipped": "您的订单已发货"
+    "orderShipped": "您的订单已发货",
+    "ratesUpdated": "汇率更新成功",
+    "rateSet": "手动汇率设置成功",
+    "paymentMethodCreated": "支付方式创建成功",
+    "paymentMethodUpdated": "支付方式更新成功",
+    "paymentMethodDeleted": "支付方式删除成功"
   }
 }

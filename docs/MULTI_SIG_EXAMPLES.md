@@ -15,7 +15,7 @@ This document provides practical examples for using the multi-signature wallet f
 As the wallet owner:
 
 ```bash
-curl -X POST http://localhost:3000/api/wallets/multi-sig \
+curl -X POST http://localhost:3000/api/multisig/wallets \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -69,7 +69,7 @@ curl -X POST http://localhost:3000/api/wallets/multi-sig \
 Each signer can verify they have access:
 
 ```bash
-curl -X GET http://localhost:3000/api/wallets/multi-sig \
+curl -X GET http://localhost:3000/api/multisig/wallets \
   -H "Authorization: Bearer SIGNER_TOKEN"
 ```
 
@@ -80,7 +80,7 @@ curl -X GET http://localhost:3000/api/wallets/multi-sig \
 After an order is created, initiate a transaction approval:
 
 ```bash
-curl -X POST http://localhost:3000/api/wallets/multi-sig/transactions \
+curl -X POST http://localhost:3000/api/multisig/transactions \
   -H "Authorization: Bearer OWNER_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -119,7 +119,7 @@ curl -X POST http://localhost:3000/api/wallets/multi-sig/transactions \
 CFO reviews and approves:
 
 ```bash
-curl -X POST http://localhost:3000/api/wallets/multi-sig/transactions/transaction789/approve \
+curl -X POST http://localhost:3000/api/multisig/transactions/transaction789/approve \
   -H "Authorization: Bearer CFO_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -155,7 +155,7 @@ curl -X POST http://localhost:3000/api/wallets/multi-sig/transactions/transactio
 CTO reviews and approves:
 
 ```bash
-curl -X POST http://localhost:3000/api/wallets/multi-sig/transactions/transaction789/approve \
+curl -X POST http://localhost:3000/api/multisig/transactions/transaction789/approve \
   -H "Authorization: Bearer CTO_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -192,7 +192,7 @@ curl -X POST http://localhost:3000/api/wallets/multi-sig/transactions/transactio
 Once approved, broadcast the transaction and register the hash:
 
 ```bash
-curl -X POST http://localhost:3000/api/wallets/multi-sig/transactions/transaction789/execute \
+curl -X POST http://localhost:3000/api/multisig/transactions/transaction789/execute \
   -H "Authorization: Bearer OWNER_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -222,7 +222,7 @@ curl -X POST http://localhost:3000/api/wallets/multi-sig/transactions/transactio
 If a signer finds an issue:
 
 ```bash
-curl -X POST http://localhost:3000/api/wallets/multi-sig/transactions/transaction789/approve \
+curl -X POST http://localhost:3000/api/multisig/transactions/transaction789/approve \
   -H "Authorization: Bearer SIGNER_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -255,7 +255,7 @@ curl -X POST http://localhost:3000/api/wallets/multi-sig/transactions/transactio
 ### Adding a New Signer
 
 ```bash
-curl -X POST http://localhost:3000/api/wallets/multi-sig/wallet123/signers \
+curl -X POST http://localhost:3000/api/multisig/wallets/wallet123/signers \
   -H "Authorization: Bearer OWNER_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -267,7 +267,7 @@ curl -X POST http://localhost:3000/api/wallets/multi-sig/wallet123/signers \
 ### Removing a Signer
 
 ```bash
-curl -X DELETE http://localhost:3000/api/wallets/multi-sig/wallet123/signers/user1 \
+curl -X DELETE http://localhost:3000/api/multisig/wallets/wallet123/signers/user1 \
   -H "Authorization: Bearer OWNER_TOKEN"
 ```
 
@@ -278,7 +278,7 @@ curl -X DELETE http://localhost:3000/api/wallets/multi-sig/wallet123/signers/use
 ### Cancel by Initiator or Owner
 
 ```bash
-curl -X DELETE http://localhost:3000/api/wallets/multi-sig/transactions/transaction789 \
+curl -X DELETE http://localhost:3000/api/multisig/transactions/transaction789 \
   -H "Authorization: Bearer OWNER_TOKEN"
 ```
 
@@ -295,21 +295,21 @@ curl -X DELETE http://localhost:3000/api/wallets/multi-sig/transactions/transact
 ### Get All Pending Transactions
 
 ```bash
-curl -X GET "http://localhost:3000/api/wallets/multi-sig/transactions?status=pending" \
+curl -X GET "http://localhost:3000/api/multisig/transactions?status=pending" \
   -H "Authorization: Bearer SIGNER_TOKEN"
 ```
 
 ### Get Transactions for Specific Wallet
 
 ```bash
-curl -X GET "http://localhost:3000/api/wallets/multi-sig/transactions?walletId=wallet123" \
+curl -X GET "http://localhost:3000/api/multisig/transactions?walletId=wallet123" \
   -H "Authorization: Bearer OWNER_TOKEN"
 ```
 
 ### Get Transaction Details
 
 ```bash
-curl -X GET http://localhost:3000/api/wallets/multi-sig/transactions/transaction789 \
+curl -X GET http://localhost:3000/api/multisig/transactions/transaction789 \
   -H "Authorization: Bearer SIGNER_TOKEN"
 ```
 
@@ -318,7 +318,7 @@ curl -X GET http://localhost:3000/api/wallets/multi-sig/transactions/transaction
 ### Update Wallet Name and Description
 
 ```bash
-curl -X PUT http://localhost:3000/api/wallets/multi-sig/wallet123 \
+curl -X PUT http://localhost:3000/api/multisig/wallets/wallet123 \
   -H "Authorization: Bearer OWNER_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -333,7 +333,7 @@ curl -X PUT http://localhost:3000/api/wallets/multi-sig/wallet123 \
 ### Soft Delete (Deactivate)
 
 ```bash
-curl -X DELETE http://localhost:3000/api/wallets/multi-sig/wallet123 \
+curl -X DELETE http://localhost:3000/api/multisig/wallets/wallet123 \
   -H "Authorization: Bearer OWNER_TOKEN"
 ```
 

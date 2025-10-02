@@ -11,7 +11,13 @@ const {
   getProductAnalytics,
   getSystemHealth,
   getPendingReviews,
-  getActivityLog
+  getActivityLog,
+  getAllMultiSigWallets,
+  getMultiSigWalletById,
+  getAllMultiSigTransactions,
+  getMultiSigTransactionById,
+  updateMultiSigWalletStatus,
+  getMultiSigStats
 } = require('../controllers/adminController');
 
 // All admin routes require admin authorization
@@ -36,5 +42,13 @@ router.get('/reviews/pending', getPendingReviews);
 
 // System
 router.get('/system/health', getSystemHealth);
+
+// Multi-sig Wallet Management
+router.get('/multi-sig/stats', getMultiSigStats);
+router.get('/multi-sig/wallets', getAllMultiSigWallets);
+router.get('/multi-sig/wallets/:id', getMultiSigWalletById);
+router.put('/multi-sig/wallets/:id/status', updateMultiSigWalletStatus);
+router.get('/multi-sig/transactions', getAllMultiSigTransactions);
+router.get('/multi-sig/transactions/:id', getMultiSigTransactionById);
 
 module.exports = router;

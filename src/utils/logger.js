@@ -38,4 +38,31 @@ const logger = winston.createLogger({
   ]
 });
 
+// Create dedicated security logger for multi-sig operations
+const securityLogger = winston.createLogger({
+  level: 'info',
+  format: logFormat,
+  defaultMeta: { service: 'cstore-security', category: 'multi-sig' },
+  transports: [
+    new winston.transports.File({ 
+      filename: path.join(__dirname, '../../logs/security.log'),
+      maxsize: 5242880, // 5MB
+      maxFiles: 10,
+    })
+  ]
+});
+
+// Helper function to log multi-sig operations
+logger.logMultiSigOperation = (operation, details) => {
+  const logEntry = {
+    operation,
+    timestamp: new Date().toISOString(),
+    ...details
+  };
+  
+  // Log to both main logger and security logger
+  logger.info(`Multi-sig ${operation}`, logEntry);
+  securityLogger.info(`Multi-sig ${operation}`, logEntry);
+};
+
 module.exports = logger;

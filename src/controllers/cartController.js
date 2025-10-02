@@ -1,6 +1,8 @@
 const Cart = require('../models/Cart');
 const Product = require('../models/Product');
+const User = require('../models/User');
 const logger = require('../utils/logger');
+const currencyService = require('../services/currencyService');
 
 /**
  * Get user's cart
@@ -9,6 +11,8 @@ const logger = require('../utils/logger');
  */
 exports.getCart = async (req, res, next) => {
   try {
+    const { currency } = req.query;
+
     let cart = await Cart.findOne({ user: req.user.id })
       .populate('items.product', 'name price priceUSD currency image stock isActive');
 
@@ -23,9 +27,31 @@ exports.getCart = async (req, res, next) => {
 
     await cart.save();
 
+    // If currency is requested and different from USD, convert prices
+    let cartData = cart.toObject();
+    if (currency && currency.toUpperCase() !== 'USD') {
+      const user = await User.findById(req.user.id);
+      const targetCurrency = currency.toUpperCase();
+
+      try {
+        const conversion = await currencyService.convertCurrency(
+          cart.totalPriceUSD,
+          'USD',
+          targetCurrency
+        );
+
+        cartData.displayCurrency = targetCurrency;
+        cartData.displayPrice = conversion.convertedAmount;
+        cartData.exchangeRate = conversion.exchangeRate;
+      } catch (error) {
+        logger.warn(`Currency conversion failed: ${error.message}`);
+        // Continue without conversion
+      }
+    }
+
     res.json({
       success: true,
-      data: cart
+      data: cartData
     });
   } catch (error) {
     logger.error('Get cart error:', error);
