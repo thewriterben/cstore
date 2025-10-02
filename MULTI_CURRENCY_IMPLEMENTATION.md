@@ -1,7 +1,7 @@
 # Multi-Currency Pricing & Regional Payment Methods Implementation
 
 ## Overview
-This document describes the implementation of multi-currency pricing and region-specific payment methods for the CStore cryptocurrency marketplace, enabling global expansion and localized customer experiences.
+This document describes the implementation of multi-currency pricing and region-specific payment methods for the Cryptons.com cryptocurrency trading platform, enabling global expansion and localized customer experiences.
 
 ## Implementation Date
 December 2024
@@ -438,7 +438,7 @@ CurrencyRate.deleteMany({
 
 ## Conclusion
 
-The multi-currency pricing and regional payment methods implementation successfully enables CStore to serve global customers with localized experiences. The system is:
+The multi-currency pricing and regional payment methods implementation successfully enables Cryptons.com to serve global customers with localized experiences. The system is:
 - ✅ Extensible (easy to add currencies and payment methods)
 - ✅ Reliable (fallback mechanisms and error handling)
 - ✅ User-friendly (automatic detection and smart defaults)
