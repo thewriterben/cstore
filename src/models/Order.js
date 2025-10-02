@@ -63,7 +63,7 @@ const orderSchema = new mongoose.Schema({
   cryptocurrency: {
     type: String,
     required: true,
-    enum: ['BTC', 'ETH', 'USDT', 'LTC', 'XRP']
+    enum: ['BTC', 'ETH', 'USDT', 'LTC', 'XRP', 'BTC-LN']
   },
   paymentAddress: {
     type: String,
@@ -85,7 +85,13 @@ const orderSchema = new mongoose.Schema({
     country: String
   },
   trackingNumber: String,
-  notes: String
+  notes: String,
+  paymentMethod: {
+    type: String,
+    enum: ['On-chain', 'Lightning Network'],
+    default: 'On-chain'
+  },
+  paidAt: Date
 }, {
   timestamps: true
 });

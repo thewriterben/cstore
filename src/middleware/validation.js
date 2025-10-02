@@ -158,6 +158,31 @@ const schemas = {
 
   executeTransaction: Joi.object({
     transactionHash: Joi.string().required()
+  }),
+
+  // Lightning Network schemas
+  createLightningInvoice: Joi.object({
+    orderId: Joi.string().required(),
+    expireSeconds: Joi.number().integer().min(60).max(86400).optional()
+  }),
+
+  confirmLightningPayment: Joi.object({
+    paymentHash: Joi.string().required()
+  }),
+
+  decodeLightningPayment: Joi.object({
+    paymentRequest: Joi.string().required()
+  }),
+
+  openLightningChannel: Joi.object({
+    publicKey: Joi.string().required(),
+    localAmount: Joi.number().integer().min(20000).required(),
+    isPrivate: Joi.boolean().optional()
+  }),
+
+  payLightningInvoice: Joi.object({
+    paymentRequest: Joi.string().required(),
+    maxFee: Joi.number().integer().min(0).optional()
   })
 };
 
