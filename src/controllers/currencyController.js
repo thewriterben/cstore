@@ -74,9 +74,18 @@ const convertCurrency = asyncHandler(async (req, res, next) => {
 // @access  Private/Admin
 const updateExchangeRates = asyncHandler(async (req, res, next) => {
   const { base = 'USD' } = req.body;
-  
-  const result = await currencyService.updateExchangeRates(base);
-  
+
+  // Validate base currency
+  const upperBase = typeof base === 'string' ? base.toUpperCase() : '';
+  const SUPPORTED_CURRENCIES = [
+    'USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'CHF', 'CNY', 'INR', 'BRL'
+  ];
+  if (!SUPPORTED_CURRENCIES.includes(upperBase)) {
+    return next(new AppError('Invalid base currency provided', 400));
+  }
+
+  const result = await currencyService.updateExchangeRates(upperBase);
+
   res.json({
     success: true,
     message: req.t('message.ratesUpdated'),
