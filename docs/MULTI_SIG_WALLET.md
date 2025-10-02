@@ -51,7 +51,7 @@ Tracks the approval status of a transaction requiring multiple signatures.
 
 #### Create Multi-Sig Wallet
 ```http
-POST /api/wallets/multi-sig
+POST /api/multisig/wallets
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -106,7 +106,7 @@ Content-Type: application/json
 
 #### Get All Wallets
 ```http
-GET /api/wallets/multi-sig?cryptocurrency=BTC&isActive=true
+GET /api/multisig/wallets?cryptocurrency=BTC&isActive=true
 Authorization: Bearer <token>
 ```
 
@@ -114,13 +114,13 @@ Returns all wallets where the user is either the owner or a signer.
 
 #### Get Wallet by ID
 ```http
-GET /api/wallets/multi-sig/:id
+GET /api/multisig/wallets/:id
 Authorization: Bearer <token>
 ```
 
 #### Update Wallet
 ```http
-PUT /api/wallets/multi-sig/:id
+PUT /api/multisig/wallets/:id
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -135,7 +135,7 @@ Content-Type: application/json
 
 #### Add Signer
 ```http
-POST /api/wallets/multi-sig/:id/signers
+POST /api/multisig/wallets/:id/signers
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -149,7 +149,7 @@ Content-Type: application/json
 
 #### Remove Signer
 ```http
-DELETE /api/wallets/multi-sig/:id/signers/:signerId
+DELETE /api/multisig/wallets/:id/signers/:signerId
 Authorization: Bearer <token>
 ```
 
@@ -159,7 +159,7 @@ Authorization: Bearer <token>
 
 #### Deactivate Wallet
 ```http
-DELETE /api/wallets/multi-sig/:id
+DELETE /api/multisig/wallets/:id
 Authorization: Bearer <token>
 ```
 
@@ -169,7 +169,7 @@ Soft-deletes the wallet by setting `isActive` to false.
 
 #### Create Transaction Approval Request
 ```http
-POST /api/wallets/multi-sig/transactions
+POST /api/multisig/transactions
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -217,7 +217,7 @@ Content-Type: application/json
 
 #### Get All Transaction Approvals
 ```http
-GET /api/wallets/multi-sig/transactions?status=pending&walletId=wallet-id
+GET /api/multisig/transactions?status=pending&walletId=wallet-id
 Authorization: Bearer <token>
 ```
 
@@ -225,13 +225,13 @@ Returns all transactions for wallets where the user has access.
 
 #### Get Transaction Approval by ID
 ```http
-GET /api/wallets/multi-sig/transactions/:id
+GET /api/multisig/transactions/:id
 Authorization: Bearer <token>
 ```
 
 #### Approve or Reject Transaction
 ```http
-POST /api/wallets/multi-sig/transactions/:id/approve
+POST /api/multisig/transactions/:id/approve
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -283,7 +283,7 @@ Content-Type: application/json
 
 #### Execute Transaction
 ```http
-POST /api/wallets/multi-sig/transactions/:id/execute
+POST /api/multisig/transactions/:id/execute
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -301,7 +301,7 @@ Content-Type: application/json
 
 #### Cancel Transaction
 ```http
-DELETE /api/wallets/multi-sig/transactions/:id
+DELETE /api/multisig/transactions/:id
 Authorization: Bearer <token>
 ```
 

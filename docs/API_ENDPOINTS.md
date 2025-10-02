@@ -525,7 +525,7 @@ All admin endpoints require Admin role authentication.
 ## Multi-Signature Wallet Endpoints
 
 ### Create Multi-Sig Wallet
-- **POST** `/wallets/multi-sig`
+- **POST** `/multisig/wallets`
 - **Auth Required:** Yes
 - **Body:**
   ```json
@@ -543,18 +543,18 @@ All admin endpoints require Admin role authentication.
   ```
 
 ### Get All Multi-Sig Wallets
-- **GET** `/wallets/multi-sig?cryptocurrency=BTC&isActive=true`
+- **GET** `/multisig/wallets?cryptocurrency=BTC&isActive=true`
 - **Auth Required:** Yes
 - **Query Params:**
   - `cryptocurrency` (optional): Filter by cryptocurrency (BTC, ETH, USDT)
   - `isActive` (optional): Filter by active status (true/false)
 
 ### Get Multi-Sig Wallet by ID
-- **GET** `/wallets/multi-sig/:id`
+- **GET** `/multisig/wallets/:id`
 - **Auth Required:** Yes
 
 ### Update Multi-Sig Wallet
-- **PUT** `/wallets/multi-sig/:id`
+- **PUT** `/multisig/wallets/:id`
 - **Auth Required:** Yes (Owner only)
 - **Body:**
   ```json
@@ -566,7 +566,7 @@ All admin endpoints require Admin role authentication.
   ```
 
 ### Add Signer to Wallet
-- **POST** `/wallets/multi-sig/:id/signers`
+- **POST** `/multisig/wallets/:id/signers`
 - **Auth Required:** Yes (Owner only)
 - **Body:**
   ```json
@@ -577,11 +577,11 @@ All admin endpoints require Admin role authentication.
   ```
 
 ### Remove Signer from Wallet
-- **DELETE** `/wallets/multi-sig/:id/signers/:signerId`
+- **DELETE** `/multisig/wallets/:id/signers/:signerId`
 - **Auth Required:** Yes (Owner only)
 
 ### Deactivate Wallet
-- **DELETE** `/wallets/multi-sig/:id`
+- **DELETE** `/multisig/wallets/:id`
 - **Auth Required:** Yes (Owner only)
 
 ---
@@ -589,7 +589,7 @@ All admin endpoints require Admin role authentication.
 ## Transaction Approval Endpoints
 
 ### Create Transaction Approval Request
-- **POST** `/wallets/multi-sig/transactions`
+- **POST** `/multisig/transactions`
 - **Auth Required:** Yes
 - **Body:**
   ```json
@@ -603,18 +603,18 @@ All admin endpoints require Admin role authentication.
   ```
 
 ### Get All Transaction Approvals
-- **GET** `/wallets/multi-sig/transactions?status=pending&walletId=wallet-id`
+- **GET** `/multisig/transactions?status=pending&walletId=wallet-id`
 - **Auth Required:** Yes
 - **Query Params:**
   - `status` (optional): Filter by status (pending, approved, rejected, executed, expired)
   - `walletId` (optional): Filter by wallet ID
 
 ### Get Transaction Approval by ID
-- **GET** `/wallets/multi-sig/transactions/:id`
+- **GET** `/multisig/transactions/:id`
 - **Auth Required:** Yes
 
 ### Approve or Reject Transaction
-- **POST** `/wallets/multi-sig/transactions/:id/approve`
+- **POST** `/multisig/transactions/:id/approve`
 - **Auth Required:** Yes (Signer only)
 - **Body:**
   ```json
@@ -626,7 +626,7 @@ All admin endpoints require Admin role authentication.
   ```
 
 ### Execute Transaction
-- **POST** `/wallets/multi-sig/transactions/:id/execute`
+- **POST** `/multisig/transactions/:id/execute`
 - **Auth Required:** Yes
 - **Body:**
   ```json
@@ -636,7 +636,7 @@ All admin endpoints require Admin role authentication.
   ```
 
 ### Cancel Transaction
-- **DELETE** `/wallets/multi-sig/transactions/:id`
+- **DELETE** `/multisig/transactions/:id`
 - **Auth Required:** Yes (Initiator or Owner only)
 
 ---

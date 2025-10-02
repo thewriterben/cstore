@@ -31,7 +31,23 @@ const {
 // All routes require authentication
 router.use(protect);
 
-// Transaction approval routes (must come before /:id to avoid conflicts)
+// Wallet management routes
+router.route('/wallets')
+  .post(validateCreateMultiSigWallet, createWallet)
+  .get(getWallets);
+
+router.route('/wallets/:id')
+  .get(getWallet)
+  .put(validateUpdateMultiSigWallet, updateWallet)
+  .delete(deleteWallet);
+
+router.route('/wallets/:id/signers')
+  .post(validateAddSigner, addSigner);
+
+router.route('/wallets/:id/signers/:signerId')
+  .delete(removeSigner);
+
+// Transaction approval routes
 router.route('/transactions')
   .post(validateCreateTransactionApproval, createTransactionApproval)
   .get(getTransactionApprovals);
@@ -45,21 +61,5 @@ router.route('/transactions/:id/approve')
 
 router.route('/transactions/:id/execute')
   .post(validateExecuteTransaction, executeTransaction);
-
-// Wallet management routes
-router.route('/')
-  .post(validateCreateMultiSigWallet, createWallet)
-  .get(getWallets);
-
-router.route('/:id')
-  .get(getWallet)
-  .put(validateUpdateMultiSigWallet, updateWallet)
-  .delete(deleteWallet);
-
-router.route('/:id/signers')
-  .post(validateAddSigner, addSigner);
-
-router.route('/:id/signers/:signerId')
-  .delete(removeSigner);
 
 module.exports = router;

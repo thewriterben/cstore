@@ -65,21 +65,21 @@ Multi-signature wallet support has been successfully implemented in the CStore c
 **18 User Endpoints:**
 
 **Wallet Management (10 endpoints):**
-- `POST /api/wallets/multi-sig` - Create wallet
-- `GET /api/wallets/multi-sig` - List wallets
-- `GET /api/wallets/multi-sig/:id` - Get wallet
-- `PUT /api/wallets/multi-sig/:id` - Update wallet
-- `DELETE /api/wallets/multi-sig/:id` - Delete wallet
-- `POST /api/wallets/multi-sig/:id/signers` - Add signer
-- `DELETE /api/wallets/multi-sig/:id/signers/:signerId` - Remove signer
+- `POST /api/multisig/wallets` - Create wallet
+- `GET /api/multisig/wallets` - List wallets
+- `GET /api/multisig/wallets/:id` - Get wallet
+- `PUT /api/multisig/wallets/:id` - Update wallet
+- `DELETE /api/multisig/wallets/:id` - Delete wallet
+- `POST /api/multisig/wallets/:id/signers` - Add signer
+- `DELETE /api/multisig/wallets/:id/signers/:signerId` - Remove signer
 
 **Transaction Approval (8 endpoints):**
-- `POST /api/wallets/multi-sig/transactions` - Create transaction
-- `GET /api/wallets/multi-sig/transactions` - List transactions
-- `GET /api/wallets/multi-sig/transactions/:id` - Get transaction
-- `POST /api/wallets/multi-sig/transactions/:id/approve` - Approve/reject (with rate limiting)
-- `POST /api/wallets/multi-sig/transactions/:id/execute` - Execute transaction
-- `DELETE /api/wallets/multi-sig/transactions/:id` - Cancel transaction
+- `POST /api/multisig/transactions` - Create transaction
+- `GET /api/multisig/transactions` - List transactions
+- `GET /api/multisig/transactions/:id` - Get transaction
+- `POST /api/multisig/transactions/:id/approve` - Approve/reject (with rate limiting)
+- `POST /api/multisig/transactions/:id/execute` - Execute transaction
+- `DELETE /api/multisig/transactions/:id` - Cancel transaction
 
 #### Admin Routes (`src/routes/adminRoutes.js`)
 **6 Admin Endpoints:**
@@ -212,7 +212,7 @@ docs/
 
 ```javascript
 // 1. Create wallet
-POST /api/wallets/multi-sig
+POST /api/multisig/wallets
 {
   "name": "Company Treasury",
   "cryptocurrency": "BTC",
@@ -226,7 +226,7 @@ POST /api/wallets/multi-sig
 }
 
 // 2. Create transaction
-POST /api/wallets/multi-sig/transactions
+POST /api/multisig/transactions
 {
   "walletId": "wallet-id",
   "amount": 0.5,
@@ -235,16 +235,16 @@ POST /api/wallets/multi-sig/transactions
 }
 
 // 3. First signer approves
-POST /api/wallets/multi-sig/transactions/:id/approve
+POST /api/multisig/transactions/:id/approve
 { "approved": true, "comment": "Approved" }
 
 // 4. Second signer approves
-POST /api/wallets/multi-sig/transactions/:id/approve
+POST /api/multisig/transactions/:id/approve
 { "approved": true, "comment": "Approved" }
 // Status automatically changes to "approved"
 
 // 5. Execute transaction
-POST /api/wallets/multi-sig/transactions/:id/execute
+POST /api/multisig/transactions/:id/execute
 { "transactionHash": "blockchain-tx-hash" }
 // Order marked as paid, payment record created
 ```

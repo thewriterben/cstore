@@ -92,7 +92,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/wallets/multi-sig', multiSigWalletRoutes);
+app.use('/api/multisig', multiSigWalletRoutes);
 app.get('/api/cryptocurrencies', getCryptocurrencies);
 
 // Health check
