@@ -81,6 +81,25 @@ admin-dashboard/
 └── dist/                # Production build
 ```
 
+## New Features Added
+
+### Pages
+- **Reviews Page**: Moderate and approve user reviews with rating display
+- **Analytics Page**: Advanced analytics with period selection and detailed charts
+  - Average order value tracking
+  - Transaction count monitoring
+  - Revenue by cryptocurrency bar charts
+  - Low stock product alerts
+  - Most reviewed products tracking
+
+### Real-time Features
+- **WebSocket Notifications**: Integrated Socket.io for real-time updates
+  - New order notifications
+  - Payment confirmation alerts
+  - Order status change notifications
+  - System alerts and warnings
+- **Toast Notifications**: Material-UI Snackbar alerts with auto-dismiss
+
 ## Development
 
 ### Available Scripts
@@ -89,6 +108,15 @@ admin-dashboard/
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
+
+## Accessing the Dashboard
+
+Once the backend server is running, the admin dashboard is available at:
+```
+http://localhost:3000/admin
+```
+
+The backend automatically serves the built React application.
 
 ## License
 

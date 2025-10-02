@@ -82,6 +82,9 @@ if (process.env.NODE_ENV === 'development') {
 // Static files
 app.use(express.static(path.join(__dirname, '../public')));
 
+// Serve admin dashboard (React app)
+app.use('/admin', express.static(path.join(__dirname, '../admin-dashboard/dist')));
+
 // API Routes
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/products', productRoutes);
@@ -109,6 +112,11 @@ app.get('/api/health', (req, res) => {
 // Serve frontend
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../public', 'index.html'));
+});
+
+// Admin dashboard SPA routing - must come before 404 handler
+app.get('/admin/*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../admin-dashboard/dist', 'index.html'));
 });
 
 // Handle 404
