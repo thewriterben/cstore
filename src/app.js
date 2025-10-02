@@ -7,6 +7,7 @@ require('dotenv').config();
 
 const connectDB = require('./config/database');
 const i18next = require('./config/i18n');
+const { initializeApp } = require('./config/startup');
 const logger = require('./utils/logger');
 const { errorHandler } = require('./middleware/errorHandler');
 const {
@@ -30,13 +31,17 @@ const cartRoutes = require('./routes/cartRoutes');
 const wishlistRoutes = require('./routes/wishlistRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const multiSigWalletRoutes = require('./routes/multiSigWalletRoutes');
-const productQuestionRoutes = require('./routes/productQuestionRoutes');
 const { getCryptocurrencies } = require('./controllers/orderController');
 
 const app = express();
 
 // Connect to database
 connectDB();
+
+// Initialize application (currency rates, regional payments)
+initializeApp().catch(err => {
+  logger.error('Application initialization failed:', err);
+});
 
 // Initialize Elasticsearch if enabled
 if (process.env.ELASTICSEARCH_ENABLED === 'true') {
@@ -94,7 +99,6 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/wallets/multi-sig', multiSigWalletRoutes);
-app.use('/api/questions', productQuestionRoutes);
 app.get('/api/cryptocurrencies', getCryptocurrencies);
 
 // Health check
