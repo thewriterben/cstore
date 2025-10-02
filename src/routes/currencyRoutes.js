@@ -1,4 +1,5 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const router = express.Router();
 const {
   getSupportedCurrencies,
@@ -11,8 +12,17 @@ const {
 const { protect, authorize } = require('../middleware/auth');
 
 // Public routes
+
+// Rate limiter for GET /rates (100 requests per 15 minutes per IP)
+const getRatesLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
 router.get('/', getSupportedCurrencies);
-router.get('/rates', getExchangeRates);
+router.get('/rates', getRatesLimiter, getExchangeRates);
 router.post('/convert', convertCurrency);
 
 // Admin routes
