@@ -1,6 +1,7 @@
 const { Web3 } = require('web3');
 const axios = require('axios');
 const logger = require('../utils/logger');
+const bitcoinRpcService = require('./bitcoinRpcService');
 
 // Initialize Web3 for Ethereum
 const web3 = new Web3(process.env.ETH_RPC_URL || 'https://eth.llamarpc.com');
@@ -12,7 +13,7 @@ const web3 = new Web3(process.env.ETH_RPC_URL || 'https://eth.llamarpc.com');
 
 /**
  * Verify Bitcoin transaction
- * Uses blockchain.info API or Bitcoin RPC if configured
+ * Uses Bitcoin Core RPC if available, otherwise falls back to blockchain.info API
  * @param {string} txHash - Transaction hash
  * @param {string} expectedAddress - Expected recipient address
  * @param {number} expectedAmount - Expected amount in BTC
@@ -22,7 +23,14 @@ async function verifyBitcoinTransaction(txHash, expectedAddress, expectedAmount)
   try {
     logger.info(`Verifying Bitcoin transaction: ${txHash}`);
 
-    // Use blockchain.info API for verification
+    // Try Bitcoin Core RPC first if available
+    if (bitcoinRpcService.isRpcAvailable()) {
+      logger.info('Using Bitcoin Core RPC for verification');
+      return await bitcoinRpcService.verifyBitcoinTransactionRpc(txHash, expectedAddress, expectedAmount);
+    }
+
+    // Fall back to blockchain.info API
+    logger.info('Using blockchain.info API for verification');
     const apiUrl = `https://blockchain.info/rawtx/${txHash}`;
     const response = await axios.get(apiUrl);
     const tx = response.data;
