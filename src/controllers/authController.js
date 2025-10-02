@@ -98,6 +98,9 @@ const getMe = asyncHandler(async (req, res, next) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        preferredCurrency: user.preferredCurrency,
+        preferredLanguage: user.preferredLanguage,
+        country: user.country,
         createdAt: user.createdAt
       }
     }
@@ -108,7 +111,7 @@ const getMe = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/auth/profile
 // @access  Private
 const updateProfile = asyncHandler(async (req, res, next) => {
-  const { name, email } = req.body;
+  const { name, email, preferredCurrency, preferredLanguage, country } = req.body;
 
   const user = await User.findById(req.user.id);
 
@@ -121,6 +124,9 @@ const updateProfile = asyncHandler(async (req, res, next) => {
     }
     user.email = email;
   }
+  if (preferredCurrency) user.preferredCurrency = preferredCurrency.toUpperCase();
+  if (preferredLanguage) user.preferredLanguage = preferredLanguage.toLowerCase();
+  if (country) user.country = country.toUpperCase();
 
   await user.save();
 
@@ -131,7 +137,10 @@ const updateProfile = asyncHandler(async (req, res, next) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        preferredCurrency: user.preferredCurrency,
+        preferredLanguage: user.preferredLanguage,
+        country: user.country
       }
     }
   });

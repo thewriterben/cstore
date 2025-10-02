@@ -1,8 +1,10 @@
 const Order = require('../models/Order');
 const Product = require('../models/Product');
+const User = require('../models/User');
 const { asyncHandler } = require('../middleware/errorHandler');
 const { AppError } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
+const currencyService = require('../services/currencyService');
 
 // Supported cryptocurrencies with addresses
 const supportedCryptos = [
@@ -15,7 +17,7 @@ const supportedCryptos = [
 // @route   POST /api/orders
 // @access  Public
 const createOrder = asyncHandler(async (req, res, next) => {
-  const { productId, quantity, customerEmail, cryptocurrency, shippingAddress } = req.body;
+  const { productId, quantity, customerEmail, cryptocurrency, shippingAddress, displayCurrency } = req.body;
 
   // Get product
   const product = await Product.findById(productId);
@@ -34,6 +36,30 @@ const createOrder = asyncHandler(async (req, res, next) => {
     return next(new AppError('Unsupported cryptocurrency', 400));
   }
 
+  // Calculate prices
+  const totalPriceUSD = product.priceUSD * quantity;
+  let displayPrice = totalPriceUSD;
+  let exchangeRate = 1;
+  let orderCurrency = displayCurrency || 'USD';
+
+  // Convert to user's preferred currency if specified
+  if (displayCurrency && displayCurrency.toUpperCase() !== 'USD') {
+    try {
+      const conversion = await currencyService.convertCurrency(
+        totalPriceUSD,
+        'USD',
+        displayCurrency.toUpperCase()
+      );
+      displayPrice = conversion.convertedAmount;
+      exchangeRate = conversion.exchangeRate;
+      orderCurrency = displayCurrency.toUpperCase();
+    } catch (error) {
+      logger.warn(`Currency conversion failed during order creation: ${error.message}`);
+      // Continue with USD if conversion fails
+      orderCurrency = 'USD';
+    }
+  }
+
   // Create order
   const order = await Order.create({
     user: req.user ? req.user.id : null,
@@ -46,7 +72,10 @@ const createOrder = asyncHandler(async (req, res, next) => {
       priceUSD: product.priceUSD
     }],
     totalPrice: product.price * quantity,
-    totalPriceUSD: product.priceUSD * quantity,
+    totalPriceUSD,
+    displayCurrency: orderCurrency,
+    displayPrice,
+    exchangeRate,
     cryptocurrency,
     paymentAddress: crypto.address,
     shippingAddress,

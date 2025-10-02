@@ -30,8 +30,11 @@ This version includes all core e-commerce features. While functional, additional
 - ❤️ **Wishlist**: Save products for later with full CRUD operations
 - 📧 **Email Service**: Transactional emails (welcome, order confirmation, payment receipt, shipping notifications)
 - 🌐 **Internationalization (i18n)**: Multi-language support (English, Spanish, French, German, Chinese)
+- 💱 **Multi-Currency Pricing**: Support for 10+ fiat currencies with real-time exchange rates
+- 🌍 **Regional Payment Methods**: 15+ region-specific payment options (SEPA, iDEAL, Alipay, PIX, etc.)
 - 🔗 **Enhanced Blockchain**: Webhook support, real-time monitoring, retry mechanisms
 - 📊 **Admin Dashboard API**: Complete admin endpoints for analytics, user management, and system monitoring
+- ❓ **Product Q&A**: Customer questions and answers with moderation, helpful voting, and notifications
 
 #### Infrastructure
 - 🧪 **Testing Suite**: Jest tests with Supertest for authentication and products
@@ -48,8 +51,6 @@ These features are implemented but require configuration:
 - **Admin Alerts**: Configure admin email for system alerts
 
 ### ❌ Not Yet Implemented (Future Enhancements)
-
-- [ ] Customer product questions & answers
 
 ### Phase 2: Advanced Blockchain
 - [ ] Multi-signature wallet support
@@ -75,22 +76,25 @@ These features are implemented but require configuration:
 ### Phase 5: Internationalization
 - [x] Multi-language support (i18n)
 - [x] Localized email templates
-- [ ] Multi-currency pricing
-- [ ] Region-specific payment methods
+- [x] Multi-currency pricing
+- [x] Region-specific payment methods
 
 ## 📋 API Endpoints Summary
 
 ### Implemented Endpoints (v2.1)
 
-- **Authentication**: Register, Login, Get Profile, Update Password
+- **Authentication**: Register, Login, Get Profile, Update Password, Update Preferences
 - **Products**: Full CRUD, Search, Filter, Pagination, Suggestions (Autocomplete), Elasticsearch Sync
-- **Orders**: Create, Get, List, Update Status (Admin)
+- **Orders**: Create, Get, List, Update Status (Admin), Multi-Currency Support
 - **Payments**: Confirm, Verify, List (Admin)
 - **Reviews**: Full CRUD, Ratings, Stats, Moderation (Admin)
 - **Categories**: Full CRUD, Product Filtering
-- **Shopping Cart**: Add, Update, Remove, Validate
+- **Shopping Cart**: Add, Update, Remove, Validate, Multi-Currency Display
+- **Currencies**: List, Convert, Exchange Rates, Historical Data (Admin)
+- **Regional Payments**: Discovery, Filtering, Management (Admin)
 - **Admin Dashboard**: Stats, Analytics, User Management, System Health
 - **Multi-Sig Wallets**: Create, Manage, Transaction Approvals
+- **Product Questions**: Ask, Answer, Vote Helpful, Moderation (Admin)
 
 See [API_ENDPOINTS.md](docs/API_ENDPOINTS.md) for complete documentation.
 

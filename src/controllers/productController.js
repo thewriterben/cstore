@@ -2,6 +2,7 @@ const Product = require('../models/Product');
 const { asyncHandler } = require('../middleware/errorHandler');
 const { AppError } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
+const elasticsearchService = require('../services/elasticsearchService');
 
 // @desc    Get all products
 // @route   GET /api/products

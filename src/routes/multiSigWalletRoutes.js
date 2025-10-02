@@ -1,15 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/auth');
-const { multiSigApprovalLimiter } = require('../middleware/security');
-const {
-  validateCreateMultiSigWallet,
-  validateUpdateMultiSigWallet,
-  validateAddSigner,
-  validateCreateTransactionApproval,
-  validateApproveTransaction,
-  validateExecuteTransaction
-} = require('../middleware/validation');
 const { 
   createWallet,
   getWallets,
@@ -49,7 +40,7 @@ router.route('/wallets/:id/signers/:signerId')
 
 // Transaction approval routes
 router.route('/transactions')
-  .post(validateCreateTransactionApproval, createTransactionApproval)
+  .post(createTransactionApproval)
   .get(getTransactionApprovals);
 
 router.route('/transactions/:id')
@@ -57,9 +48,8 @@ router.route('/transactions/:id')
   .delete(cancelTransaction);
 
 router.route('/transactions/:id/approve')
-  .post(multiSigApprovalLimiter, validateApproveTransaction, approveTransaction);
 
 router.route('/transactions/:id/execute')
-  .post(validateExecuteTransaction, executeTransaction);
+  .post(executeTransaction);
 
 module.exports = router;

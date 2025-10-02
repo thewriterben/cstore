@@ -122,6 +122,11 @@
     "thankYou": "Gracias por su compra",
     "orderPlaced": "Pedido realizado con éxito",
     "paymentReceived": "Pago recibido con éxito",
-    "orderShipped": "Su pedido ha sido enviado"
+    "orderShipped": "Su pedido ha sido enviado",
+    "ratesUpdated": "Tipos de cambio actualizados con éxito",
+    "rateSet": "Tipo de cambio manual establecido con éxito",
+    "paymentMethodCreated": "Método de pago creado con éxito",
+    "paymentMethodUpdated": "Método de pago actualizado con éxito",
+    "paymentMethodDeleted": "Método de pago eliminado con éxito"
   }
 }

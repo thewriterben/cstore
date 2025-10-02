@@ -7,6 +7,7 @@ require('dotenv').config();
 
 const connectDB = require('./config/database');
 const i18next = require('./config/i18n');
+const { initializeApp } = require('./config/startup');
 const logger = require('./utils/logger');
 const { errorHandler } = require('./middleware/errorHandler');
 const {
@@ -36,6 +37,11 @@ const app = express();
 
 // Connect to database
 connectDB();
+
+// Initialize application (currency rates, regional payments)
+initializeApp().catch(err => {
+  logger.error('Application initialization failed:', err);
+});
 
 // Initialize Elasticsearch if enabled
 if (process.env.ELASTICSEARCH_ENABLED === 'true') {
