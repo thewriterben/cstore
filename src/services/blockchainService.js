@@ -275,8 +275,155 @@ async function verifyUSDTTransaction(txHash, expectedAddress, expectedAmount) {
 }
 
 /**
+ * Verify Litecoin transaction
+ * Uses blockchair.com API for LTC verification
+ * @param {string} txHash - Transaction hash
+ * @param {string} expectedAddress - Expected recipient address
+ * @param {number} expectedAmount - Expected amount in LTC
+ * @returns {Promise<Object>} - Transaction verification result
+ */
+async function verifyLitecoinTransaction(txHash, expectedAddress, expectedAmount) {
+  try {
+    logger.info(`Verifying Litecoin transaction: ${txHash}`);
+
+    // Use blockchair.com API for LTC verification
+    const apiUrl = `https://api.blockchair.com/litecoin/dashboards/transaction/${txHash}`;
+    const response = await axios.get(apiUrl);
+    const tx = response.data.data[txHash];
+
+    if (!tx) {
+      return {
+        verified: false,
+        error: 'Transaction not found'
+      };
+    }
+
+    // Find output matching our address
+    const output = tx.outputs.find(out => 
+      out.recipient === expectedAddress
+    );
+
+    if (!output) {
+      return {
+        verified: false,
+        error: 'Address not found in transaction outputs'
+      };
+    }
+
+    // Convert from litoshis to LTC
+    const receivedAmount = output.value / 100000000;
+
+    // Verify amount
+    const tolerance = 0.0001;
+    const amountVerified = Math.abs(receivedAmount - expectedAmount) < tolerance;
+
+    // Get confirmations
+    const confirmations = tx.transaction.block_id ? (response.data.context.state - tx.transaction.block_id + 1) : 0;
+
+    return {
+      verified: amountVerified,
+      transactionHash: txHash,
+      fromAddress: tx.inputs[0]?.recipient || 'Unknown',
+      toAddress: expectedAddress,
+      amount: receivedAmount,
+      expectedAmount: expectedAmount,
+      confirmations: confirmations,
+      timestamp: tx.transaction.time,
+      blockHash: tx.transaction.block_id || null,
+      error: amountVerified ? null : 'Amount mismatch'
+    };
+  } catch (error) {
+    logger.error('Litecoin transaction verification error:', error);
+    return {
+      verified: false,
+      error: error.message || 'Failed to verify Litecoin transaction'
+    };
+  }
+}
+
+/**
+ * Verify XRP (Ripple) transaction
+ * Uses xrpl library to verify XRP transactions
+ * @param {string} txHash - Transaction hash
+ * @param {string} expectedAddress - Expected recipient address
+ * @param {number} expectedAmount - Expected amount in XRP
+ * @returns {Promise<Object>} - Transaction verification result
+ */
+async function verifyXRPTransaction(txHash, expectedAddress, expectedAmount) {
+  try {
+    logger.info(`Verifying XRP transaction: ${txHash}`);
+
+    // Use public XRP API
+    const apiUrl = `https://s1.ripple.com:51234/`;
+    const response = await axios.post(apiUrl, {
+      method: 'tx',
+      params: [{
+        transaction: txHash,
+        binary: false
+      }]
+    });
+
+    const tx = response.data.result;
+
+    if (!tx || tx.status !== 'success') {
+      return {
+        verified: false,
+        error: 'Transaction not found or failed'
+      };
+    }
+
+    // Verify recipient
+    if (tx.Destination !== expectedAddress) {
+      return {
+        verified: false,
+        error: 'Address mismatch'
+      };
+    }
+
+    // XRP amounts are in drops (1 XRP = 1,000,000 drops)
+    const receivedAmount = parseFloat(tx.Amount) / 1000000;
+
+    // Verify amount
+    const tolerance = 0.0001;
+    const amountVerified = Math.abs(receivedAmount - expectedAmount) < tolerance;
+
+    // Get ledger info for confirmations
+    let confirmations = 0;
+    try {
+      const ledgerResponse = await axios.post(apiUrl, {
+        method: 'ledger',
+        params: [{ ledger_index: 'validated' }]
+      });
+      const currentLedger = ledgerResponse.data.result.ledger_index;
+      confirmations = currentLedger - (tx.ledger_index || 0);
+    } catch (err) {
+      logger.warn('Could not get XRP confirmations:', err);
+    }
+
+    return {
+      verified: amountVerified,
+      transactionHash: txHash,
+      fromAddress: tx.Account,
+      toAddress: tx.Destination,
+      amount: receivedAmount,
+      expectedAmount: expectedAmount,
+      confirmations: confirmations,
+      timestamp: tx.date ? (tx.date + 946684800) : null, // Ripple epoch to Unix epoch
+      ledgerIndex: tx.ledger_index,
+      error: amountVerified ? null : 'Amount mismatch'
+    };
+  } catch (error) {
+    logger.error('XRP transaction verification error:', error);
+    return {
+      verified: false,
+      error: error.message || 'Failed to verify XRP transaction'
+    };
+  }
+}
+
+/**
  * Verify cryptocurrency transaction based on currency type
- * @param {string} cryptocurrency - Currency type (BTC, ETH, USDT)
+ * @param {string} cryptocurrency - Currency type (BTC, ETH, USDT, LTC, XRP)
  * @param {string} txHash - Transaction hash
  * @param {string} address - Expected recipient address
  * @param {number} amount - Expected amount
@@ -295,6 +442,12 @@ async function verifyTransaction(cryptocurrency, txHash, address, amount) {
         break;
       case 'USDT':
         result = await verifyUSDTTransaction(txHash, address, amount);
+        break;
+      case 'LTC':
+        result = await verifyLitecoinTransaction(txHash, address, amount);
+        break;
+      case 'XRP':
+        result = await verifyXRPTransaction(txHash, address, amount);
         break;
       default:
         result = {
@@ -315,16 +468,26 @@ async function verifyTransaction(cryptocurrency, txHash, address, amount) {
 
 /**
  * Get current cryptocurrency price in USD
- * @param {string} symbol - Cryptocurrency symbol (BTC, ETH, USDT)
+ * @param {string} symbol - Cryptocurrency symbol (BTC, ETH, USDT, LTC, XRP)
  * @returns {Promise<number>} - Price in USD
  */
 async function getCryptoPrice(symbol) {
   try {
+    // Map symbols to CoinGecko IDs
+    const coinIdMap = {
+      'BTC': 'bitcoin',
+      'ETH': 'ethereum',
+      'USDT': 'tether',
+      'LTC': 'litecoin',
+      'XRP': 'ripple'
+    };
+    
+    const coinId = coinIdMap[symbol.toUpperCase()] || symbol.toLowerCase();
+    
     const response = await axios.get(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${symbol.toLowerCase()}&vs_currencies=usd`
+      `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`
     );
     
-    const coinId = symbol === 'BTC' ? 'bitcoin' : symbol === 'ETH' ? 'ethereum' : 'tether';
     return response.data[coinId]?.usd || 0;
   } catch (error) {
     logger.error('Error fetching crypto price:', error);
@@ -575,6 +738,8 @@ module.exports = {
   verifyBitcoinTransaction,
   verifyEthereumTransaction,
   verifyUSDTTransaction,
+  verifyLitecoinTransaction,
+  verifyXRPTransaction,
   getCryptoPrice,
   monitorPayment,
   triggerPaymentWebhook,

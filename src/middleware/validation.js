@@ -38,7 +38,7 @@ const schemas = {
     productId: Joi.string().required(),
     quantity: Joi.number().integer().min(1).required(),
     customerEmail: Joi.string().email().required(),
-    cryptocurrency: Joi.string().valid('BTC', 'ETH', 'USDT').required(),
+    cryptocurrency: Joi.string().valid('BTC', 'ETH', 'USDT', 'LTC', 'XRP').required(),
     shippingAddress: Joi.object({
       street: Joi.string(),
       city: Joi.string(),
@@ -60,7 +60,7 @@ const schemas = {
     description: Joi.string().min(10).max(2000).required(),
     price: Joi.number().min(0).required(),
     priceUSD: Joi.number().min(0).required(),
-    currency: Joi.string().valid('BTC', 'ETH', 'USDT').default('BTC'),
+    currency: Joi.string().valid('BTC', 'ETH', 'USDT', 'LTC', 'XRP').default('BTC'),
     category: Joi.string().optional(),
     stock: Joi.number().integer().min(0).default(0),
     image: Joi.string().optional()
@@ -72,7 +72,7 @@ const schemas = {
     description: Joi.string().min(10).max(2000).optional(),
     price: Joi.number().min(0).optional(),
     priceUSD: Joi.number().min(0).optional(),
-    currency: Joi.string().valid('BTC', 'ETH', 'USDT').optional(),
+    currency: Joi.string().valid('BTC', 'ETH', 'USDT', 'LTC', 'XRP').optional(),
     category: Joi.string().optional(),
     stock: Joi.number().integer().min(0).optional(),
     image: Joi.string().optional(),
@@ -119,7 +119,7 @@ const schemas = {
   // Multi-sig wallet schemas
   createMultiSigWallet: Joi.object({
     name: Joi.string().min(3).max(100).required(),
-    cryptocurrency: Joi.string().valid('BTC', 'ETH', 'USDT').required(),
+    cryptocurrency: Joi.string().valid('BTC', 'ETH', 'USDT', 'LTC', 'XRP').required(),
     address: Joi.string().required(),
     signers: Joi.array().items(Joi.object({
       email: Joi.string().email().required(),
@@ -146,7 +146,7 @@ const schemas = {
     amount: Joi.number().min(0).required(),
     toAddress: Joi.string().required(),
     fromAddress: Joi.string().optional(),
-    cryptocurrency: Joi.string().valid('BTC', 'ETH', 'USDT').required(),
+    cryptocurrency: Joi.string().valid('BTC', 'ETH', 'USDT', 'LTC', 'XRP').required(),
     description: Joi.string().max(500).optional().allow(''),
     expiresAt: Joi.date().optional()
   }),
