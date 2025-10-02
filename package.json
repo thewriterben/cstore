@@ -1,7 +1,7 @@
 {
-  "name": "cstore",
+  "name": "cryptons",
   "version": "2.0.0",
-  "description": "A production-ready cryptocurrency marketplace with real blockchain integration",
+  "description": "Cryptons.com - Professional Cryptocurrency Trading Platform with real blockchain integration",
   "main": "server-new.js",
   "scripts": {
     "start": "node server-new.js",
@@ -16,9 +16,9 @@
     "format": "prettier --write \"src/**/*.js\" \"tests/**/*.js\"",
     "format:check": "prettier --check \"src/**/*.js\" \"tests/**/*.js\"",
     "security:audit": "npm audit --audit-level=moderate",
-    "docker:build": "docker build -t cstore:latest .",
-    "docker:build:dev": "docker build --target development -t cstore:dev .",
-    "docker:build:prod": "docker build --target production -t cstore:prod ."
+    "docker:build": "docker build -t cryptons:latest .",
+    "docker:build:dev": "docker build --target development -t cryptons:dev .",
+    "docker:build:prod": "docker build --target production -t cryptons:prod ."
   },
   "keywords": [
     "cryptocurrency",

@@ -129,7 +129,7 @@ jobs:
         context: .
         target: development
         push: false
-        tags: cstore:dev
+        tags: cryptons:dev
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
@@ -139,8 +139,8 @@ jobs:
         context: .
         target: production
         push: false
-        tags: cstore:latest
+        tags: cryptons:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
-        outputs: type=docker,dest=/tmp/cstore-image.tar
+        outputs: type=docker,dest=/tmp/cryptons-image.tar
 

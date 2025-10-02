@@ -4,24 +4,24 @@ services:
   # MongoDB Database
   mongodb:
     image: mongo:7.0
-    container_name: cstore-mongodb
+    container_name: cryptons-mongodb
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-admin}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password}
-      MONGO_INITDB_DATABASE: cstore
+      MONGO_INITDB_DATABASE: cryptons
     ports:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
       - mongodb_config:/data/configdb
     networks:
-      - cstore-network
+      - cryptons-network
 
   # Elasticsearch (Optional - for advanced search)
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
-    container_name: cstore-elasticsearch
+    container_name: cryptons-elasticsearch
     restart: unless-stopped
     environment:
       - discovery.type=single-node
@@ -33,7 +33,7 @@ services:
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
     networks:
-      - cstore-network
+      - cryptons-network
     profiles:
       - elasticsearch
 
@@ -43,14 +43,14 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: cstore-app
+    container_name: cryptons-app
     restart: unless-stopped
     ports:
       - "${PORT:-3000}:3000"
     environment:
       NODE_ENV: production
       PORT: 3000
-      MONGODB_URI: mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-password}@mongodb:27017/cstore?authSource=admin
+      MONGODB_URI: mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-password}@mongodb:27017/cryptons?authSource=admin
       JWT_SECRET: ${JWT_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       BTC_ADDRESS: ${BTC_ADDRESS}
@@ -65,7 +65,7 @@ services:
     volumes:
       - ./logs:/app/logs
     networks:
-      - cstore-network
+      - cryptons-network
 
   # Development service (optional)
   app-dev:
@@ -73,14 +73,14 @@ services:
       context: .
       dockerfile: Dockerfile
       target: development
-    container_name: cstore-app-dev
+    container_name: cryptons-app-dev
     restart: unless-stopped
     ports:
       - "3001:3000"
     environment:
       NODE_ENV: development
       PORT: 3000
-      MONGODB_URI: mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-password}@mongodb:27017/cstore?authSource=admin
+      MONGODB_URI: mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-password}@mongodb:27017/cryptons?authSource=admin
       JWT_SECRET: ${JWT_SECRET:-dev-secret}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-refresh-secret}
       BTC_ADDRESS: ${BTC_ADDRESS}
@@ -97,12 +97,12 @@ services:
       - /app/node_modules
       - ./logs:/app/logs
     networks:
-      - cstore-network
+      - cryptons-network
     profiles:
       - dev
 
 networks:
-  cstore-network:
+  cryptons-network:
     driver: bridge
 
 volumes:

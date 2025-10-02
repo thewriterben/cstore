@@ -9,7 +9,7 @@ const connectDB = async () => {
       return;
     }
 
-    const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/cstore', {
+    const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/cryptons', {
       // Mongoose 6+ doesn't need these options
       // useNewUrlParser: true,
       // useUnifiedTopology: true,
