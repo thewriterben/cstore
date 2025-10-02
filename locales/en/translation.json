@@ -122,6 +122,11 @@
     "thankYou": "Thank you for your purchase",
     "orderPlaced": "Order placed successfully",
     "paymentReceived": "Payment received successfully",
-    "orderShipped": "Your order has been shipped"
+    "orderShipped": "Your order has been shipped",
+    "ratesUpdated": "Exchange rates updated successfully",
+    "rateSet": "Manual exchange rate set successfully",
+    "paymentMethodCreated": "Payment method created successfully",
+    "paymentMethodUpdated": "Payment method updated successfully",
+    "paymentMethodDeleted": "Payment method deleted successfully"
   }
 }

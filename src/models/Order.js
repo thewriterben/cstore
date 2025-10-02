@@ -47,6 +47,19 @@ const orderSchema = new mongoose.Schema({
     required: true,
     min: 0
   },
+  displayCurrency: {
+    type: String,
+    default: 'USD',
+    uppercase: true
+  },
+  displayPrice: {
+    type: Number,
+    min: 0
+  },
+  exchangeRate: {
+    type: Number,
+    min: 0
+  },
   cryptocurrency: {
     type: String,
     required: true,

@@ -51,7 +51,7 @@ Tracks the approval status of a transaction requiring multiple signatures.
 
 #### Create Multi-Sig Wallet
 ```http
-POST /api/wallets/multi-sig
+POST /api/multisig/wallets
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -106,7 +106,7 @@ Content-Type: application/json
 
 #### Get All Wallets
 ```http
-GET /api/wallets/multi-sig?cryptocurrency=BTC&isActive=true
+GET /api/multisig/wallets?cryptocurrency=BTC&isActive=true
 Authorization: Bearer <token>
 ```
 
@@ -114,13 +114,13 @@ Returns all wallets where the user is either the owner or a signer.
 
 #### Get Wallet by ID
 ```http
-GET /api/wallets/multi-sig/:id
+GET /api/multisig/wallets/:id
 Authorization: Bearer <token>
 ```
 
 #### Update Wallet
 ```http
-PUT /api/wallets/multi-sig/:id
+PUT /api/multisig/wallets/:id
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -135,7 +135,7 @@ Content-Type: application/json
 
 #### Add Signer
 ```http
-POST /api/wallets/multi-sig/:id/signers
+POST /api/multisig/wallets/:id/signers
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -149,7 +149,7 @@ Content-Type: application/json
 
 #### Remove Signer
 ```http
-DELETE /api/wallets/multi-sig/:id/signers/:signerId
+DELETE /api/multisig/wallets/:id/signers/:signerId
 Authorization: Bearer <token>
 ```
 
@@ -159,7 +159,7 @@ Authorization: Bearer <token>
 
 #### Deactivate Wallet
 ```http
-DELETE /api/wallets/multi-sig/:id
+DELETE /api/multisig/wallets/:id
 Authorization: Bearer <token>
 ```
 
@@ -169,7 +169,7 @@ Soft-deletes the wallet by setting `isActive` to false.
 
 #### Create Transaction Approval Request
 ```http
-POST /api/wallets/multi-sig/transactions
+POST /api/multisig/transactions
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -217,7 +217,7 @@ Content-Type: application/json
 
 #### Get All Transaction Approvals
 ```http
-GET /api/wallets/multi-sig/transactions?status=pending&walletId=wallet-id
+GET /api/multisig/transactions?status=pending&walletId=wallet-id
 Authorization: Bearer <token>
 ```
 
@@ -225,13 +225,13 @@ Returns all transactions for wallets where the user has access.
 
 #### Get Transaction Approval by ID
 ```http
-GET /api/wallets/multi-sig/transactions/:id
+GET /api/multisig/transactions/:id
 Authorization: Bearer <token>
 ```
 
 #### Approve or Reject Transaction
 ```http
-POST /api/wallets/multi-sig/transactions/:id/approve
+POST /api/multisig/transactions/:id/approve
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -283,7 +283,7 @@ Content-Type: application/json
 
 #### Execute Transaction
 ```http
-POST /api/wallets/multi-sig/transactions/:id/execute
+POST /api/multisig/transactions/:id/execute
 Authorization: Bearer <token>
 Content-Type: application/json
 
@@ -301,7 +301,7 @@ Content-Type: application/json
 
 #### Cancel Transaction
 ```http
-DELETE /api/wallets/multi-sig/transactions/:id
+DELETE /api/multisig/transactions/:id
 Authorization: Bearer <token>
 ```
 
@@ -333,6 +333,118 @@ Authorization: Bearer <token>
 3. **Status Update**: Transaction immediately moves to "rejected" status
 4. **Notification**: System logs the rejection for audit trail
 
+## Admin Endpoints
+
+Administrators have access to specialized endpoints for monitoring and managing multi-sig wallets across the platform.
+
+### Get Multi-Sig Statistics
+
+**GET** `/api/admin/multi-sig/stats`
+
+Get comprehensive statistics about multi-sig wallets and transactions.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "wallets": {
+      "total": 50,
+      "active": 45,
+      "inactive": 5
+    },
+    "transactions": {
+      "total": 250,
+      "pending": 10,
+      "approved": 5,
+      "executed": 230,
+      "rejected": 5
+    },
+    "byCryptocurrency": [
+      { "_id": "BTC", "count": 100, "totalAmount": 5.5 },
+      { "_id": "ETH", "count": 120, "totalAmount": 45.2 },
+      { "_id": "USDT", "count": 30, "totalAmount": 15000 }
+    ],
+    "recentPending": [...]
+  }
+}
+```
+
+### List All Multi-Sig Wallets
+
+**GET** `/api/admin/multi-sig/wallets`
+
+List all multi-sig wallets with pagination and filtering.
+
+**Query Parameters:**
+- `isActive` (boolean): Filter by active status
+- `cryptocurrency` (string): Filter by cryptocurrency type
+- `page` (number): Page number (default: 1)
+- `limit` (number): Items per page (default: 20)
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": [...],
+  "count": 20,
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 50,
+    "pages": 3
+  }
+}
+```
+
+### Get Wallet Details
+
+**GET** `/api/admin/multi-sig/wallets/:id`
+
+Get detailed information about a specific wallet including all associated transactions.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "wallet": {...},
+    "transactions": [...]
+  }
+}
+```
+
+### Update Wallet Status
+
+**PUT** `/api/admin/multi-sig/wallets/:id/status`
+
+Activate or deactivate a wallet.
+
+**Request Body:**
+```json
+{
+  "isActive": true
+}
+```
+
+### List All Transactions
+
+**GET** `/api/admin/multi-sig/transactions`
+
+List all multi-sig transactions with pagination and filtering.
+
+**Query Parameters:**
+- `status` (string): Filter by transaction status
+- `cryptocurrency` (string): Filter by cryptocurrency
+- `page` (number): Page number (default: 1)
+- `limit` (number): Items per page (default: 20)
+
+### Get Transaction Details
+
+**GET** `/api/admin/multi-sig/transactions/:id`
+
+Get detailed information about a specific transaction including all approvals.
+
 ## Security Features
 
 ### Authorization
@@ -349,6 +461,69 @@ Authorization: Bearer <token>
 - **Duplicate Prevention**: Signers cannot approve the same transaction twice
 - **Status Checks**: Operations validated against current transaction status
 - **Expiration**: Transactions can expire if not approved in time
+
+### Rate Limiting
+
+Enhanced rate limiting specifically for multi-sig approval operations:
+- **Approval Requests**: Limited to 50 requests per hour per IP address
+- **Protection**: Prevents approval request flooding and potential abuse
+- **Bypass**: Rate limiting is skipped for unauthenticated requests
+
+### Security Logging
+
+Comprehensive audit trail for all multi-sig operations:
+
+**Dedicated Security Log File** (`logs/security.log`)
+- Separate from main application logs
+- 10 file rotation with 5MB each
+- Structured JSON format for easy parsing
+
+**Logged Operations:**
+1. **Wallet Creation**
+   - Wallet ID, owner ID and email
+   - Wallet configuration (name, address, cryptocurrency)
+   - Number of signers and required signatures
+   - List of signer emails
+
+2. **Transaction Creation**
+   - Transaction ID, wallet ID, user ID and email
+   - Amount, cryptocurrency, and addresses
+   - Order ID (if linked)
+   - Required approvals count
+
+3. **Transaction Approval**
+   - Transaction ID, wallet ID, user ID and email
+   - Approval decision (approved/rejected)
+   - Comment and signature presence
+   - Current vs required approvals
+   - New transaction status
+
+4. **Transaction Execution**
+   - Transaction ID, wallet ID, executor ID and email
+   - Blockchain transaction hash
+   - Amount, cryptocurrency, and addresses
+   - Order ID (if linked)
+   - Verification status
+
+**Log Entry Example:**
+```json
+{
+  "level": "info",
+  "message": "Multi-sig transaction_approval",
+  "operation": "transaction_approval",
+  "timestamp": "2024-10-01T10:30:00.000Z",
+  "transactionId": "507f1f77bcf86cd799439011",
+  "walletId": "507f191e810c19729de860ea",
+  "userId": "507f1f77bcf86cd799439012",
+  "userEmail": "signer@example.com",
+  "approved": true,
+  "currentApprovals": 2,
+  "requiredApprovals": 2,
+  "newStatus": "approved",
+  "service": "cstore-security",
+  "category": "multi-sig"
+}
+```
 
 ### Blockchain Verification
 

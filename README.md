@@ -30,16 +30,22 @@ This version includes all core e-commerce features. While functional, additional
 - ❤️ **Wishlist**: Save products for later with full CRUD operations
 - 📧 **Email Service**: Transactional emails (welcome, order confirmation, payment receipt, shipping notifications)
 - 🌐 **Internationalization (i18n)**: Multi-language support (English, Spanish, French, German, Chinese)
+- 💱 **Multi-Currency Pricing**: Support for 10+ fiat currencies with real-time exchange rates
+- 🌍 **Regional Payment Methods**: 15+ region-specific payment options (SEPA, iDEAL, Alipay, PIX, etc.)
 - 🔗 **Enhanced Blockchain**: Webhook support, real-time monitoring, retry mechanisms
 - 📊 **Admin Dashboard API**: Complete admin endpoints for analytics, user management, and system monitoring
-- 🎨 **React Admin Dashboard**: Modern React-based admin panel with Material-UI, charts, and real-time data
 
 #### Infrastructure
 - 🧪 **Testing Suite**: Jest tests with Supertest for authentication and products
-- 🐳 **Docker Support**: Dockerfile and Docker Compose configuration
+- 🐳 **Docker Support**: Multi-stage Dockerfile and Docker Compose configuration
 - 📝 **Logging**: Winston logger with file and console transports
 - 🚦 **Error Handling**: Centralized error handling middleware
 - 📈 **Analytics**: Sales analytics, product analytics, and activity logging
+- 🔄 **CI/CD Pipeline**: Comprehensive GitHub Actions workflows for testing, building, and deployment
+- 🔒 **Security Automation**: GitLeaks, npm audit, and Trivy container scanning
+- ⚡ **Performance Testing**: K6 load testing and stress testing
+- 🚀 **Blue-Green Deployment**: Zero-downtime deployments with automatic rollback
+- 🎨 **Code Quality**: ESLint and Prettier integration
 
 ### 🔧 Configuration Required
 
@@ -49,8 +55,6 @@ These features are implemented but require configuration:
 - **Admin Alerts**: Configure admin email for system alerts
 
 ### ❌ Not Yet Implemented (Future Enhancements)
-
-- [ ] Customer product questions & answers
 
 ### Phase 2: Advanced Blockchain
 - [ ] Multi-signature wallet support
@@ -68,7 +72,14 @@ These features are implemented but require configuration:
 - [ ] CSV/PDF export features (future enhancement)
 
 ### Phase 4: DevOps & Scaling
-- [ ] Complete GitHub Actions CI/CD pipeline
+- [x] Complete GitHub Actions CI/CD pipeline
+- [x] Multi-environment deployment (dev, staging, production)
+- [x] Blue-green deployment strategy
+- [x] Automated testing and linting
+- [x] Security scanning (npm audit, Trivy, GitLeaks)
+- [x] Performance testing with K6
+- [x] Health checks and smoke tests
+- [x] Deployment rollback capabilities
 - [ ] Kubernetes deployment manifests
 - [ ] Prometheus metrics integration
 - [ ] Grafana dashboards
@@ -78,8 +89,8 @@ These features are implemented but require configuration:
 ### Phase 5: Internationalization
 - [x] Multi-language support (i18n)
 - [x] Localized email templates
-- [ ] Multi-currency pricing
-- [ ] Region-specific payment methods
+- [x] Multi-currency pricing
+- [x] Region-specific payment methods
 
 ## 🎨 Admin Dashboard
 
@@ -133,15 +144,18 @@ For detailed documentation, see [admin-dashboard/README.md](admin-dashboard/READ
 
 ### Implemented Endpoints (v2.1)
 
-- **Authentication**: Register, Login, Get Profile, Update Password
+- **Authentication**: Register, Login, Get Profile, Update Password, Update Preferences
 - **Products**: Full CRUD, Search, Filter, Pagination, Suggestions (Autocomplete), Elasticsearch Sync
-- **Orders**: Create, Get, List, Update Status (Admin)
+- **Orders**: Create, Get, List, Update Status (Admin), Multi-Currency Support
 - **Payments**: Confirm, Verify, List (Admin)
 - **Reviews**: Full CRUD, Ratings, Stats, Moderation (Admin)
 - **Categories**: Full CRUD, Product Filtering
-- **Shopping Cart**: Add, Update, Remove, Validate
+- **Shopping Cart**: Add, Update, Remove, Validate, Multi-Currency Display
+- **Currencies**: List, Convert, Exchange Rates, Historical Data (Admin)
+- **Regional Payments**: Discovery, Filtering, Management (Admin)
 - **Admin Dashboard**: Stats, Analytics, User Management, System Health
 - **Multi-Sig Wallets**: Create, Manage, Transaction Approvals
+- **Product Questions**: Ask, Answer, Vote Helpful, Moderation (Admin)
 
 See [API_ENDPOINTS.md](docs/API_ENDPOINTS.md) for complete documentation.
 
@@ -163,6 +177,50 @@ All v2.0 endpoints remain compatible. New endpoints are additive only.
 **Database Migration**: No migration required. New collections (Cart, MultiSigWallet, TransactionApproval) will be created automatically.
 
 **Configuration**: Add email SMTP settings to `.env` file (see `.env.example`).
+
+## 🔄 CI/CD Pipeline
+
+The project includes a comprehensive CI/CD pipeline using GitHub Actions.
+
+### Workflows
+
+1. **CI Pipeline** (`.github/workflows/ci.yml`)
+   - Automated linting with ESLint and Prettier
+   - Jest tests with coverage reporting
+   - Security scanning (npm audit, GitLeaks, Trivy)
+   - Multi-version Node.js testing (18.x, 20.x)
+   - Docker image building and caching
+
+2. **Deployment Pipeline** (`.github/workflows/deploy.yml`)
+   - Multi-environment support (development, staging, production)
+   - Blue-green deployment strategy
+   - Automated health checks and smoke tests
+   - Gradual traffic shifting for production
+   - Automatic rollback on failure
+   - Database migration support
+
+3. **Performance Testing** (`.github/workflows/performance.yml`)
+   - K6 load testing
+   - Stress testing
+   - API benchmarking
+   - Performance regression detection
+
+### Deployment Environments
+
+- **Development**: Auto-deploy from `develop` branch
+- **Staging**: Auto-deploy from `main` branch
+- **Production**: Deploy via git tags (e.g., `v1.0.0`)
+
+### Scripts
+
+Located in `scripts/deployment/`:
+- `health-check.sh` - Application health validation
+- `smoke-test.sh` - Basic functional tests
+- `rollback.sh` - Automated rollback procedure
+
+### Documentation
+
+See [docs/CICD_PIPELINE.md](docs/CICD_PIPELINE.md) for comprehensive CI/CD documentation.
 
 ## 🤝 Contributing
 

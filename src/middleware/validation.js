@@ -113,9 +113,7 @@ const schemas = {
 
   // Update cart item quantity
   updateCartItem: Joi.object({
-    quantity: Joi.number().integer().min(0).required()
-  }),
-
+    quantity: Joi.number().integer().min(0).required()n
   })
 };
 
@@ -125,6 +123,12 @@ const validateCategory = validate(schemas.createCategory);
 const validateUpdateCategory = validate(schemas.updateCategory);
 const validateCartItem = validate(schemas.cartItem);
 const validateUpdateCartItem = validate(schemas.updateCartItem);
+const validateCreateMultiSigWallet = validate(schemas.createMultiSigWallet);
+const validateUpdateMultiSigWallet = validate(schemas.updateMultiSigWallet);
+const validateAddSigner = validate(schemas.addSigner);
+const validateCreateTransactionApproval = validate(schemas.createTransactionApproval);
+const validateApproveTransaction = validate(schemas.approveTransaction);
+const validateExecuteTransaction = validate(schemas.executeTransaction);
 
 module.exports = { 
   validate, 
@@ -134,4 +138,9 @@ module.exports = {
   validateUpdateCategory,
   validateCartItem,
   validateUpdateCartItem,
+  validateCreateMultiSigWallet,
+  validateUpdateMultiSigWallet,
+  validateAddSigner,
+  validateCreateTransactionApproval,
+  validateApproveTransaction,
 };

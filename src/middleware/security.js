@@ -33,6 +33,16 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// Rate limiting for multi-sig approval operations
+const multiSigApprovalLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 50, // Limit each IP to 50 approval requests per hour
+  message: 'Too many approval requests, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+  // Use standard IP-based rate limiting
+  skip: (req) => !req.user // Skip rate limiting if not authenticated
+});
 
 // MongoDB sanitization - prevent NoSQL injection (Express 5 compatible)
 // Note: express-mongo-sanitize has compatibility issues with Express 5
@@ -106,6 +116,7 @@ module.exports = {
   securityHeaders,
   limiter,
   authLimiter,
+  multiSigApprovalLimiter,
   sanitizeData,
   xssClean,
   preventParamPollution

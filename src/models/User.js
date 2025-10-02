@@ -34,6 +34,20 @@ const userSchema = new mongoose.Schema({
     cryptocurrency: String,
     address: String
   }],
+  preferredCurrency: {
+    type: String,
+    default: 'USD',
+    uppercase: true
+  },
+  preferredLanguage: {
+    type: String,
+    default: 'en',
+    lowercase: true
+  },
+  country: {
+    type: String,
+    uppercase: true
+  },
   resetPasswordToken: String,
   resetPasswordExpire: Date
 }, {

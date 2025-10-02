@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cstore-config
+  namespace: cstore
+data:
+  NODE_ENV: "production"
+  PORT: "3000"
+  LOG_LEVEL: "info"
+  SEED_DATA: "false"
+  ELASTICSEARCH_ENABLED: "false"
+  # Add other non-sensitive configuration here
