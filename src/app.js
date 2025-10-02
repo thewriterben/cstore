@@ -121,7 +121,7 @@ app.get('/', (req, res) => {
 });
 
 // Admin dashboard SPA routing - must come before 404 handler
-app.get('/admin/*', (req, res) => {
+app.get(/^\/admin(?:\/.*)?$/, (req, res) => {
   res.sendFile(path.join(__dirname, '../admin-dashboard/dist', 'index.html'));
 });
 

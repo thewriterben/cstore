@@ -113,7 +113,51 @@ const schemas = {
 
   // Update cart item quantity
   updateCartItem: Joi.object({
-    quantity: Joi.number().integer().min(0).required()n
+    quantity: Joi.number().integer().min(0).required()
+  }),
+
+  // Multi-sig wallet schemas
+  createMultiSigWallet: Joi.object({
+    name: Joi.string().min(3).max(100).required(),
+    cryptocurrency: Joi.string().valid('BTC', 'ETH', 'USDT').required(),
+    address: Joi.string().required(),
+    signers: Joi.array().items(Joi.object({
+      email: Joi.string().email().required(),
+      publicKey: Joi.string().optional()
+    })).min(2).required(),
+    requiredSignatures: Joi.number().integer().min(2).required(),
+    description: Joi.string().max(500).optional().allow('')
+  }),
+
+  updateMultiSigWallet: Joi.object({
+    name: Joi.string().min(3).max(100).optional(),
+    description: Joi.string().max(500).optional().allow(''),
+    isActive: Joi.boolean().optional()
+  }),
+
+  addSigner: Joi.object({
+    email: Joi.string().email().required(),
+    publicKey: Joi.string().optional()
+  }),
+
+  createTransactionApproval: Joi.object({
+    walletId: Joi.string().required(),
+    orderId: Joi.string().optional(),
+    amount: Joi.number().min(0).required(),
+    toAddress: Joi.string().required(),
+    fromAddress: Joi.string().optional(),
+    cryptocurrency: Joi.string().valid('BTC', 'ETH', 'USDT').required(),
+    description: Joi.string().max(500).optional().allow(''),
+    expiresAt: Joi.date().optional()
+  }),
+
+  approveTransaction: Joi.object({
+    approved: Joi.boolean().required(),
+    comment: Joi.string().max(500).optional().allow('')
+  }),
+
+  executeTransaction: Joi.object({
+    transactionHash: Joi.string().required()
   })
 };
 
@@ -143,4 +187,5 @@ module.exports = {
   validateAddSigner,
   validateCreateTransactionApproval,
   validateApproveTransaction,
+  validateExecuteTransaction
 };
