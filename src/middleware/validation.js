@@ -113,7 +113,7 @@ const schemas = {
 
   // Update cart item quantity
   updateCartItem: Joi.object({
-    quantity: Joi.number().integer().min(0).required()
+    quantity: Joi.number().integer().min(0).required()n
   })
 };
 

@@ -10,7 +10,15 @@
     "dev:legacy": "node server.js",
     "test": "NODE_ENV=test jest --verbose --runInBand",
     "test:watch": "NODE_ENV=test jest --watch",
-    "test:coverage": "NODE_ENV=test jest --coverage"
+    "test:coverage": "NODE_ENV=test jest --coverage",
+    "lint": "eslint src/**/*.js tests/**/*.js",
+    "lint:fix": "eslint src/**/*.js tests/**/*.js --fix",
+    "format": "prettier --write \"src/**/*.js\" \"tests/**/*.js\"",
+    "format:check": "prettier --check \"src/**/*.js\" \"tests/**/*.js\"",
+    "security:audit": "npm audit --audit-level=moderate",
+    "docker:build": "docker build -t cstore:latest .",
+    "docker:build:dev": "docker build --target development -t cstore:dev .",
+    "docker:build:prod": "docker build --target production -t cstore:prod ."
   },
   "keywords": [
     "cryptocurrency",
@@ -49,8 +57,13 @@
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-security": "^2.1.1",
     "jest": "^30.2.0",
     "mongodb-memory-server": "^10.2.1",
+    "prettier": "^3.6.2",
     "supertest": "^7.1.4"
   }
 }
