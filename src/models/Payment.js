@@ -14,7 +14,7 @@ const paymentSchema = new mongoose.Schema({
   cryptocurrency: {
     type: String,
     required: true,
-    enum: ['BTC', 'ETH', 'USDT']
+    enum: ['BTC', 'ETH', 'USDT', 'LTC', 'XRP']
   },
   amount: {
     type: Number,

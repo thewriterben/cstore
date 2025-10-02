@@ -22,7 +22,7 @@ const cartItemSchema = new mongoose.Schema({
   },
   currency: {
     type: String,
-    enum: ['BTC', 'ETH', 'USDT'],
+    enum: ['BTC', 'ETH', 'USDT', 'LTC', 'XRP'],
     required: true
   }
 });

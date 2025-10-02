@@ -25,7 +25,7 @@ const productSchema = new mongoose.Schema({
   currency: {
     type: String,
     default: 'BTC',
-    enum: ['BTC', 'ETH', 'USDT']
+    enum: ['BTC', 'ETH', 'USDT', 'LTC', 'XRP']
   },
   category: {
     type: mongoose.Schema.Types.ObjectId,
