@@ -7,6 +7,14 @@ const MultiSigWallet = require('../models/MultiSigWallet');
 const TransactionApproval = require('../models/TransactionApproval');
 const logger = require('../utils/logger');
 const { verifyEmailConfig } = require('../services/emailService');
+const {
+  exportProductsToCSV,
+  exportOrdersToCSV,
+  exportUsersToCSV,
+  exportProductsToPDF,
+  exportOrdersToPDF
+} = require('../services/exportService');
+const fs = require('fs');
 
 /**
  * Get dashboard statistics
@@ -843,6 +851,250 @@ exports.getMultiSigStats = async (req, res, next) => {
     });
   } catch (error) {
     logger.error('Admin get multi-sig stats error:', error);
+    next(error);
+  }
+};
+
+/**
+ * Bulk reorder products
+ * PUT /api/admin/products/reorder
+ * @access Private (Admin)
+ */
+exports.reorderProducts = async (req, res, next) => {
+  try {
+    const { productOrders } = req.body;
+
+    if (!productOrders || !Array.isArray(productOrders)) {
+      return res.status(400).json({
+        success: false,
+        message: 'productOrders array is required'
+      });
+    }
+
+    // Bulk update all product orders
+    const bulkOps = productOrders.map(({ productId, sortOrder }) => ({
+      updateOne: {
+        filter: { _id: productId },
+        update: { $set: { sortOrder } }
+      }
+    }));
+
+    await Product.bulkWrite(bulkOps);
+
+    logger.info(`Reordered ${productOrders.length} products`);
+
+    res.json({
+      success: true,
+      message: 'Products reordered successfully'
+    });
+  } catch (error) {
+    logger.error('Product reorder error:', error);
+    next(error);
+  }
+};
+
+/**
+ * Export products to CSV
+ * GET /api/admin/products/export/csv
+ * @access Private (Admin)
+ */
+exports.exportProductsCSV = async (req, res, next) => {
+  try {
+    const { search, category } = req.query;
+
+    const query = { isActive: true };
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
+    }
+    if (category) {
+      query.category = category;
+    }
+
+    const products = await Product.find(query)
+      .populate('category', 'name')
+      .sort({ sortOrder: 1, createdAt: -1 })
+      .lean();
+
+    const filePath = await exportProductsToCSV(products);
+
+    res.download(filePath, `products-${Date.now()}.csv`, (err) => {
+      if (err) {
+        logger.error('File download error:', err);
+      }
+      // Clean up file after download
+      fs.unlink(filePath, (unlinkErr) => {
+        if (unlinkErr) logger.error('File cleanup error:', unlinkErr);
+      });
+    });
+  } catch (error) {
+    logger.error('Product CSV export error:', error);
+    next(error);
+  }
+};
+
+/**
+ * Export products to PDF
+ * GET /api/admin/products/export/pdf
+ * @access Private (Admin)
+ */
+exports.exportProductsPDF = async (req, res, next) => {
+  try {
+    const { search, category } = req.query;
+
+    const query = { isActive: true };
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
+    }
+    if (category) {
+      query.category = category;
+    }
+
+    const products = await Product.find(query)
+      .populate('category', 'name')
+      .sort({ sortOrder: 1, createdAt: -1 })
+      .lean();
+
+    const filePath = await exportProductsToPDF(products);
+
+    res.download(filePath, `products-${Date.now()}.pdf`, (err) => {
+      if (err) {
+        logger.error('File download error:', err);
+      }
+      // Clean up file after download
+      fs.unlink(filePath, (unlinkErr) => {
+        if (unlinkErr) logger.error('File cleanup error:', unlinkErr);
+      });
+    });
+  } catch (error) {
+    logger.error('Product PDF export error:', error);
+    next(error);
+  }
+};
+
+/**
+ * Export orders to CSV
+ * GET /api/admin/orders/export/csv
+ * @access Private (Admin)
+ */
+exports.exportOrdersCSV = async (req, res, next) => {
+  try {
+    const { status, startDate, endDate } = req.query;
+
+    const query = {};
+    if (status) {
+      query.status = status;
+    }
+    if (startDate || endDate) {
+      query.createdAt = {};
+      if (startDate) query.createdAt.$gte = new Date(startDate);
+      if (endDate) query.createdAt.$lte = new Date(endDate);
+    }
+
+    const orders = await Order.find(query)
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const filePath = await exportOrdersToCSV(orders);
+
+    res.download(filePath, `orders-${Date.now()}.csv`, (err) => {
+      if (err) {
+        logger.error('File download error:', err);
+      }
+      // Clean up file after download
+      fs.unlink(filePath, (unlinkErr) => {
+        if (unlinkErr) logger.error('File cleanup error:', unlinkErr);
+      });
+    });
+  } catch (error) {
+    logger.error('Order CSV export error:', error);
+    next(error);
+  }
+};
+
+/**
+ * Export orders to PDF
+ * GET /api/admin/orders/export/pdf
+ * @access Private (Admin)
+ */
+exports.exportOrdersPDF = async (req, res, next) => {
+  try {
+    const { status, startDate, endDate } = req.query;
+
+    const query = {};
+    if (status) {
+      query.status = status;
+    }
+    if (startDate || endDate) {
+      query.createdAt = {};
+      if (startDate) query.createdAt.$gte = new Date(startDate);
+      if (endDate) query.createdAt.$lte = new Date(endDate);
+    }
+
+    const orders = await Order.find(query)
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const filePath = await exportOrdersToPDF(orders);
+
+    res.download(filePath, `orders-${Date.now()}.pdf`, (err) => {
+      if (err) {
+        logger.error('File download error:', err);
+      }
+      // Clean up file after download
+      fs.unlink(filePath, (unlinkErr) => {
+        if (unlinkErr) logger.error('File cleanup error:', unlinkErr);
+      });
+    });
+  } catch (error) {
+    logger.error('Order PDF export error:', error);
+    next(error);
+  }
+};
+
+/**
+ * Export users to CSV
+ * GET /api/admin/users/export/csv
+ * @access Private (Admin)
+ */
+exports.exportUsersCSV = async (req, res, next) => {
+  try {
+    const { role, search } = req.query;
+
+    const query = {};
+    if (role) {
+      query.role = role;
+    }
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    const users = await User.find(query)
+      .select('name email role createdAt')
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const filePath = await exportUsersToCSV(users);
+
+    res.download(filePath, `users-${Date.now()}.csv`, (err) => {
+      if (err) {
+        logger.error('File download error:', err);
+      }
+      // Clean up file after download
+      fs.unlink(filePath, (unlinkErr) => {
+        if (unlinkErr) logger.error('File cleanup error:', unlinkErr);
+      });
+    });
+  } catch (error) {
+    logger.error('User CSV export error:', error);
     next(error);
   }
 };

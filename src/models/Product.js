@@ -74,6 +74,10 @@ const productSchema = new mongoose.Schema({
       type: Number,
       default: 0
     }
+  },
+  sortOrder: {
+    type: Number,
+    default: 0
   }
 }, {
   timestamps: true
@@ -83,5 +87,6 @@ const productSchema = new mongoose.Schema({
 productSchema.index({ name: 'text', description: 'text' });
 productSchema.index({ category: 1, isActive: 1 });
 productSchema.index({ featured: 1, isActive: 1 });
+productSchema.index({ sortOrder: 1 });
 
 module.exports = mongoose.model('Product', productSchema);
