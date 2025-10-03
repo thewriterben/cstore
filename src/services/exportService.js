@@ -158,7 +158,7 @@ async function exportProductsToPDF(products) {
       const rowHeight = 20;
       const pageHeight = 700;
 
-      products.forEach((product, index) => {
+      products.forEach((product) => {
         if (y > pageHeight) {
           doc.addPage();
           y = 50;

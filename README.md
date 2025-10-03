@@ -68,8 +68,8 @@ These features are implemented but require configuration:
 - [x] Real-time order notifications (Socket.io client ready)
 - [x] Product management interface
 - [x] Advanced analytics and reporting features
-- [ ] Drag-and-drop product management (future enhancement)
-- [ ] CSV/PDF export features (future enhancement)
+- [x] Drag-and-drop product management
+- [x] CSV/PDF export features
 
 ### Phase 4: DevOps & Scaling
 - [x] Complete GitHub Actions CI/CD pipeline
@@ -100,8 +100,12 @@ The Cryptons.com platform now includes a modern React-based admin dashboard for 
 - **Dashboard Overview**: Key metrics, sales trends, and recent orders at a glance
 - **Sales Analytics**: Interactive charts showing sales by date and cryptocurrency distribution
 - **Product Management**: Browse, search, and manage products with stock indicators
+  - **Drag-and-Drop Reordering**: Reorder products by dragging and dropping them in the list
+  - **Export**: Export products to CSV or PDF formats
 - **Order Management**: View and filter orders by status with detailed information
+  - **Export**: Export orders to CSV or PDF formats with filtering options
 - **User Management**: Browse registered users and their account details
+  - **Export**: Export user data to CSV format
 - **System Health**: Monitor database, email service, memory usage, and server uptime
 
 ### Tech Stack
@@ -110,6 +114,8 @@ The Cryptons.com platform now includes a modern React-based admin dashboard for 
 - Redux Toolkit for state management
 - Recharts for data visualization
 - Axios for API integration
+- @dnd-kit for drag-and-drop functionality
+- Papaparse for CSV exports
 
 ### Getting Started
 
