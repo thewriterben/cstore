@@ -483,6 +483,68 @@ All admin endpoints require Admin role authentication.
   - `limit` - Number of activities to return
 - **Returns:** Recent orders, reviews, and user registrations
 
+### Product Management
+
+#### Reorder Products
+- **PUT** `/admin/products/reorder`
+- **Auth Required:** Yes (Admin)
+- **Body:**
+  ```json
+  {
+    "productOrders": [
+      {
+        "productId": "product_id",
+        "sortOrder": 0
+      }
+    ]
+  }
+  ```
+- **Description:** Bulk update product sort orders for drag-and-drop reordering
+
+### Export Endpoints
+
+#### Export Products to CSV
+- **GET** `/admin/products/export/csv`
+- **Auth Required:** Yes (Admin)
+- **Query Parameters:**
+  - `search` - Search filter (optional)
+  - `category` - Category filter (optional)
+- **Returns:** CSV file download
+
+#### Export Products to PDF
+- **GET** `/admin/products/export/pdf`
+- **Auth Required:** Yes (Admin)
+- **Query Parameters:**
+  - `search` - Search filter (optional)
+  - `category` - Category filter (optional)
+- **Returns:** PDF file download
+
+#### Export Orders to CSV
+- **GET** `/admin/orders/export/csv`
+- **Auth Required:** Yes (Admin)
+- **Query Parameters:**
+  - `status` - Order status filter (optional)
+  - `startDate` - Start date filter (optional)
+  - `endDate` - End date filter (optional)
+- **Returns:** CSV file download
+
+#### Export Orders to PDF
+- **GET** `/admin/orders/export/pdf`
+- **Auth Required:** Yes (Admin)
+- **Query Parameters:**
+  - `status` - Order status filter (optional)
+  - `startDate` - Start date filter (optional)
+  - `endDate` - End date filter (optional)
+- **Returns:** PDF file download
+
+#### Export Users to CSV
+- **GET** `/admin/users/export/csv`
+- **Auth Required:** Yes (Admin)
+- **Query Parameters:**
+  - `role` - Role filter (optional)
+  - `search` - Search filter (optional)
+- **Returns:** CSV file download
+
 ---
 
 ## Utility Endpoints

@@ -142,6 +142,33 @@ class ApiService {
     return response.data;
   }
 
+  async reorderProducts(productOrders: Array<{ productId: string; sortOrder: number }>) {
+    const response = await this.api.put('/admin/products/reorder', { productOrders });
+    return response.data;
+  }
+
+  async exportProductsCSV(search?: string, category?: string) {
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (category) params.append('category', category);
+    
+    const response = await this.api.get(`/admin/products/export/csv?${params.toString()}`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  }
+
+  async exportProductsPDF(search?: string, category?: string) {
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (category) params.append('category', category);
+    
+    const response = await this.api.get(`/admin/products/export/pdf?${params.toString()}`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  }
+
   // Order management
   async getOrders(page = 1, limit = 10, status?: string) {
     const params = new URLSearchParams();
@@ -163,6 +190,30 @@ class ApiService {
     return response.data;
   }
 
+  async exportOrdersCSV(status?: string, startDate?: string, endDate?: string) {
+    const params = new URLSearchParams();
+    if (status) params.append('status', status);
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    
+    const response = await this.api.get(`/admin/orders/export/csv?${params.toString()}`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  }
+
+  async exportOrdersPDF(status?: string, startDate?: string, endDate?: string) {
+    const params = new URLSearchParams();
+    if (status) params.append('status', status);
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    
+    const response = await this.api.get(`/admin/orders/export/pdf?${params.toString()}`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  }
+
   // Reviews moderation
   async getPendingReviews(page = 1, limit = 10) {
     const params = new URLSearchParams();
@@ -175,6 +226,17 @@ class ApiService {
 
   async approveReview(reviewId: string) {
     const response = await this.api.put(`/reviews/${reviewId}/approve`);
+    return response.data;
+  }
+
+  async exportUsersCSV(role?: string, search?: string) {
+    const params = new URLSearchParams();
+    if (role) params.append('role', role);
+    if (search) params.append('search', search);
+    
+    const response = await this.api.get(`/admin/users/export/csv?${params.toString()}`, {
+      responseType: 'blob'
+    });
     return response.data;
   }
 }

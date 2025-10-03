@@ -18,6 +18,7 @@ export interface Product {
   isActive: boolean;
   averageRating?: number;
   numReviews?: number;
+  sortOrder?: number;
   createdAt: string;
 }
 

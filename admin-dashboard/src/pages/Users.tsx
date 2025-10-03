@@ -14,11 +14,14 @@ import {
   TextField,
   InputAdornment,
   CircularProgress,
+  Button,
 } from '@mui/material';
-import { Search } from '@mui/icons-material';
+import { Search, FileDownload } from '@mui/icons-material';
 import { format } from 'date-fns';
 import apiService from '../services/api';
 import type { User } from '../types';
+import ExportDialog from '../components/common/ExportDialog';
+import { downloadBlob, generateFilename } from '../utils/exportUtils';
 
 const Users = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -27,6 +30,7 @@ const Users = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState('');
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
   useEffect(() => {
     loadUsers();
@@ -54,6 +58,18 @@ const Users = () => {
     setPage(0);
   };
 
+  const handleExport = async (_format: 'csv' | 'pdf') => {
+    try {
+      // Only CSV export is available for users (privacy consideration)
+      const blob = await apiService.exportUsersCSV(undefined, search);
+      const filename = generateFilename('users', 'csv');
+      downloadBlob(blob, filename);
+    } catch (error) {
+      console.error('Export error:', error);
+      throw error;
+    }
+  };
+
   if (loading && users.length === 0) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
@@ -64,9 +80,16 @@ const Users = () => {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
-        Users
-      </Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h4">Users</Typography>
+        <Button
+          variant="outlined"
+          startIcon={<FileDownload />}
+          onClick={() => setExportDialogOpen(true)}
+        >
+          Export
+        </Button>
+      </Box>
 
       <Paper sx={{ mb: 2, p: 2 }}>
         <TextField
@@ -126,6 +149,13 @@ const Users = () => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
+
+      <ExportDialog
+        open={exportDialogOpen}
+        onClose={() => setExportDialogOpen(false)}
+        onExport={handleExport}
+        title="Export Users (CSV Only)"
+      />
     </Box>
   );
 };

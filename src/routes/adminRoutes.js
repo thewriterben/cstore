@@ -17,7 +17,13 @@ const {
   getAllMultiSigTransactions,
   getMultiSigTransactionById,
   updateMultiSigWalletStatus,
-  getMultiSigStats
+  getMultiSigStats,
+  reorderProducts,
+  exportProductsCSV,
+  exportProductsPDF,
+  exportOrdersCSV,
+  exportOrdersPDF,
+  exportUsersCSV
 } = require('../controllers/adminController');
 
 // All admin routes require admin authorization
@@ -50,5 +56,15 @@ router.get('/multi-sig/wallets/:id', getMultiSigWalletById);
 router.put('/multi-sig/wallets/:id/status', updateMultiSigWalletStatus);
 router.get('/multi-sig/transactions', getAllMultiSigTransactions);
 router.get('/multi-sig/transactions/:id', getMultiSigTransactionById);
+
+// Product Management
+router.put('/products/reorder', reorderProducts);
+
+// Export Routes
+router.get('/products/export/csv', exportProductsCSV);
+router.get('/products/export/pdf', exportProductsPDF);
+router.get('/orders/export/csv', exportOrdersCSV);
+router.get('/orders/export/pdf', exportOrdersPDF);
+router.get('/users/export/csv', exportUsersCSV);
 
 module.exports = router;
