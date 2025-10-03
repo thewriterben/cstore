@@ -16,10 +16,14 @@ import {
   FormControl,
   InputLabel,
   CircularProgress,
+  Button,
 } from '@mui/material';
+import { FileDownload } from '@mui/icons-material';
 import { format } from 'date-fns';
 import apiService from '../services/api';
 import type { Order } from '../types';
+import ExportDialog from '../components/common/ExportDialog';
+import { downloadBlob, generateFilename } from '../utils/exportUtils';
 
 const Orders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -28,6 +32,7 @@ const Orders = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [total, setTotal] = useState(0);
   const [statusFilter, setStatusFilter] = useState('');
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
 
   useEffect(() => {
     loadOrders();
@@ -73,6 +78,26 @@ const Orders = () => {
     }
   };
 
+  const handleExport = async (format: 'csv' | 'pdf') => {
+    try {
+      let blob: Blob;
+      let filename: string;
+
+      if (format === 'csv') {
+        blob = await apiService.exportOrdersCSV(statusFilter);
+        filename = generateFilename('orders', 'csv');
+      } else {
+        blob = await apiService.exportOrdersPDF(statusFilter);
+        filename = generateFilename('orders', 'pdf');
+      }
+
+      downloadBlob(blob, filename);
+    } catch (error) {
+      console.error('Export error:', error);
+      throw error;
+    }
+  };
+
   if (loading && orders.length === 0) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
@@ -83,9 +108,16 @@ const Orders = () => {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
-        Orders
-      </Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h4">Orders</Typography>
+        <Button
+          variant="outlined"
+          startIcon={<FileDownload />}
+          onClick={() => setExportDialogOpen(true)}
+        >
+          Export
+        </Button>
+      </Box>
 
       <Paper sx={{ mb: 2, p: 2 }}>
         <FormControl sx={{ minWidth: 200 }}>
@@ -156,6 +188,13 @@ const Orders = () => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
+
+      <ExportDialog
+        open={exportDialogOpen}
+        onClose={() => setExportDialogOpen(false)}
+        onExport={handleExport}
+        title="Export Orders"
+      />
     </Box>
   );
 };
