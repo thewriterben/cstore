@@ -5,13 +5,15 @@ This directory contains essential guides for getting started with Cryptons.com, 
 ## 📚 Contents
 
 ### Installation & Setup
-- Quick setup guide and installation instructions
-- Environment configuration
-- Docker deployment
-- Local development setup
+- **[INSTALLATION.md](INSTALLATION.md)** - Complete installation guide
+  - Prerequisites and requirements
+  - Local development setup
+  - Docker deployment
+  - Environment configuration
+  - Troubleshooting
 
 ### First Steps
-- Creating your first account
+- Creating your first account (see main [README.md](../../README.md))
 - Basic platform navigation
 - Key concepts and terminology
 

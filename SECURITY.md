@@ -59,7 +59,7 @@ If you're contributing to Cryptons.com, please:
 
 1. **Never commit secrets**: Use environment variables for sensitive data
 2. **Update dependencies**: Keep all packages up to date
-3. **Follow secure coding practices**: Review [docs/SECURITY.md](docs/SECURITY.md)
+3. **Follow secure coding practices**: Review [docs/security/SECURITY.md](docs/security/SECURITY.md)
 4. **Test security features**: Write tests for security-critical code
 5. **Review the audit reports**: Understand the security landscape in [audit/](audit/)
 
@@ -114,7 +114,7 @@ See [audit/COMPLIANCE_AUDIT.md](audit/COMPLIANCE_AUDIT.md) for complete details.
 ✅ Logging and monitoring  
 ✅ Error handling  
 
-See [docs/SECURITY.md](docs/SECURITY.md) for implementation details.
+See [docs/security/SECURITY.md](docs/security/SECURITY.md) for implementation details.
 
 ## Security Roadmap
 

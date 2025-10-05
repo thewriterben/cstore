@@ -33,6 +33,15 @@ Welcome to the Cryptons.com documentation. This comprehensive index provides org
 - **[CHANGELOG.md](CHANGELOG.md)** - Version history and release notes
 - **[LICENSE](LICENSE)** - MIT License
 
+### Getting Started
+- **[docs/getting-started/README.md](docs/getting-started/README.md)** - Getting started hub
+- **[docs/getting-started/INSTALLATION.md](docs/getting-started/INSTALLATION.md)** - Complete installation guide
+  - Prerequisites and requirements
+  - Local development setup
+  - Docker deployment
+  - Environment configuration
+  - Troubleshooting
+
 ### Configuration
 - **[.env.example](.env.example)** - Environment variables reference
   - Server configuration

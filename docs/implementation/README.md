@@ -27,7 +27,7 @@ These documents represent the historical development journey of Cryptons.com. Th
 - Legacy system references
 - Migration guides
 
-**Note**: Some documents may reference the original "CStore" name. These have been intentionally preserved for historical accuracy.
+**Note**: These documents contain historical references to old file paths and the original "CStore" name. These have been intentionally preserved for historical accuracy and to document the actual implementation process. For current documentation locations, refer to the [Documentation Index](../../DOCUMENTATION_INDEX.md).
 
 ## 🔗 Current Documentation
 
