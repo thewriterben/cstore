@@ -405,10 +405,12 @@ Comprehensive security testing strategy:
 ## 📚 Additional Resources
 
 ### Internal Documentation
-- `/docs/SECURITY.md` - Current security implementation
-- `/docs/AUTHENTICATION.md` - Authentication system details
-- `/docs/CICD_PIPELINE.md` - CI/CD and deployment
-- `/README.md` - Main project documentation
+- **[DOCUMENTATION_INDEX.md](../DOCUMENTATION_INDEX.md)** - Complete documentation index
+- **[docs/security/SECURITY.md](../docs/security/SECURITY.md)** - Current security implementation
+- **[docs/security/AUTHENTICATION.md](../docs/security/AUTHENTICATION.md)** - Authentication system details
+- **[docs/infrastructure/CICD_PIPELINE.md](../docs/infrastructure/CICD_PIPELINE.md)** - CI/CD and deployment
+- **[docs/compliance/COMPLIANCE_CHECKLIST.md](../docs/compliance/COMPLIANCE_CHECKLIST.md)** - Compliance requirements
+- **[README.md](../README.md)** - Main project documentation
 
 ### External Resources
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
