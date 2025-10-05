@@ -14,11 +14,11 @@ A full-featured cryptocurrency trading platform built with Node.js, Express, and
 ### Before ANY Production Deployment:
 
 1. **🔴 CRITICAL SECURITY IMPLEMENTATIONS REQUIRED**
-   - [ ] JWT Token Revocation ([Implementation Guide](docs/JWT_TOKEN_REVOCATION.md))
-   - [ ] Webhook Signature Verification ([Implementation Guide](docs/WEBHOOK_SECURITY.md))
-   - [ ] Database Encryption at Rest ([Implementation Guide](docs/DATABASE_ENCRYPTION.md))
-   - [ ] Production CORS Configuration ([Implementation Guide](docs/CORS_CONFIGURATION.md))
-   - [ ] Secrets Management System ([Implementation Guide](docs/SECRETS_MANAGEMENT.md))
+   - [ ] JWT Token Revocation ([Implementation Guide](docs/security/JWT_TOKEN_REVOCATION.md))
+   - [ ] Webhook Signature Verification ([Implementation Guide](docs/security/WEBHOOK_SECURITY.md))
+   - [ ] Database Encryption at Rest ([Implementation Guide](docs/security/DATABASE_ENCRYPTION.md))
+   - [ ] Production CORS Configuration ([Implementation Guide](docs/infrastructure/CORS_CONFIGURATION.md))
+   - [ ] Secrets Management System ([Implementation Guide](docs/security/SECRETS_MANAGEMENT.md))
 
 2. **🔴 LEGAL & COMPLIANCE REQUIREMENTS**
    - [ ] Money Transmitter Licenses (48+ U.S. states)
@@ -61,10 +61,13 @@ Operating a cryptocurrency trading platform without proper licenses and complian
 
 ### 📚 Documentation
 
-- **[DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)** - Complete documentation guide
-- **[SECURITY.md](SECURITY.md)** - Security policy and vulnerability reporting
-- **[AUDIT_SUMMARY.md](AUDIT_SUMMARY.md)** - Executive audit summary
-- **[COMPLIANCE_CHECKLIST.md](docs/COMPLIANCE_CHECKLIST.md)** - Compliance requirements
+**For complete documentation, see [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)**
+
+Quick Links:
+- **[Security Documentation](docs/security/README.md)** - Security implementation and requirements
+- **[Compliance Checklist](docs/compliance/COMPLIANCE_CHECKLIST.md)** - Legal and regulatory requirements
+- **[API Documentation](docs/api/README.md)** - API reference and integration guides
+- **[Audit Reports](audit/README.md)** - Security and compliance audit findings
 
 ---
 
@@ -123,10 +126,10 @@ These features are implemented but require configuration:
 ### ❌ Not Yet Implemented (Future Enhancements)
 
 ### Phase 2: Advanced Blockchain
-- [x] Multi-signature wallet support (see [Multi-Sig Wallet Guide](docs/MULTI_SIG_WALLET.md))
-- [x] Direct Bitcoin Core RPC integration (see [Bitcoin RPC Guide](docs/BITCOIN_RPC.md))
+- [x] Multi-signature wallet support (see [Multi-Sig Wallet Guide](docs/api/MULTI_SIG_WALLET.md))
+- [x] Direct Bitcoin Core RPC integration (see [Bitcoin RPC Guide](docs/api/BITCOIN_RPC.md))
 - [ ] Layer 2 payment solutions (Lightning Network)
-- [x] Additional cryptocurrency support - LTC and XRP (see [Multi-Cryptocurrency Guide](docs/MULTI_CRYPTOCURRENCY.md))
+- [x] Additional cryptocurrency support - LTC and XRP (see [Multi-Cryptocurrency Guide](docs/api/MULTI_CRYPTOCURRENCY.md))
 
 ### Phase 3: Admin Dashboard UI
 - [x] React-based admin panel

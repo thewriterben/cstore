@@ -349,9 +349,10 @@ Please report security issues privately by following the guidelines in [SECURITY
 When contributing, please update relevant documentation:
 
 - **Code comments**: For complex logic
-- **API documentation**: In `docs/API.md` or `docs/API_ENDPOINTS.md`
+- **API documentation**: In `docs/api/API.md` or `docs/api/API_ENDPOINTS.md`
 - **README.md**: For major feature additions
 - **Configuration**: Update `.env.example` if adding new environment variables
+- **Documentation Index**: Update `DOCUMENTATION_INDEX.md` for new docs
 
 ## Questions?
 

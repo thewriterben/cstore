@@ -451,11 +451,13 @@ Contact DevOps team for implementation planning
 ## 📚 Additional Documentation
 
 ### Internal Docs:
-- `/audit/` - All detailed audit reports
-- `/docs/SECURITY.md` - Current security implementation
-- `/docs/AUTHENTICATION.md` - Auth system details
-- `/docs/CICD_PIPELINE.md` - CI/CD pipeline
-- `/README.md` - Project overview
+- **[DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)** - Complete documentation index
+- **[audit/](audit/)** - All detailed audit reports
+- **[docs/security/SECURITY.md](docs/security/SECURITY.md)** - Current security implementation
+- **[docs/security/AUTHENTICATION.md](docs/security/AUTHENTICATION.md)** - Auth system details
+- **[docs/infrastructure/CICD_PIPELINE.md](docs/infrastructure/CICD_PIPELINE.md)** - CI/CD pipeline
+- **[docs/compliance/COMPLIANCE_CHECKLIST.md](docs/compliance/COMPLIANCE_CHECKLIST.md)** - Compliance requirements
+- **[README.md](README.md)** - Project overview
 
 ### External Resources:
 - [FinCEN MSB Registration](https://www.fincen.gov/money-services-business-msb-registration)
