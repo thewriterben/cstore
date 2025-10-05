@@ -1,6 +1,6 @@
 {
   "name": "cryptons",
-  "version": "2.0.0",
+  "version": "2.2.0",
   "description": "Cryptons.com - Professional Cryptocurrency Trading Platform with real blockchain integration",
   "main": "server-new.js",
   "scripts": {
@@ -26,10 +26,20 @@
     "bitcoin",
     "ethereum",
     "blockchain",
-    "ecommerce"
+    "ecommerce",
+    "trading-platform",
+    "crypto-exchange"
   ],
-  "author": "",
-  "license": "ISC",
+  "author": "Cryptons.com Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thewriterben/cstore"
+  },
+  "bugs": {
+    "url": "https://github.com/thewriterben/cstore/issues"
+  },
+  "homepage": "https://github.com/thewriterben/cstore#readme",
   "dependencies": {
     "@elastic/elasticsearch": "^9.1.1",
     "axios": "^1.12.2",
