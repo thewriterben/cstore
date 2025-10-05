@@ -9,4 +9,16 @@ data:
   LOG_LEVEL: "info"
   SEED_DATA: "false"
   ELASTICSEARCH_ENABLED: "false"
+  # Redis Configuration
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+  REDIS_ENABLED: "true"
+  CACHE_TTL: "3600"
+  # CDN Configuration
+  CDN_URL: "https://cdn.cstore.example.com"
+  STATIC_ASSETS_PATH: "/static"
+  # Monitoring
+  METRICS_ENABLED: "true"
+  METRICS_PORT: "3000"
+  METRICS_PATH: "/metrics"
   # Add other non-sensitive configuration here
