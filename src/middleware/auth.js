@@ -1,6 +1,8 @@
 const { verifyToken } = require('../utils/jwt');
 const User = require('../models/User');
 const { AppError } = require('./errorHandler');
+const tokenBlacklist = require('../utils/tokenBlacklist');
+const logger = require('../utils/logger');
 
 // Protect routes - require authentication
 const protect = async (req, res, next) => {
@@ -17,11 +19,25 @@ const protect = async (req, res, next) => {
   }
 
   try {
+    // Check if token is blacklisted
+    const isBlacklisted = await tokenBlacklist.isBlacklisted(token);
+    if (isBlacklisted) {
+      logger.warn(`Blacklisted token attempt: ${token.substring(0, 20)}...`);
+      return next(new AppError('Token has been revoked', 401));
+    }
+
     // Verify token
     const decoded = verifyToken(token);
     
     if (!decoded) {
       return next(new AppError('Invalid or expired token', 401));
+    }
+
+    // Check if all user tokens are revoked (password change, security breach, etc.)
+    const areRevoked = await tokenBlacklist.areUserTokensRevoked(decoded.id, decoded.iat);
+    if (areRevoked) {
+      logger.warn(`Revoked user token attempt: User ${decoded.id}`);
+      return next(new AppError('Token has been revoked. Please log in again.', 401));
     }
 
     // Get user from token

@@ -3,6 +3,8 @@ const { generateToken, generateRefreshToken } = require('../utils/jwt');
 const { asyncHandler } = require('../middleware/errorHandler');
 const { AppError } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
+const tokenBlacklist = require('../utils/tokenBlacklist');
+const { logAuthEvent } = require('../utils/auditLogger');
 
 // @desc    Register new user
 // @route   POST /api/auth/register
@@ -28,6 +30,10 @@ const register = asyncHandler(async (req, res, next) => {
   const refreshToken = generateRefreshToken(user._id);
 
   logger.info(`New user registered: ${user.email}`);
+  logAuthEvent(user._id.toString(), user.email, 'register', {
+    ip: req.ip,
+    userAgent: req.headers['user-agent']
+  });
 
   res.status(201).json({
     success: true,
@@ -68,6 +74,10 @@ const login = asyncHandler(async (req, res, next) => {
   const refreshToken = generateRefreshToken(user._id);
 
   logger.info(`User logged in: ${user.email}`);
+  logAuthEvent(user._id.toString(), user.email, 'login', {
+    ip: req.ip,
+    userAgent: req.headers['user-agent']
+  });
 
   res.json({
     success: true,
@@ -164,17 +174,86 @@ const updatePassword = asyncHandler(async (req, res, next) => {
   user.password = newPassword;
   await user.save();
 
-  logger.info(`Password updated for user: ${user.email}`);
+  // Revoke all existing tokens for this user
+  try {
+    await tokenBlacklist.revokeUserTokens(user._id.toString());
+    logger.info(`Password updated and all tokens revoked for user: ${user.email}`);
+  } catch (error) {
+    logger.error(`Failed to revoke tokens for user ${user.email}:`, error);
+    // Continue even if token revocation fails
+  }
+
+  // Generate new tokens
+  const token = generateToken(user._id);
+  const refreshToken = generateRefreshToken(user._id);
 
   res.json({
     success: true,
-    message: 'Password updated successfully'
+    message: 'Password updated successfully. All other sessions have been logged out.',
+    data: {
+      token,
+      refreshToken
+    }
   });
+});
+
+// @desc    Logout user and revoke token
+// @route   POST /api/auth/logout
+// @access  Private
+const logout = asyncHandler(async (req, res, next) => {
+  // Get token from header
+  let token;
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  if (!token) {
+    return next(new AppError('No token provided', 400));
+  }
+
+  try {
+    // Add token to blacklist
+    await tokenBlacklist.addToBlacklist(token);
+    logger.info(`User logged out: ${req.user.email}`);
+    logAuthEvent(req.user.id, req.user.email, 'logout', {
+      ip: req.ip,
+      userAgent: req.headers['user-agent']
+    });
+
+    res.json({
+      success: true,
+      message: 'Logged out successfully'
+    });
+  } catch (error) {
+    logger.error(`Logout failed for user ${req.user.email}:`, error);
+    return next(new AppError('Logout failed. Please try again.', 500));
+  }
+});
+
+// @desc    Logout from all devices (revoke all tokens)
+// @route   POST /api/auth/logout-all
+// @access  Private
+const logoutAll = asyncHandler(async (req, res, next) => {
+  try {
+    // Revoke all tokens for this user
+    await tokenBlacklist.revokeUserTokens(req.user.id);
+    logger.info(`All tokens revoked for user: ${req.user.email}`);
+
+    res.json({
+      success: true,
+      message: 'Logged out from all devices successfully'
+    });
+  } catch (error) {
+    logger.error(`Logout all failed for user ${req.user.email}:`, error);
+    return next(new AppError('Logout failed. Please try again.', 500));
+  }
 });
 
 module.exports = {
   register,
   login,
+  logout,
+  logoutAll,
   getMe,
   updateProfile,
   updatePassword
