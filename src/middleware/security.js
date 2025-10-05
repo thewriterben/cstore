@@ -1,8 +1,9 @@
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const hpp = require('hpp');
+const { logRateLimitExceeded } = require('../utils/auditLogger');
 
-// Security headers
+// Security headers with enhanced configuration
 const securityHeaders = helmet({
   contentSecurityPolicy: {
     directives: {
@@ -10,27 +11,70 @@ const securityHeaders = helmet({
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", 'data:', 'https:'],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"]
     }
+  },
+  // Strict Transport Security (HSTS)
+  hsts: {
+    maxAge: 31536000, // 1 year
+    includeSubDomains: true,
+    preload: true
+  },
+  // Prevent MIME type sniffing
+  noSniff: true,
+  // Disable X-Powered-By header
+  hidePoweredBy: true,
+  // XSS Protection
+  xssFilter: true,
+  // Prevent clickjacking
+  frameguard: {
+    action: 'deny'
+  },
+  // Referrer Policy
+  referrerPolicy: {
+    policy: 'strict-origin-when-cross-origin'
   }
 });
 
-// Rate limiting
+// Rate limiting with audit logging
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW || 15) * 60 * 1000,
+  max: parseInt(process.env.RATE_LIMIT_MAX || 100),
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
+  handler: (req, res) => {
+    logRateLimitExceeded(req);
+    res.status(429).json({
+      success: false,
+      error: 'Too many requests',
+      message: 'You have exceeded the rate limit. Please try again later.',
+      retryAfter: Math.ceil(req.rateLimit.resetTime / 1000)
+    });
+  }
 });
 
 // Stricter rate limiting for auth endpoints
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Limit each IP to 5 requests per windowMs
+  max: parseInt(process.env.AUTH_RATE_LIMIT_MAX || 5), // Default: 5 attempts
   message: 'Too many authentication attempts, please try again later.',
   skipSuccessfulRequests: true,
   standardHeaders: true,
   legacyHeaders: false,
+  handler: (req, res) => {
+    logRateLimitExceeded(req);
+    res.status(429).json({
+      success: false,
+      error: 'Too many authentication attempts',
+      message: 'You have made too many login attempts. Please try again later.',
+      retryAfter: Math.ceil(req.rateLimit.resetTime / 1000)
+    });
+  }
 });
 
 // Rate limiting for multi-sig approval operations
