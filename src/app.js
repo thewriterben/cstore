@@ -8,6 +8,8 @@ require('dotenv').config();
 const connectDB = require('./config/database');
 const i18next = require('./config/i18n');
 const { initializeApp } = require('./config/startup');
+const { initRedisClient } = require('./config/redis');
+const { getCorsOptions } = require('./config/cors');
 const logger = require('./utils/logger');
 const { errorHandler } = require('./middleware/errorHandler');
 const {
@@ -32,12 +34,18 @@ const wishlistRoutes = require('./routes/wishlistRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const multiSigWalletRoutes = require('./routes/multiSigWalletRoutes');
 const lightningRoutes = require('./routes/lightningRoutes');
+const webhookRoutes = require('./routes/webhookRoutes');
 const { getCryptocurrencies } = require('./controllers/orderController');
 
 const app = express();
 
 // Connect to database
 connectDB();
+
+// Initialize Redis (for token blacklist)
+initRedisClient().catch(err => {
+  logger.error('Redis initialization failed:', err);
+});
 
 // Initialize application (currency rates, regional payments)
 initializeApp().catch(err => {
@@ -72,8 +80,10 @@ app.use(express.urlencoded({ extended: true }));
 // i18n middleware
 app.use(middleware.handle(i18next));
 
-// CORS
-app.use(cors());
+// CORS - Environment-specific configuration
+const corsOptions = getCorsOptions();
+app.use(cors(corsOptions));
+logger.info(`CORS configured for environment: ${process.env.NODE_ENV || 'development'}`);
 
 // Logging
 if (process.env.NODE_ENV === 'development') {
@@ -104,6 +114,7 @@ app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/multisig', multiSigWalletRoutes);
 app.use('/api/lightning', lightningRoutes);
+app.use('/api/webhooks', webhookRoutes);
 app.get('/api/cryptocurrencies', getCryptocurrencies);
 
 // Health check

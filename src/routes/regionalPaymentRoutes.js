@@ -1,5 +1,4 @@
 const express = require('express');
-const RateLimit = require('express-rate-limit');
 const router = express.Router();
 const {
   getRegionalPaymentMethods,
@@ -18,6 +17,6 @@ router.get('/code/:code', getPaymentMethodByCode);
 router.get('/all', protect, authorize('admin'), getAllPaymentMethods);
 router.post('/', protect, authorize('admin'), createPaymentMethod);
 router.put('/:id', protect, authorize('admin'), updatePaymentMethod);
-router.delete('/:id', protect, authorize('admin'), adminRateLimiter, deletePaymentMethod);
+router.delete('/:id', protect, authorize('admin'), deletePaymentMethod);
 
 module.exports = router;
