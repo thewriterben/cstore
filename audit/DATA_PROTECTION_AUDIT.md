@@ -1,8 +1,8 @@
 # Cryptons.com Data Protection & Privacy Audit
 
-**Audit Date:** October 2024  
+**Audit Date:** October 2025  
 **Platform:** Cryptons.com Cryptocurrency Marketplace  
-**Version:** 2.1.0  
+**Version:** 2.2.0  
 **Auditor:** Data Protection Team  
 **Classification:** CONFIDENTIAL
 

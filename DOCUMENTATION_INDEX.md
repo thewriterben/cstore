@@ -1,7 +1,7 @@
 # Cryptons.com Documentation Index
 
 **Version:** 2.2.0  
-**Last Updated:** October 2024
+**Last Updated:** October 2025
 
 Welcome to the Cryptons.com documentation. This comprehensive index provides organized access to all documentation, grouped by topic and audience.
 
@@ -359,7 +359,8 @@ Found an issue with documentation? Please:
 
 ## 🔄 Documentation Maintenance
 
-**Last Major Reorganization:** October 2024 (Version 2.2.0)
+**Last Major Reorganization:** October 2024 (Version 2.2.0)  
+**Latest Update:** October 2025 (Production warnings and compliance dates updated)
 
 **Update Frequency:**
 - Security docs: As needed for critical issues
@@ -395,5 +396,5 @@ Found an issue with documentation? Please:
 ---
 
 **Version:** 2.2.0  
-**Last Major Update:** October 2024 (Documentation Reorganization)  
+**Last Major Update:** October 2025 (Production warnings and compliance updates)  
 **Maintained By:** Cryptons.com Team
