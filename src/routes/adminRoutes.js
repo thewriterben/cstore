@@ -25,6 +25,18 @@ const {
   exportOrdersPDF,
   exportUsersCSV
 } = require('../controllers/adminController');
+const {
+  getPodStats,
+  getAdminPodProducts,
+  updatePodProduct,
+  deletePodProduct,
+  getAdminPodOrders,
+  getAdminPodOrder,
+  syncSingleProduct,
+  publishProduct,
+  getBlueprints,
+  getPrintProviders
+} = require('../controllers/adminPodController');
 
 // All admin routes require admin authorization
 router.use(protect, authorize('admin'));
@@ -66,5 +78,17 @@ router.get('/products/export/pdf', exportProductsPDF);
 router.get('/orders/export/csv', exportOrdersCSV);
 router.get('/orders/export/pdf', exportOrdersPDF);
 router.get('/users/export/csv', exportUsersCSV);
+
+// POD (Print-on-Demand) Management
+router.get('/pod/stats', getPodStats);
+router.get('/pod/products', getAdminPodProducts);
+router.put('/pod/products/:id', updatePodProduct);
+router.delete('/pod/products/:id', deletePodProduct);
+router.post('/pod/products/:id/sync', syncSingleProduct);
+router.post('/pod/products/:id/publish', publishProduct);
+router.get('/pod/orders', getAdminPodOrders);
+router.get('/pod/orders/:id', getAdminPodOrder);
+router.get('/pod/catalog/blueprints', getBlueprints);
+router.get('/pod/catalog/blueprints/:id/providers', getPrintProviders);
 
 module.exports = router;
