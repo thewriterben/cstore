@@ -11,7 +11,7 @@ const { asyncHandler, AppError } = require('../middleware/errorHandler');
  * @route   GET /api/printify/products
  * @access  Public
  */
-const getPodProducts = asyncHandler(async (req, res, next) => {
+const getPodProducts = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 20;
   const skip = (page - 1) * limit;
@@ -379,7 +379,7 @@ const getPodOrder = asyncHandler(async (req, res, next) => {
  * @route   GET /api/printify/orders
  * @access  Private/Admin
  */
-const listPodOrders = asyncHandler(async (req, res, next) => {
+const listPodOrders = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 20;
   const skip = (page - 1) * limit;

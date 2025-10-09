@@ -9,7 +9,7 @@ const { asyncHandler, AppError } = require('../middleware/errorHandler');
  * @route   GET /api/admin/pod/stats
  * @access  Private/Admin
  */
-const getPodStats = asyncHandler(async (req, res, next) => {
+const getPodStats = asyncHandler(async (req, res) => {
   const totalProducts = await PodProduct.countDocuments({ isActive: true });
   const publishedProducts = await PodProduct.countDocuments({ 
     isActive: true, 
@@ -73,7 +73,7 @@ const getPodStats = asyncHandler(async (req, res, next) => {
  * @route   GET /api/admin/pod/products
  * @access  Private/Admin
  */
-const getAdminPodProducts = asyncHandler(async (req, res, next) => {
+const getAdminPodProducts = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 20;
   const skip = (page - 1) * limit;
@@ -179,7 +179,7 @@ const deletePodProduct = asyncHandler(async (req, res, next) => {
  * @route   GET /api/admin/pod/orders
  * @access  Private/Admin
  */
-const getAdminPodOrders = asyncHandler(async (req, res, next) => {
+const getAdminPodOrders = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 20;
   const skip = (page - 1) * limit;
