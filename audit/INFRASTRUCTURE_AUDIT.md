@@ -1,6 +1,6 @@
 # Cryptons.com Infrastructure Security Audit
 
-**Audit Date:** October 2024  
+**Audit Date:** October 2025  
 **Platform:** Cryptons.com Cryptocurrency Marketplace  
 **Version:** 2.1.0  
 **Auditor:** Infrastructure Security Team  
