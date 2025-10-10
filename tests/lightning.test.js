@@ -483,4 +483,137 @@ describe('Lightning Network Integration', () => {
       expect(updatedChannel.isActive).toBe(true);
     });
   });
+
+  describe('Lightning Integration Workflow', () => {
+    it('should validate invoice expiration check', async () => {
+      if (!global.isConnected()) return;
+
+      const invoice = new LightningInvoice({
+        order: '507f1f77bcf86cd799439099',
+        paymentRequest: 'lnbc10u1p3workflow1...',
+        paymentHash: 'workflow-test-1',
+        amount: 5000,
+        amountMsat: 5000000,
+        amountUSD: 50.00,
+        description: 'Workflow test invoice',
+        status: 'pending',
+        expiresAt: new Date(Date.now() - 1000) // Already expired
+      });
+
+      const isExpired = invoice.checkExpiration();
+      expect(isExpired).toBe(true);
+      expect(invoice.status).toBe('expired');
+    });
+
+    it('should handle multiple invoices for same order', async () => {
+      if (!global.isConnected()) return;
+
+      const orderId = '507f1f77bcf86cd799439088';
+
+      // Create first invoice (expired)
+      const invoice1 = await new LightningInvoice({
+        order: orderId,
+        paymentRequest: 'lnbc10u1p3multi1...',
+        paymentHash: 'multi-hash-1',
+        amount: 1000,
+        amountMsat: 1000000,
+        amountUSD: 10.00,
+        description: 'First invoice',
+        status: 'expired',
+        expiresAt: new Date(Date.now() - 1000)
+      }).save();
+
+      // Create second invoice (pending)
+      const invoice2 = await new LightningInvoice({
+        order: orderId,
+        paymentRequest: 'lnbc10u1p3multi2...',
+        paymentHash: 'multi-hash-2',
+        amount: 1000,
+        amountMsat: 1000000,
+        amountUSD: 10.00,
+        description: 'Second invoice',
+        status: 'pending',
+        expiresAt: new Date(Date.now() + 3600000)
+      }).save();
+
+      const invoices = await LightningInvoice.find({ order: orderId });
+      expect(invoices).toHaveLength(2);
+      
+      const pendingInvoices = await LightningInvoice.find({ 
+        order: orderId, 
+        status: 'pending' 
+      });
+      expect(pendingInvoices).toHaveLength(1);
+      expect(pendingInvoices[0].paymentHash).toBe('multi-hash-2');
+    });
+
+    it('should calculate correct millisatoshi values', async () => {
+      if (!global.isConnected()) return;
+
+      const satoshis = 10000;
+      const millisatoshis = satoshis * 1000;
+
+      const invoice = new LightningInvoice({
+        order: '507f1f77bcf86cd799439077',
+        paymentRequest: 'lnbc100u1p3calc...',
+        paymentHash: 'calc-test-1',
+        amount: satoshis,
+        amountMsat: millisatoshis,
+        amountUSD: 100.00,
+        description: 'Calculation test',
+        status: 'pending',
+        expiresAt: new Date(Date.now() + 3600000)
+      });
+
+      await invoice.save();
+
+      expect(invoice.amount).toBe(10000);
+      expect(invoice.amountMsat).toBe(10000000);
+      expect(invoice.amountMsat).toBe(invoice.amount * 1000);
+    });
+
+    it('should properly track channel balance changes', async () => {
+      if (!global.isConnected()) return;
+
+      const channel = new LightningChannel({
+        channelId: 'balance-track-123',
+        remotePubkey: '03balance...',
+        capacity: 1000000,
+        localBalance: 800000,
+        remoteBalance: 200000,
+        status: 'active',
+        isActive: true
+      });
+
+      await channel.save();
+
+      // Simulate a payment (local balance decreases, remote increases)
+      channel.updateBalances(750000, 250000);
+      await channel.save();
+
+      expect(channel.localBalance).toBe(750000);
+      expect(channel.remoteBalance).toBe(250000);
+      expect(channel.localBalance + channel.remoteBalance).toBe(channel.capacity);
+      expect(channel.lastUpdatedAt).toBeDefined();
+    });
+
+    it('should validate channel capacity constraints', async () => {
+      if (!global.isConnected()) return;
+
+      const channel = new LightningChannel({
+        channelId: 'capacity-test-123',
+        remotePubkey: '03capacity...',
+        capacity: 1000000,
+        localBalance: 600000,
+        remoteBalance: 400000,
+        unsettledBalance: 50000,
+        status: 'active',
+        isActive: true
+      });
+
+      const availableBalance = channel.availableBalance;
+      expect(availableBalance).toBe(550000); // 600000 - 50000
+      expect(availableBalance + channel.unsettledBalance).toBe(channel.localBalance);
+    });
+  });
 });

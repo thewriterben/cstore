@@ -10,7 +10,8 @@ const currencyService = require('../services/currencyService');
 const supportedCryptos = [
   { symbol: 'BTC', name: 'Bitcoin', address: process.env.BTC_ADDRESS || 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh' },
   { symbol: 'ETH', name: 'Ethereum', address: process.env.ETH_ADDRESS || '0x742d35Cc6634C0532925a3b844Bc454e4438f44e' },
-  { symbol: 'USDT', name: 'Tether', address: process.env.USDT_ADDRESS || '0x742d35Cc6634C0532925a3b844Bc454e4438f44e' }
+  { symbol: 'USDT', name: 'Tether', address: process.env.USDT_ADDRESS || '0x742d35Cc6634C0532925a3b844Bc454e4438f44e' },
+  { symbol: 'BTC-LN', name: 'Bitcoin Lightning Network', address: 'Lightning Network' }
 ];
 
 // @desc    Create order
