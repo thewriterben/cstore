@@ -139,7 +139,7 @@ class RateCalculator {
   /**
    * Estimate conversion amount with fees
    */
-  static estimateConversion(cryptoAmount, exchangeRate, exchange, cryptocurrency, fiatCurrency) {
+  static estimateConversion(cryptoAmount, exchangeRate, exchange, cryptocurrency, fiatCurrency = 'USD') {
     // Calculate gross fiat amount
     const grossFiatAmount = this.calculateFiatAmount(cryptoAmount, exchangeRate);
     

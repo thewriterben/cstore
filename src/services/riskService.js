@@ -254,7 +254,6 @@ class RiskService {
 
       const reliability = stats.map(stat => {
         const successRate = (stat.successful / stat.total) * 100;
-        const consecutiveCheck = this.checkConsecutiveFailures(stat._id);
         
         return {
           exchange: stat._id,

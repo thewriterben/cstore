@@ -110,7 +110,7 @@ class ExchangeClient {
         };
         break;
 
-      case 'kraken':
+      case 'kraken': {
         const nonce = Date.now() * 1000;
         const postData = new URLSearchParams({ nonce, ...data }).toString();
         headers = {
@@ -118,8 +118,9 @@ class ExchangeClient {
           'API-Sign': this.generateKrakenSignature(endpoint, nonce, postData)
         };
         break;
+      }
 
-      case 'binance':
+      case 'binance': {
         const queryString = new URLSearchParams({ timestamp, ...data }).toString();
         params = {
           ...data,
@@ -130,6 +131,7 @@ class ExchangeClient {
           'X-MBX-APIKEY': this.config.apiKey
         };
         break;
+      }
 
       default:
         throw new Error(`Authentication not implemented for ${this.exchangeName}`);
@@ -184,7 +186,6 @@ class ExchangeClient {
    * Get Coinbase exchange rate
    */
   async getCoinbaseRate(cryptoCurrency, fiatCurrency) {
-    const pair = `${cryptoCurrency}-${fiatCurrency}`;
     const response = await this.client.get(`/exchange-rates?currency=${cryptoCurrency}`);
     return parseFloat(response.data.data.rates[fiatCurrency]);
   }

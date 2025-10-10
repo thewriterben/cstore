@@ -131,11 +131,13 @@ class RiskCalculator {
     
     if (riskScore <= thresholds.low) {
       return 'low';
-    } else if (riskScore <= thresholds.medium) {
-      return 'medium';
-    } else {
-      return 'high';
     }
+    
+    if (riskScore <= thresholds.medium) {
+      return 'medium';
+    }
+    
+    return 'high';
   }
 
   /**
