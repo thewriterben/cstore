@@ -38,7 +38,7 @@ const schemas = {
     productId: Joi.string().required(),
     quantity: Joi.number().integer().min(1).required(),
     customerEmail: Joi.string().email().required(),
-    cryptocurrency: Joi.string().valid('BTC', 'ETH', 'USDT', 'LTC', 'XRP').required(),
+    cryptocurrency: Joi.string().valid('BTC', 'ETH', 'USDT', 'LTC', 'XRP', 'BTC-LN').required(),
     shippingAddress: Joi.object({
       street: Joi.string(),
       city: Joi.string(),

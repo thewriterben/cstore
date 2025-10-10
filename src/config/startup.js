@@ -1,6 +1,7 @@
 const logger = require('../utils/logger');
 const currencyService = require('../services/currencyService');
 const { seedRegionalPayments } = require('../utils/seedRegionalPayments');
+const lightningService = require('../services/lightningService');
 
 /**
  * Initialize application startup tasks
@@ -22,6 +23,14 @@ async function initializeApp() {
   } catch (error) {
     logger.error(`Failed to seed regional payment methods: ${error.message}`);
     // Don't fail startup - methods can be added manually
+  }
+
+  // Initialize Lightning Network
+  try {
+    await lightningService.initializeLightning();
+  } catch (error) {
+    logger.error(`Failed to initialize Lightning Network: ${error.message}`);
+    // Don't fail startup - Lightning is optional
   }
 
   logger.info('Application initialization completed');
