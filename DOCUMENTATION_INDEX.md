@@ -13,11 +13,14 @@ Welcome to the Cryptons.com documentation. This comprehensive index provides org
 
 **New to Cryptons.com? Follow this path:**
 
-1. **[README.md](README.md)** - Project overview, features, and **critical production warnings** ⚠️
-2. **[Getting Started Guide](docs/getting-started/README.md)** - Installation and local setup
-3. **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute to the project
-4. **[CHANGELOG.md](CHANGELOG.md)** - Version history and what's new
-5. **[SECURITY.md](SECURITY.md)** - Security policy and vulnerability reporting
+1. **[README.md](README.md)** - Project overview, quick start, and **critical production warnings** ⚠️
+2. **[GETTING_STARTED.md](GETTING_STARTED.md)** - Quick setup guide (5 minutes)
+3. **[FEATURES.md](FEATURES.md)** - Comprehensive feature documentation
+4. **[ARCHITECTURE.md](ARCHITECTURE.md)** - System architecture and technical design
+5. **[DEPLOYMENT.md](DEPLOYMENT.md)** - Deployment and infrastructure guide
+6. **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute to the project
+7. **[SECURITY.md](SECURITY.md)** - Security policy and vulnerability reporting
+8. **[CHANGELOG.md](CHANGELOG.md)** - Version history and what's new
 
 ### Role-Based Quick Start
 
@@ -27,15 +30,16 @@ Choose your role to get started quickly:
 **Goal:** Understand architecture and start developing features
 
 **Learning Path:**
-1. [Getting Started Guide](docs/getting-started/README.md) - Set up development environment
-2. [API Documentation](docs/api/README.md) - Understand API structure
-3. [Feature Implementation Summary](docs/features/FEATURE_IMPLEMENTATION_SUMMARY.md) - See what's built
-4. [Admin Dashboard README](admin-dashboard/README.md) - Frontend development
-5. [Contributing Guidelines](CONTRIBUTING.md) - Development workflow
+1. [GETTING_STARTED.md](GETTING_STARTED.md) - Quick setup (5 minutes)
+2. [FEATURES.md](FEATURES.md) - Feature overview and capabilities
+3. [ARCHITECTURE.md](ARCHITECTURE.md) - System architecture and design
+4. [API Documentation](docs/api/README.md) - Understand API structure
+5. [Admin Dashboard README](admin-dashboard/README.md) - Frontend development
+6. [Contributing Guidelines](CONTRIBUTING.md) - Development workflow
 
 **Key Documentation:**
 - [API Endpoints](docs/api/API_ENDPOINTS.md) - Complete API reference
-- [Project Structure](docs/getting-started/INSTALLATION.md) - Code organization
+- [DEPLOYMENT.md](DEPLOYMENT.md) - Deployment guide
 - [Testing Guide](tests/) - How to write and run tests
 
 #### 🔒 Security Engineers
@@ -406,7 +410,11 @@ Found an issue with documentation? Please:
 
 ```
 /
-├── README.md                    # Project overview (essential info only)
+├── README.md                    # Project overview (concise, <250 lines)
+├── GETTING_STARTED.md           # Quick setup guide (5 minutes)
+├── FEATURES.md                  # Comprehensive feature documentation
+├── ARCHITECTURE.md              # Technical architecture and design
+├── DEPLOYMENT.md                # Deployment and infrastructure guide
 ├── DOCUMENTATION_INDEX.md       # This file - master index
 ├── SECURITY.md                  # Security policy
 ├── CONTRIBUTING.md              # Contribution guidelines
@@ -729,9 +737,17 @@ const token = jwt.sign(data, secret);
 
 ### Recent Changes
 
-**📝 October 2024 Documentation Reorganization**: The documentation structure was completely reorganized to improve navigation, maintainability, and accessibility. See [Documentation Reorganization Summary](docs/DOCUMENTATION_REORGANIZATION.md) for complete details.
+**📝 October 2025 Documentation Restructuring**: README.md and core documentation restructured for better readability and user experience. See [Documentation Migration Guide](docs/DOCUMENTATION_MIGRATION_GUIDE.md) for details.
 
-**Key Changes**:
+**Latest Changes** (October 2025):
+- README.md reduced from 952 to 230 lines (76% reduction)
+- Created GETTING_STARTED.md - Quick 5-minute setup guide
+- Created FEATURES.md - Comprehensive feature documentation
+- Created ARCHITECTURE.md - Technical architecture overview
+- Created DEPLOYMENT.md - Deployment and infrastructure guide
+- Updated DOCUMENTATION_INDEX.md with new file references
+
+**Previous Reorganization** (October 2024):
 - 47 files reorganized into topic-based folders
 - 8 new hub READMEs created for each category
 - Role-based navigation added
