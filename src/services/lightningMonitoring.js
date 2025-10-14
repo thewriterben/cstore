@@ -47,7 +47,7 @@ class LightningMonitoringService {
    * @param {Object} paymentData - Payment data
    */
   recordPayment(paymentData) {
-    const { status, amount, amountUSD, fee = 0, duration = 0 } = paymentData;
+    const { status, amount, amountUSD, fee = 0 } = paymentData;
     
     this.metrics.payments.total++;
     
@@ -97,7 +97,7 @@ class LightningMonitoringService {
    * @param {Object} channelData - Channel data
    */
   recordChannel(channelData) {
-    const { event, channelId, capacity, localBalance, remoteBalance, isActive } = channelData;
+    const { event, channelId, isActive } = channelData;
     
     // Record recent activity
     this.recordActivity({

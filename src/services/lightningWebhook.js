@@ -1,7 +1,6 @@
 const axios = require('axios');
 const crypto = require('crypto');
 const logger = require('../utils/logger');
-const LightningInvoice = require('../models/LightningInvoice');
 
 /**
  * Lightning Network Webhook Service
