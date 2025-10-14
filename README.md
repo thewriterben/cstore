@@ -1,6 +1,4 @@
-@@ -1,949 +1,6 @@
 Professional Cryptocurrency Trading Platform
-# CStore
 
 A full-featured cryptocurrency trading platform built with Node.js, Express, and MongoDB. This application includes JWT authentication, comprehensive blockchain integration, email notifications, shopping cart, reviews system, and admin dashboard API.
 ## Features
