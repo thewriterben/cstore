@@ -93,7 +93,7 @@ exports.createEscrow = asyncHandler(async (req, res, next) => {
  * GET /api/escrow
  * @access Private
  */
-exports.getEscrows = asyncHandler(async (req, res, next) => {
+exports.getEscrows = asyncHandler(async (req, res) => {
   const { status, role } = req.query;
   const userId = req.user.id;
   
@@ -468,7 +468,7 @@ exports.cancelEscrow = asyncHandler(async (req, res, next) => {
  * GET /api/escrow/stats
  * @access Private (Admin)
  */
-exports.getEscrowStats = asyncHandler(async (req, res, next) => {
+exports.getEscrowStats = asyncHandler(async (req, res) => {
   const stats = await Escrow.aggregate([
     {
       $facet: {

@@ -1,6 +1,4 @@
 const Escrow = require('../models/Escrow');
-const Order = require('../models/Order');
-const MultiSigWallet = require('../models/MultiSigWallet');
 const logger = require('../utils/logger');
 const { verifyTransaction } = require('./blockchainService');
 
@@ -321,20 +319,26 @@ class EscrowService {
       
       // Apply resolution
       switch (resolution.type) {
-        case 'buyer_favor':
+        case 'buyer_favor': {
           escrow.status = 'refunded';
           escrow.refundedAt = new Date();
           break;
-        case 'seller_favor':
+        }
+        case 'seller_favor': {
           escrow.status = 'completed';
           escrow.releasedAt = new Date();
           break;
-        case 'partial_refund':
+        }
+        case 'partial_refund': {
           // Handle partial refund logic
           escrow.status = 'completed';
           break;
-        case 'custom':
+        }
+        case 'custom': {
           // Handle custom resolution
+          break;
+        }
+        default:
           break;
       }
       
@@ -480,7 +484,7 @@ class EscrowService {
           case 'delivery_confirmation':
             // This would be updated externally when delivery is confirmed
             break;
-          case 'inspection_period':
+          case 'inspection_period': {
             const inspectionEndDate = new Date(
               escrow.fundedAt.getTime() + (condition.value * 24 * 60 * 60 * 1000)
             );
@@ -489,6 +493,9 @@ class EscrowService {
               condition.metAt = new Date();
               conditionsUpdated = true;
             }
+            break;
+          }
+          default:
             break;
         }
       }
