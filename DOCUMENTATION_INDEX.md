@@ -737,9 +737,17 @@ const token = jwt.sign(data, secret);
 
 ### Recent Changes
 
-**📝 October 2024 Documentation Reorganization**: The documentation structure was completely reorganized to improve navigation, maintainability, and accessibility. See [Documentation Reorganization Summary](docs/DOCUMENTATION_REORGANIZATION.md) for complete details.
+**📝 October 2025 Documentation Restructuring**: README.md and core documentation restructured for better readability and user experience. See [Documentation Migration Guide](docs/DOCUMENTATION_MIGRATION_GUIDE.md) for details.
 
-**Key Changes**:
+**Latest Changes** (October 2025):
+- README.md reduced from 952 to 230 lines (76% reduction)
+- Created GETTING_STARTED.md - Quick 5-minute setup guide
+- Created FEATURES.md - Comprehensive feature documentation
+- Created ARCHITECTURE.md - Technical architecture overview
+- Created DEPLOYMENT.md - Deployment and infrastructure guide
+- Updated DOCUMENTATION_INDEX.md with new file references
+
+**Previous Reorganization** (October 2024):
 - 47 files reorganized into topic-based folders
 - 8 new hub READMEs created for each category
 - Role-based navigation added
