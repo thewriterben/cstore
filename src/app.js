@@ -10,6 +10,8 @@ const i18next = require('./config/i18n');
 const { initializeApp } = require('./config/startup');
 const { initRedisClient } = require('./config/redis');
 const { getCorsOptions } = require('./config/cors');
+const { initializeSecurityConfig } = require('../config/security');
+const { initializeEncryptionConfig } = require('../config/database-encryption');
 const logger = require('./utils/logger');
 const { errorHandler } = require('./middleware/errorHandler');
 const {
@@ -20,7 +22,12 @@ const {
   xssClean,
   preventParamPollution
 } = require('./middleware/security');
+const { enforceHttps, secureSessionCookies } = require('./middleware/httpsEnforcement');
 const elasticsearchService = require('./services/elasticsearchService');
+const monitoringService = require('./services/monitoring');
+const healthService = require('./services/health');
+const performanceService = require('./services/performance');
+const loggingService = require('./services/logging');
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
@@ -39,6 +46,12 @@ const printifyRoutes = require('./routes/printifyRoutes');
 const { getCryptocurrencies } = require('./controllers/orderController');
 
 const app = express();
+
+// Initialize security configuration
+initializeSecurityConfig();
+
+// Initialize encryption configuration
+initializeEncryptionConfig();
 
 // Connect to database
 connectDB();
@@ -67,6 +80,7 @@ if (process.env.ELASTICSEARCH_ENABLED === 'true') {
   });
 }
 
+
 // Security middleware
 app.use(securityHeaders);
 app.use(limiter);
@@ -85,6 +99,27 @@ app.use(middleware.handle(i18next));
 const corsOptions = getCorsOptions();
 app.use(cors(corsOptions));
 logger.info(`CORS configured for environment: ${process.env.NODE_ENV || 'development'}`);
+
+// Monitoring middleware - track requests
+app.use((req, res, next) => {
+  req.startTime = Date.now();
+  req.correlationId = loggingService.generateCorrelationId();
+  
+  // Track response
+  const originalSend = res.send;
+  res.send = function(data) {
+    const duration = Date.now() - req.startTime;
+    
+    // Record metrics
+    monitoringService.recordRequest(req.method, req.path, res.statusCode, duration);
+    performanceService.recordEndpoint(req.method, req.path, duration, res.statusCode);
+    loggingService.logRequest(req, res, duration);
+    
+    return originalSend.call(this, data);
+  };
+  
+  next();
+});
 
 // Logging
 if (process.env.NODE_ENV === 'development') {
@@ -119,14 +154,58 @@ app.use('/api/webhooks', webhookRoutes);
 app.use('/api/printify', printifyRoutes);
 app.get('/api/cryptocurrencies', getCryptocurrencies);
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({
-    success: true,
+// Health check endpoints
+app.get('/api/health', async (req, res) => {
+  const health = await healthService.runHealthChecks();
+  const statusCode = health.status === 'healthy' ? 200 : health.status === 'degraded' ? 200 : 503;
+  
+  res.status(statusCode).json({
+    success: health.status !== 'unhealthy',
+    ...health,
     message: req.t('message.serverRunning'),
-    timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
     language: req.language
+  });
+});
+
+// Liveness probe
+app.get('/api/health/live', async (req, res) => {
+  const liveness = await healthService.getLiveness();
+  res.json(liveness);
+});
+
+// Readiness probe
+app.get('/api/health/ready', async (req, res) => {
+  const readiness = await healthService.getReadiness();
+  const statusCode = readiness.status === 'ready' ? 200 : 503;
+  res.status(statusCode).json(readiness);
+});
+
+// Startup probe
+app.get('/api/health/startup', async (req, res) => {
+  const startup = await healthService.getStartup();
+  const statusCode = startup.status === 'started' ? 200 : 503;
+  res.status(statusCode).json(startup);
+});
+
+// Metrics endpoint (Prometheus format)
+app.get('/api/metrics', (req, res) => {
+  if (process.env.PROMETHEUS_ENABLED === 'true') {
+    res.set('Content-Type', 'text/plain');
+    res.send(monitoringService.getPrometheusMetrics());
+  } else {
+    res.json(monitoringService.getMetrics());
+  }
+});
+
+// Performance report endpoint
+app.get('/api/performance', (req, res) => {
+  const report = performanceService.getReport();
+  const recommendations = performanceService.getOptimizationRecommendations();
+  res.json({
+    success: true,
+    report,
+    recommendations
   });
 });
 
