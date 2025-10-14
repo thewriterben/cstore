@@ -138,7 +138,6 @@ These features are implemented but require configuration:
 ### Phase 2: Advanced Blockchain
 - [x] Multi-signature wallet support (see [Multi-Sig Wallet Guide](docs/api/MULTI_SIG_WALLET.md))
 - [x] Direct Bitcoin Core RPC integration (see [Bitcoin RPC Guide](docs/api/BITCOIN_RPC.md))
-- [ ] Layer 2 payment solutions (Lightning Network)
 - [x] Additional cryptocurrency support - LTC and XRP (see [Multi-Cryptocurrency Guide](docs/api/MULTI_CRYPTOCURRENCY.md))
 
 ### Phase 3: Admin Dashboard UI
