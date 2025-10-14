@@ -5,6 +5,77 @@ All notable changes to the Cryptons.com platform will be documented in this file
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2025-10-14
+
+### Added - Phase 3: Compliance Foundation
+
+#### Core Compliance Models
+- KYCVerification model for identity verification tracking
+- AMLAlert model for anti-money laundering alerts
+- SanctionsScreening model for sanctions list screening
+- ComplianceCase model for case management
+- UserConsent model for GDPR consent tracking
+- AuditLog model for comprehensive audit trails
+- LegalDocument model for legal document versioning
+- DataRetentionPolicy model for data retention management
+
+#### KYC/AML Services
+- KYC Service with Jumio, Onfido, and Sumsub integration support
+- AML Service with real-time transaction monitoring
+- Sanctions Screening Service (OFAC, UN, EU lists)
+- Transaction Monitoring Service with ML-based risk scoring
+- Risk Scoring Service with multi-factor risk assessment
+
+#### GDPR & Privacy Services
+- GDPR Service implementing all data subject rights
+  - Right to Access (data export)
+  - Right to Rectification (data correction)
+  - Right to Erasure (right to be forgotten)
+  - Right to Data Portability (JSON/CSV export)
+  - Right to Object (processing restriction)
+- Consent Management Service for tracking user consents
+- Data Retention Service with automated data purging
+- Privacy Controls Service for user privacy settings
+
+#### Legal & Compliance Management
+- Legal Documents Service with versioning support
+- Compliance Officer Service for case management
+- Compliance Reporting Service (CTR/SAR/tax reports)
+- Regulatory Calendar Service for deadline tracking
+- Audit Trail Service for comprehensive logging
+
+#### Configuration & Documentation
+- Compliance configuration file (config/compliance.js)
+- Comprehensive compliance services documentation
+- Environment variables for compliance settings
+- Compliance test suite with 50+ test cases
+
+#### Dependencies
+- Added crypto-js for encryption utilities
+- Added pdf-lib for PDF document generation
+
+### Configuration
+- Added 40+ new environment variables for compliance configuration
+- KYC provider settings (Jumio, Onfido, Sumsub)
+- AML monitoring thresholds and rules
+- GDPR compliance settings
+- Regulatory reporting configuration
+- Risk scoring parameters
+
+### Testing
+- Comprehensive compliance test suite
+- Tests for KYC verification workflows
+- Tests for AML alert generation
+- Tests for GDPR data subject rights
+- Tests for consent management
+- Tests for audit trail logging
+
+### Documentation
+- Complete compliance services documentation
+- Compliance workflow examples
+- Configuration guide
+- Best practices for compliance management
+
 ## [2.2.0] - 2024-10-05
 
 ### Added
