@@ -10,6 +10,8 @@ const i18next = require('./config/i18n');
 const { initializeApp } = require('./config/startup');
 const { initRedisClient } = require('./config/redis');
 const { getCorsOptions } = require('./config/cors');
+const { initializeSecurityConfig } = require('../config/security');
+const { initializeEncryptionConfig } = require('../config/database-encryption');
 const logger = require('./utils/logger');
 const { errorHandler } = require('./middleware/errorHandler');
 const {
@@ -20,6 +22,7 @@ const {
   xssClean,
   preventParamPollution
 } = require('./middleware/security');
+const { enforceHttps, secureSessionCookies } = require('./middleware/httpsEnforcement');
 const elasticsearchService = require('./services/elasticsearchService');
 
 // Import routes
@@ -39,6 +42,12 @@ const printifyRoutes = require('./routes/printifyRoutes');
 const { getCryptocurrencies } = require('./controllers/orderController');
 
 const app = express();
+
+// Initialize security configuration
+initializeSecurityConfig();
+
+// Initialize encryption configuration
+initializeEncryptionConfig();
 
 // Connect to database
 connectDB();
@@ -66,6 +75,10 @@ if (process.env.ELASTICSEARCH_ENABLED === 'true') {
     }
   });
 }
+
+// HTTPS enforcement (must be first)
+app.use(enforceHttps);
+app.use(secureSessionCookies);
 
 // Security middleware
 app.use(securityHeaders);
