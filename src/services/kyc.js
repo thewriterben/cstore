@@ -28,7 +28,7 @@ class KYCService {
 
     return {
       name: 'jumio',
-      startVerification: async (userId, userData) => {
+      startVerification: async (userId, _userData) => {
         // Integration with Jumio Web SDK
         logger.info(`Starting Jumio verification for user ${userId}`);
         return {
@@ -58,7 +58,7 @@ class KYCService {
 
     return {
       name: 'onfido',
-      startVerification: async (userId, userData) => {
+      startVerification: async (userId, _userData) => {
         logger.info(`Starting Onfido verification for user ${userId}`);
         return {
           provider: 'onfido',
@@ -86,7 +86,7 @@ class KYCService {
 
     return {
       name: 'sumsub',
-      startVerification: async (userId, userData) => {
+      startVerification: async (userId, _userData) => {
         logger.info(`Starting Sumsub verification for user ${userId}`);
         return {
           provider: 'sumsub',
