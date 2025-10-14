@@ -43,6 +43,7 @@ const multiSigWalletRoutes = require('./routes/multiSigWalletRoutes');
 const lightningRoutes = require('./routes/lightningRoutes');
 const webhookRoutes = require('./routes/webhookRoutes');
 const printifyRoutes = require('./routes/printifyRoutes');
+const escrowRoutes = require('./routes/escrowRoutes');
 const { getCryptocurrencies } = require('./controllers/orderController');
 
 const app = express();
@@ -152,6 +153,7 @@ app.use('/api/multisig', multiSigWalletRoutes);
 app.use('/api/lightning', lightningRoutes);
 app.use('/api/webhooks', webhookRoutes);
 app.use('/api/printify', printifyRoutes);
+app.use('/api/escrow', escrowRoutes);
 app.get('/api/cryptocurrencies', getCryptocurrencies);
 
 // Health check endpoints
