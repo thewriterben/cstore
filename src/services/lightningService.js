@@ -2,6 +2,8 @@ const lnService = require('ln-service');
 const logger = require('../utils/logger');
 const LightningInvoice = require('../models/LightningInvoice');
 const LightningChannel = require('../models/LightningChannel');
+const lightningWebhook = require('./lightningWebhook');
+const lightningMonitoring = require('./lightningMonitoring');
 
 /**
  * Lightning Network Service
@@ -517,8 +519,39 @@ function startInvoiceMonitoring() {
             
             logger.info(`Lightning invoice paid: ${invoice.id}`);
             
-            // Emit event for payment confirmation
-            // This can be used to trigger order processing
+            // Record in monitoring
+            lightningMonitoring.recordPayment({
+              status: 'paid',
+              amount: dbInvoice.amount,
+              amountUSD: dbInvoice.amountUSD
+            });
+            
+            // Send webhook notification
+            try {
+              await lightningWebhook.notifyPaymentConfirmed(dbInvoice, {
+                _id: invoice.id,
+                transactionHash: invoice.id,
+                status: 'confirmed'
+              });
+            } catch (webhookError) {
+              logger.error('Error sending webhook notification:', webhookError);
+            }
+          }
+        } else if (invoice.is_canceled) {
+          const dbInvoice = await LightningInvoice.findOne({ paymentHash: invoice.id });
+          
+          if (dbInvoice && dbInvoice.status !== 'cancelled') {
+            dbInvoice.status = 'cancelled';
+            await dbInvoice.save();
+            
+            logger.info(`Lightning invoice cancelled: ${invoice.id}`);
+            
+            // Record in monitoring
+            lightningMonitoring.recordPayment({
+              status: 'cancelled',
+              amount: dbInvoice.amount,
+              amountUSD: dbInvoice.amountUSD
+            });
           }
         }
       } catch (error) {
