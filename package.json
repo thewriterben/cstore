@@ -47,6 +47,7 @@
   },
   "homepage": "https://github.com/thewriterben/cstore#readme",
   "dependencies": {
+    "@aws-sdk/client-secrets-manager": "^3.0.0",
     "@elastic/elasticsearch": "^9.1.1",
     "axios": "^1.12.2",
     "bcryptjs": "^3.0.2",
@@ -71,6 +72,7 @@
     "ln-service": "^57.27.0",
     "mongoose": "^8.18.3",
     "morgan": "^1.10.1",
+    "node-vault": "^0.10.2",
     "nodemailer": "^7.0.6",
     "pdfkit": "^0.17.2",
     "pm2": "^5.3.0",
