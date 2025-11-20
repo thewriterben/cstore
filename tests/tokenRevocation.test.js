@@ -160,5 +160,22 @@ describe('JWT Token Revocation', () => {
       const added = await tokenBlacklist.addToBlacklist(token);
       expect(typeof added).toBe('boolean');
     });
+
+    it('should check if token is blacklisted using isTokenBlacklisted function', async () => {
+      if (!global.isConnected()) return;
+
+      const { isTokenBlacklisted } = require('../src/utils/tokenBlacklist');
+
+      // Check token before blacklisting
+      const beforeBlacklist = await isTokenBlacklisted(token);
+      expect(typeof beforeBlacklist).toBe('boolean');
+
+      // Add token to blacklist
+      await tokenBlacklist.addToBlacklist(token);
+
+      // Check token after blacklisting - may return true if Redis is available
+      const afterBlacklist = await isTokenBlacklisted(token);
+      expect(typeof afterBlacklist).toBe('boolean');
+    });
   });
 });

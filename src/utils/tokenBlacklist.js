@@ -148,4 +148,16 @@ class TokenBlacklist {
   }
 }
 
-module.exports = new TokenBlacklist();
+const tokenBlacklistInstance = new TokenBlacklist();
+
+/**
+ * Check if a token is blacklisted (exported function for convenience)
+ * @param {string} token - JWT token to check
+ * @returns {boolean} - True if blacklisted, false otherwise
+ */
+const isTokenBlacklisted = async (token) => {
+  return await tokenBlacklistInstance.isBlacklisted(token);
+};
+
+module.exports = tokenBlacklistInstance;
+module.exports.isTokenBlacklisted = isTokenBlacklisted;

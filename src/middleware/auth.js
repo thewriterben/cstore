@@ -2,6 +2,7 @@ const { verifyToken } = require('../utils/jwt');
 const User = require('../models/User');
 const { AppError } = require('./errorHandler');
 const tokenBlacklist = require('../utils/tokenBlacklist');
+const { isTokenBlacklisted } = require('../utils/tokenBlacklist');
 const logger = require('../utils/logger');
 
 // Protect routes - require authentication
@@ -19,8 +20,8 @@ const protect = async (req, res, next) => {
   }
 
   try {
-    // Check if token is blacklisted
-    const isBlacklisted = await tokenBlacklist.isBlacklisted(token);
+    // Check if token is blacklisted using isTokenBlacklisted function
+    const isBlacklisted = await isTokenBlacklisted(token);
     if (isBlacklisted) {
       logger.warn(`Blacklisted token attempt: ${token.substring(0, 20)}...`);
       return next(new AppError('Token has been revoked', 401));
