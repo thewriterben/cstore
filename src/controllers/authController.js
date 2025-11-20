@@ -213,7 +213,7 @@ const logout = asyncHandler(async (req, res, next) => {
 
   try {
     // Add token to blacklist
-    await tokenBlacklist.addToBlacklist(token);
+    await tokenBlacklist.blacklistToken(token);
     logger.info(`User logged out: ${req.user.email}`);
     logAuthEvent(req.user.id, req.user.email, 'logout', {
       ip: req.ip,
