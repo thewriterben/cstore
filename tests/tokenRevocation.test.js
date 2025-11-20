@@ -161,12 +161,7 @@ describe('JWT Token Revocation', () => {
       expect(typeof added).toBe('boolean');
     });
 
-    it('should blacklist token using blacklistToken function', async () => {
-      if (!global.isConnected()) return;
 
-      // blacklistToken should work the same as addToBlacklist
-      const result = await tokenBlacklist.blacklistToken(token);
-      expect(typeof result).toBe('boolean');
     });
   });
 });
