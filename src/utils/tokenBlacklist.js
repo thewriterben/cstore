@@ -44,6 +44,14 @@ class TokenBlacklist {
   }
   
   /**
+   * Blacklist a token (alias for addToBlacklist)
+   * @param {string} token - JWT token to blacklist
+   */
+  async blacklistToken(token) {
+    return this.addToBlacklist(token);
+  }
+  
+  /**
    * Check if a token is blacklisted
    * @param {string} token - JWT token to check
    * @returns {boolean} - True if blacklisted, false otherwise
