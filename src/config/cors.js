@@ -7,7 +7,28 @@ const logger = require('../utils/logger');
 const getAllowedOrigins = () => {
   const env = process.env.NODE_ENV || 'development';
   
-  // Get origins from environment variable
+  // In production, ONLY use ALLOWED_ORIGINS environment variable
+  if (env === 'production') {
+    const envOrigins = process.env.ALLOWED_ORIGINS;
+    
+    if (!envOrigins) {
+      logger.error('CRITICAL: ALLOWED_ORIGINS environment variable is not set in production. CORS will block all requests.');
+      return [];
+    }
+    
+    // Split comma-separated origins and trim whitespace
+    const origins = envOrigins.split(',').map(origin => origin.trim()).filter(origin => origin);
+    
+    if (origins.length === 0) {
+      logger.error('CRITICAL: ALLOWED_ORIGINS environment variable is empty in production. CORS will block all requests.');
+      return [];
+    }
+    
+    logger.info(`CORS allowed origins in production: ${origins.join(', ')}`);
+    return origins;
+  }
+  
+  // For non-production environments, check ALLOWED_ORIGINS first, then fall back to defaults
   const envOrigins = process.env.ALLOWED_ORIGINS;
   
   if (envOrigins) {
@@ -19,16 +40,8 @@ const getAllowedOrigins = () => {
     }
   }
   
-  // Default origins by environment
+  // Default origins by environment (for non-production)
   switch (env) {
-    case 'production':
-      // PRODUCTION: Strict whitelist - NO wildcards
-      return [
-        'https://cryptons.com',
-        'https://www.cryptons.com',
-        'https://app.cryptons.com'
-      ];
-    
     case 'staging':
       return [
         'https://staging.cryptons.com',
@@ -85,16 +98,19 @@ const corsOriginValidator = (origin, callback) => {
 
 /**
  * Get CORS options for the application
+ * Environment-specific configuration:
+ * - Production: Strict - Only uses ALLOWED_ORIGINS environment variable
+ * - Development: More permissive - Uses ALLOWED_ORIGINS or defaults to localhost
  * @returns {Object} - CORS options
  */
 const getCorsOptions = () => {
   const env = process.env.NODE_ENV || 'development';
   
-  return {
+  // Base CORS configuration
+  const corsConfig = {
     origin: corsOriginValidator,
-    credentials: process.env.CORS_CREDENTIALS === 'true' || true, // Default to true for cookie/auth support
+    credentials: true, // Always enabled for cookie/session/auth support
     optionsSuccessStatus: 200, // Some legacy browsers (IE11) choke on 204
-    maxAge: parseInt(process.env.CORS_MAX_AGE) || 86400, // 24 hours
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [
       'Content-Type',
@@ -112,6 +128,17 @@ const getCorsOptions = () => {
     ],
     preflightContinue: false
   };
+  
+  // Environment-specific settings
+  if (env === 'production') {
+    // Production: Stricter settings
+    corsConfig.maxAge = parseInt(process.env.CORS_MAX_AGE) || 86400; // 24 hours
+  } else {
+    // Development/Staging: More flexible
+    corsConfig.maxAge = parseInt(process.env.CORS_MAX_AGE) || 600; // 10 minutes for easier testing
+  }
+  
+  return corsConfig;
 };
 
 /**
