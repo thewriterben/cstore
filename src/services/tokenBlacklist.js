@@ -1,15 +1,21 @@
 const jwt = require('jsonwebtoken');
-const { getRedisClient, isRedisAvailable } = require('../config/redis');
-const logger = require('./logger');
+const redisService = require('./redisService');
+const logger = require('../utils/logger');
 
-class TokenBlacklist {
+/**
+ * Token Blacklist Service
+ * Manages JWT token blacklisting using Redis
+ */
+class TokenBlacklistService {
   /**
    * Add a token to the blacklist
+   * The token will be stored in Redis with an expiration time equal to the token's remaining validity
    * @param {string} token - JWT token to blacklist
+   * @returns {Promise<boolean>} True if successful, false otherwise
    */
-  async addToBlacklist(token) {
+  async blacklistToken(token) {
     try {
-      if (!isRedisAvailable()) {
+      if (!redisService.isAvailable()) {
         logger.warn('Redis not available, cannot blacklist token');
         return false;
       }
@@ -30,10 +36,10 @@ class TokenBlacklist {
         return true;
       }
       
-      // Store token in Redis with TTL
+      // Store token in Redis with TTL equal to remaining validity
       const key = `blacklist:${token}`;
-      const redisClient = getRedisClient();
-      await redisClient.setEx(key, ttl, 'revoked');
+      const client = redisService.getClient();
+      await client.setEx(key, ttl, 'revoked');
       
       logger.info(`Token blacklisted successfully for user ${decoded.id}, TTL: ${ttl}s`);
       return true;
@@ -44,29 +50,21 @@ class TokenBlacklist {
   }
   
   /**
-   * Blacklist a token (alias for addToBlacklist)
-   * @param {string} token - JWT token to blacklist
-   */
-  async blacklistToken(token) {
-    return this.addToBlacklist(token);
-  }
-  
-  /**
    * Check if a token is blacklisted
    * @param {string} token - JWT token to check
-   * @returns {boolean} - True if blacklisted, false otherwise
+   * @returns {Promise<boolean>} True if blacklisted, false otherwise
    */
-  async isBlacklisted(token) {
+  async isTokenBlacklisted(token) {
     try {
-      if (!isRedisAvailable()) {
+      if (!redisService.isAvailable()) {
         // Fail-safe: If Redis is down, allow the token (logged for monitoring)
         logger.warn('Redis unavailable, allowing token access (fail-open)');
         return false;
       }
 
       const key = `blacklist:${token}`;
-      const redisClient = getRedisClient();
-      const result = await redisClient.get(key);
+      const client = redisService.getClient();
+      const result = await client.get(key);
       return result === 'revoked';
     } catch (error) {
       logger.error('Error checking token blacklist:', error);
@@ -80,20 +78,21 @@ class TokenBlacklist {
    * Revoke all tokens for a user (e.g., on password change or security breach)
    * @param {string} userId - User ID
    * @param {number} timestamp - Timestamp after which tokens should be revoked (optional, defaults to now)
+   * @returns {Promise<boolean>} True if successful, false otherwise
    */
   async revokeUserTokens(userId, timestamp = null) {
     try {
-      if (!isRedisAvailable()) {
+      if (!redisService.isAvailable()) {
         logger.warn('Redis not available, cannot revoke user tokens');
         return false;
       }
 
       const revokedAt = timestamp || Date.now();
       const key = `user:${userId}:revoked`;
-      const redisClient = getRedisClient();
+      const client = redisService.getClient();
       
       // Store revocation timestamp with 30 days TTL (longer than max token lifetime)
-      await redisClient.setEx(key, 30 * 24 * 60 * 60, revokedAt.toString());
+      await client.setEx(key, 30 * 24 * 60 * 60, revokedAt.toString());
       
       logger.info(`All tokens revoked for user ${userId} at ${new Date(revokedAt).toISOString()}`);
       return true;
@@ -107,18 +106,18 @@ class TokenBlacklist {
    * Check if all user tokens are revoked
    * @param {string} userId - User ID
    * @param {number} tokenIssuedAt - Token issued at timestamp (iat claim from JWT)
-   * @returns {boolean} - True if user tokens are revoked, false otherwise
+   * @returns {Promise<boolean>} True if user tokens are revoked, false otherwise
    */
   async areUserTokensRevoked(userId, tokenIssuedAt) {
     try {
-      if (!isRedisAvailable()) {
+      if (!redisService.isAvailable()) {
         logger.warn('Redis unavailable, allowing user token access (fail-open)');
         return false;
       }
 
       const key = `user:${userId}:revoked`;
-      const redisClient = getRedisClient();
-      const revokedAt = await redisClient.get(key);
+      const client = redisService.getClient();
+      const revokedAt = await client.get(key);
       
       if (!revokedAt) {
         return false;
@@ -135,17 +134,18 @@ class TokenBlacklist {
   /**
    * Clear user token revocation (e.g., after resolving security issue)
    * @param {string} userId - User ID
+   * @returns {Promise<boolean>} True if successful, false otherwise
    */
   async clearUserRevocation(userId) {
     try {
-      if (!isRedisAvailable()) {
+      if (!redisService.isAvailable()) {
         logger.warn('Redis not available, cannot clear user revocation');
         return false;
       }
 
       const key = `user:${userId}:revoked`;
-      const redisClient = getRedisClient();
-      await redisClient.del(key);
+      const client = redisService.getClient();
+      await client.del(key);
       
       logger.info(`Cleared token revocation for user ${userId}`);
       return true;
@@ -156,16 +156,7 @@ class TokenBlacklist {
   }
 }
 
-const tokenBlacklistInstance = new TokenBlacklist();
+// Export singleton instance
+const tokenBlacklistService = new TokenBlacklistService();
 
-/**
- * Check if a token is blacklisted (exported function for convenience)
- * @param {string} token - JWT token to check
- * @returns {boolean} - True if blacklisted, false otherwise
- */
-const isTokenBlacklisted = async (token) => {
-  return await tokenBlacklistInstance.isBlacklisted(token);
-};
-
-module.exports = tokenBlacklistInstance;
-module.exports.isTokenBlacklisted = isTokenBlacklisted;
+module.exports = tokenBlacklistService;
