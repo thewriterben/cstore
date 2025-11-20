@@ -1,7 +1,9 @@
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const hpp = require('hpp');
+const crypto = require('crypto');
 const { logRateLimitExceeded } = require('../utils/auditLogger');
+const logger = require('../utils/logger');
 
 // Security headers with enhanced configuration
 const securityHeaders = helmet({
@@ -156,6 +158,120 @@ const preventParamPollution = hpp({
   whitelist: ['price', 'rating', 'stock'] // Allow duplicates for these params
 });
 
+/**
+ * Verify webhook signature using HMAC-SHA256
+ * Compares calculated signature with X-Webhook-Signature header
+ * Uses timing-safe comparison to prevent timing attacks
+ * 
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ */
+const verifyWebhookSignature = (req, res, next) => {
+  try {
+    // Get the webhook secret from environment variables
+    const webhookSecret = process.env.WEBHOOK_SECRET;
+
+    if (!webhookSecret) {
+      logger.error('Webhook secret not configured');
+      return res.status(500).json({
+        success: false,
+        error: 'Webhook verification not configured'
+      });
+    }
+
+    // Get signature from header
+    const signatureHeader = req.headers['x-webhook-signature'];
+    
+    if (!signatureHeader) {
+      logger.warn('Webhook signature header missing', {
+        ip: req.ip,
+        path: req.path
+      });
+      return res.status(401).json({
+        success: false,
+        error: 'Missing webhook signature'
+      });
+    }
+
+    // Get raw request body
+    // Note: req.body is already parsed by express.json()
+    // For proper HMAC verification, we need the raw body string
+    const rawBody = JSON.stringify(req.body);
+
+    // Calculate HMAC-SHA256 signature
+    const hmac = crypto.createHmac('sha256', webhookSecret);
+    hmac.update(rawBody);
+    const calculatedSignature = hmac.digest('hex');
+
+    // Extract signature from header (may have prefix like "sha256=")
+    let receivedSignature = signatureHeader;
+    if (signatureHeader.startsWith('sha256=')) {
+      receivedSignature = signatureHeader.substring(7);
+    }
+
+    // Validate signature lengths match before comparison
+    if (calculatedSignature.length !== receivedSignature.length) {
+      logger.warn('Webhook signature length mismatch', {
+        ip: req.ip,
+        path: req.path,
+        expectedLength: calculatedSignature.length,
+        receivedLength: receivedSignature.length
+      });
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid webhook signature'
+      });
+    }
+
+    // Use timing-safe comparison to prevent timing attacks
+    const calculatedBuffer = Buffer.from(calculatedSignature, 'hex');
+    const receivedBuffer = Buffer.from(receivedSignature, 'hex');
+
+    // Verify buffers are the same length (should be caught above, but double-check)
+    if (calculatedBuffer.length !== receivedBuffer.length) {
+      logger.warn('Webhook signature buffer length mismatch', {
+        ip: req.ip,
+        path: req.path
+      });
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid webhook signature'
+      });
+    }
+
+    const isValid = crypto.timingSafeEqual(calculatedBuffer, receivedBuffer);
+
+    if (!isValid) {
+      logger.warn('Webhook signature verification failed', {
+        ip: req.ip,
+        path: req.path
+      });
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid webhook signature'
+      });
+    }
+
+    logger.info('Webhook signature verified successfully', {
+      ip: req.ip,
+      path: req.path
+    });
+
+    next();
+  } catch (error) {
+    logger.error('Webhook signature verification error:', {
+      error: error.message,
+      ip: req.ip,
+      path: req.path
+    });
+    return res.status(500).json({
+      success: false,
+      error: 'Webhook verification failed'
+    });
+  }
+};
+
 module.exports = {
   securityHeaders,
   limiter,
@@ -163,5 +279,6 @@ module.exports = {
   multiSigApprovalLimiter,
   sanitizeData,
   xssClean,
-  preventParamPollution
+  preventParamPollution,
+  verifyWebhookSignature
 };
