@@ -136,6 +136,121 @@ describe('Multi-Signature Wallet API', () => {
 
       expect(res.status).toBe(401);
     });
+
+    it('should reject invalid Bitcoin address', async () => {
+      if (mongoose.connection.readyState !== 1) return;
+
+      const res = await request(app)
+        .post('/api/wallets/multi-sig')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          name: 'Test Invalid Address',
+          cryptocurrency: 'BTC',
+          address: 'invalid-bitcoin-address',
+          signers: [
+            { email: 'signer1@test.com' },
+            { email: 'signer2@test.com' }
+          ],
+          requiredSignatures: 2,
+          description: 'Testing invalid address'
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.message).toContain('Invalid Bitcoin address');
+    });
+
+    it('should reject Ethereum address for BTC wallet', async () => {
+      if (mongoose.connection.readyState !== 1) return;
+
+      const res = await request(app)
+        .post('/api/wallets/multi-sig')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          name: 'Test Wrong Address Type',
+          cryptocurrency: 'BTC',
+          address: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
+          signers: [
+            { email: 'signer1@test.com' },
+            { email: 'signer2@test.com' }
+          ],
+          requiredSignatures: 2,
+          description: 'Testing Ethereum address for BTC'
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.message).toContain('Invalid Bitcoin address');
+    });
+
+    it('should accept valid P2SH Bitcoin address', async () => {
+      if (mongoose.connection.readyState !== 1) return;
+
+      const res = await request(app)
+        .post('/api/wallets/multi-sig')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          name: 'Test P2SH Wallet',
+          cryptocurrency: 'BTC',
+          address: '3Ai1JZ8pdJb2ksieUV8FsxSNVJCpoPi8W6',
+          signers: [
+            { email: 'signer1@test.com' },
+            { email: 'signer2@test.com' }
+          ],
+          requiredSignatures: 2,
+          description: 'Testing P2SH address'
+        });
+
+      expect(res.status).toBe(201);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.address).toBe('3Ai1JZ8pdJb2ksieUV8FsxSNVJCpoPi8W6');
+    });
+
+    it('should accept valid Bech32 Bitcoin address', async () => {
+      if (mongoose.connection.readyState !== 1) return;
+
+      const res = await request(app)
+        .post('/api/wallets/multi-sig')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          name: 'Test Bech32 Wallet',
+          cryptocurrency: 'BTC',
+          address: 'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4',
+          signers: [
+            { email: 'signer1@test.com' },
+            { email: 'signer2@test.com' }
+          ],
+          requiredSignatures: 2,
+          description: 'Testing Bech32 address'
+        });
+
+      expect(res.status).toBe(201);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.address).toBe('bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4');
+    });
+
+    it('should not validate addresses for non-BTC cryptocurrencies', async () => {
+      if (mongoose.connection.readyState !== 1) return;
+
+      // For non-BTC cryptocurrencies, the Bitcoin address validation should not apply
+      const res = await request(app)
+        .post('/api/wallets/multi-sig')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          name: 'Test ETH Wallet',
+          cryptocurrency: 'ETH',
+          address: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
+          signers: [
+            { email: 'signer1@test.com' },
+            { email: 'signer2@test.com' }
+          ],
+          requiredSignatures: 2,
+          description: 'Testing ETH address'
+        });
+
+      expect(res.status).toBe(201);
+      expect(res.body.success).toBe(true);
+    });
   });
 
   describe('GET /api/wallets/multi-sig', () => {

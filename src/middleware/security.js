@@ -1,9 +1,11 @@
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const { ipKeyGenerator } = require('express-rate-limit');
 const hpp = require('hpp');
 const crypto = require('crypto');
 const { logRateLimitExceeded } = require('../utils/auditLogger');
 const logger = require('../utils/logger');
+const { verifyToken } = require('../utils/jwt');
 
 // Security headers with enhanced configuration
 const securityHeaders = helmet({
@@ -88,6 +90,69 @@ const multiSigApprovalLimiter = rateLimit({
   legacyHeaders: false,
   // Use standard IP-based rate limiting
   skip: (req) => !req.user // Skip rate limiting if not authenticated
+});
+
+// Rate limiting for authenticated users - uses user ID from JWT as key
+const authenticatedUserLimiter = rateLimit({
+  windowMs: parseInt(process.env.AUTH_USER_RATE_LIMIT_WINDOW || 15) * 60 * 1000, // Default: 15 minutes
+  max: parseInt(process.env.AUTH_USER_RATE_LIMIT_MAX || 100), // Default: 100 requests per window
+  message: 'Too many requests from this user, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+  // Use user ID from JWT token as the rate limit key instead of IP address
+  keyGenerator: (req) => {
+    let token;
+    
+    // Extract token from Authorization header
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+    
+    // If no token, fall back to IP address using the proper helper for IPv6 support
+    if (!token) {
+      return ipKeyGenerator(req.ip);
+    }
+    
+    try {
+      // Verify and decode the JWT token
+      const decoded = verifyToken(token);
+      
+      // If token is valid and contains user ID, use it as the key
+      if (decoded && decoded.id) {
+        return `user:${decoded.id}`;
+      }
+      
+      // If token is invalid or doesn't contain ID, fall back to IP using the helper
+      return ipKeyGenerator(req.ip);
+    } catch (error) {
+      // On error, fall back to IP address using the helper
+      return ipKeyGenerator(req.ip);
+    }
+  },
+  handler: (req, res) => {
+    logRateLimitExceeded(req);
+    res.status(429).json({
+      success: false,
+      error: 'Too many requests',
+      message: 'You have exceeded the rate limit. Please try again later.',
+      retryAfter: Math.ceil(req.rateLimit.resetTime / 1000)
+    });
+  },
+  // Skip rate limiting if not authenticated (optional - can be removed if you want to rate limit all requests)
+  skip: (req) => {
+    // Only apply rate limiting if there's a valid JWT token
+    if (!req.headers.authorization || !req.headers.authorization.startsWith('Bearer')) {
+      return true;
+    }
+    
+    const token = req.headers.authorization.split(' ')[1];
+    try {
+      const decoded = verifyToken(token);
+      return !decoded || !decoded.id;
+    } catch (error) {
+      return true;
+    }
+  }
 });
 
 // MongoDB sanitization - prevent NoSQL injection (Express 5 compatible)
@@ -277,6 +342,7 @@ module.exports = {
   limiter,
   authLimiter,
   multiSigApprovalLimiter,
+  authenticatedUserLimiter,
   sanitizeData,
   xssClean,
   preventParamPollution,

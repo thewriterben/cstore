@@ -3,6 +3,7 @@ const User = require('../models/User');
 const { asyncHandler } = require('../middleware/errorHandler');
 const { AppError } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
+const { isValidBitcoinAddress } = require('../utils/addressValidation');
 
 /**
  * Create a new multi-signature wallet
@@ -19,6 +20,11 @@ exports.createWallet = asyncHandler(async (req, res, next) => {
   
   if (requiredSignatures < 2 || requiredSignatures > signers.length) {
     return next(new AppError('Required signatures must be between 2 and the number of signers', 400));
+  }
+  
+  // Validate Bitcoin address if cryptocurrency is BTC
+  if (cryptocurrency === 'BTC' && !isValidBitcoinAddress(address)) {
+    return next(new AppError('Invalid Bitcoin address format', 400));
   }
   
   // Check if wallet address already exists
