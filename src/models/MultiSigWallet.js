@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { isValidBitcoinAddress } = require('../utils/addressValidation');
 
 const signerSchema = new mongoose.Schema({
   user: {
@@ -36,7 +37,18 @@ const multiSigWalletSchema = new mongoose.Schema({
   },
   address: {
     type: String,
-    required: [true, 'Wallet address is required']
+    required: [true, 'Wallet address is required'],
+    validate: {
+      validator: function(address) {
+        // Only validate Bitcoin addresses for BTC cryptocurrency
+        if (this.cryptocurrency === 'BTC') {
+          return isValidBitcoinAddress(address);
+        }
+        // For other cryptocurrencies, just ensure address is not empty
+        return address && address.length > 0;
+      },
+      message: 'Invalid Bitcoin address format'
+    }
   },
   signers: {
     type: [signerSchema],

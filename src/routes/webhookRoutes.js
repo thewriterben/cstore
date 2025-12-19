@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { verifyWebhookSignature } = require('../middleware/webhookAuth');
+const { verifyWebhookSignature } = require('../middleware/security');
 const {
   handlePaymentWebhook,
   handleTransactionWebhook,
