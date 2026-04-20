@@ -75,13 +75,15 @@ class BuyBoxService {
     const winner = scoredOffers[0];
     const now = new Date();
 
-    for (const { offer, score } of scoredOffers) {
-      const isWinner = offer._id.toString() === winner.offer._id.toString();
-      offer.isBuyBoxWinner = isWinner;
-      offer.buyBoxScore = isWinner ? score : offer.buyBoxScore;
-      offer.buyBoxCalculatedAt = now;
-      await offer.save();
-    }
+    await Promise.all(
+      scoredOffers.map(({ offer, score }) => {
+        const isWinner = offer._id.toString() === winner.offer._id.toString();
+        offer.isBuyBoxWinner = isWinner;
+        offer.buyBoxScore = isWinner ? score : offer.buyBoxScore;
+        offer.buyBoxCalculatedAt = now;
+        return offer.save();
+      })
+    );
 
     logger.info(`Buy box winner selected for product ${productId}: seller ${winner.offer.seller._id}`);
     return winner.offer;

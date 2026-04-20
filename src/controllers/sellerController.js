@@ -182,7 +182,16 @@ exports.getCommissionRules = async (req, res, next) => {
 
 exports.createCommissionRule = async (req, res, next) => {
   try {
-    const rule = await CommissionRule.create({ ...req.body, createdBy: req.user.id });
+    const allowed = [
+      'name', 'description', 'applicableTo', 'categoryIds', 'sellerTier',
+      'commissionType', 'commissionPct', 'flatFee', 'tiers', 'minFee', 'maxFee',
+      'isActive', 'priority'
+    ];
+    const data = { createdBy: req.user.id };
+    for (const key of allowed) {
+      if (req.body[key] !== undefined) data[key] = req.body[key];
+    }
+    const rule = await CommissionRule.create(data);
     res.status(201).json({ success: true, data: rule });
   } catch (err) {
     next(err);
@@ -191,7 +200,16 @@ exports.createCommissionRule = async (req, res, next) => {
 
 exports.updateCommissionRule = async (req, res, next) => {
   try {
-    const rule = await CommissionRule.findByIdAndUpdate(req.params.id, req.body, {
+    const allowed = [
+      'name', 'description', 'applicableTo', 'categoryIds', 'sellerTier',
+      'commissionType', 'commissionPct', 'flatFee', 'tiers', 'minFee', 'maxFee',
+      'isActive', 'priority'
+    ];
+    const updates = {};
+    for (const key of allowed) {
+      if (req.body[key] !== undefined) updates[key] = req.body[key];
+    }
+    const rule = await CommissionRule.findByIdAndUpdate(req.params.id, updates, {
       new: true,
       runValidators: true
     });
