@@ -376,7 +376,7 @@ class ContentModerationService {
     return log;
   }
 
-  async processAppeal(logId, appealReason, userId) {
+  async processAppeal(logId, appealReason, _userId) {
     const log = await ContentModerationLog.findByIdAndUpdate(
       logId,
       { appealedAt: new Date(), appealReason },

@@ -129,8 +129,6 @@ const sellerSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-sellerSchema.index({ user: 1 }, { unique: true });
-sellerSchema.index({ slug: 1 }, { unique: true });
 sellerSchema.index({ verificationStatus: 1 });
 sellerSchema.index({ isSuspended: 1 });
 sellerSchema.index({ 'performanceMetrics.averageRating': 1 });

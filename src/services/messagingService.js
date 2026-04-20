@@ -132,8 +132,9 @@ class MessagingService {
       throw err;
     }
 
-    page = parseInt(page, 10) || 1;
-    limit = parseInt(limit, 10) || 30;
+    const parsedPage = parseInt(page, 10) || 1;
+    const parsedLimit = parseInt(limit, 10) || 30;
+    void parsedPage; // page-based cursor reserved for future use; current impl uses before-cursor pagination
 
     const query = { conversation: conversationId };
     if (before) {
@@ -142,10 +143,10 @@ class MessagingService {
 
     const messages = await Message.find(query)
       .sort({ createdAt: -1 })
-      .limit(limit + 1); // fetch one extra to detect hasMore
+      .limit(parsedLimit + 1); // fetch one extra to detect hasMore
 
-    const hasMore = messages.length > limit;
-    const result = hasMore ? messages.slice(0, limit) : messages;
+    const hasMore = messages.length > parsedLimit;
+    const result = hasMore ? messages.slice(0, parsedLimit) : messages;
 
     // Mark messages as read by this user (fire-and-forget)
     const unreadIds = result

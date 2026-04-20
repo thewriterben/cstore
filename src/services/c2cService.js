@@ -92,8 +92,7 @@ class C2CService {
       minPrice,
       maxPrice,
       search,
-      radiusKm = 50,
-      status
+      radiusKm = 50
     } = filters;
 
     page = parseInt(page, 10) || 1;
@@ -162,7 +161,7 @@ class C2CService {
     return { listings, total, page, limit };
   }
 
-  async getListing(listingId, viewerUserId) {
+  async getListing(listingId, _viewerUserId) {
     const listing = await C2CListing.findById(listingId)
       .populate('seller', 'name createdAt');
 
