@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { NON_LIGHTNING_CRYPTO_SYMBOLS } = require('../config/cryptocurrencies');
 
 const approvalSchema = new mongoose.Schema({
   signer: {
@@ -32,7 +33,7 @@ const transactionApprovalSchema = new mongoose.Schema({
   cryptocurrency: {
     type: String,
     required: true,
-    enum: ['BTC', 'ETH', 'USDT', 'LTC', 'XRP']
+    enum: NON_LIGHTNING_CRYPTO_SYMBOLS
   },
   amount: {
     type: Number,

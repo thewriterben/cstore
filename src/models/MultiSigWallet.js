@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { isValidBitcoinAddress } = require('../utils/addressValidation');
+const { NON_LIGHTNING_CRYPTO_SYMBOLS } = require('../config/cryptocurrencies');
 
 const signerSchema = new mongoose.Schema({
   user: {
@@ -33,7 +34,7 @@ const multiSigWalletSchema = new mongoose.Schema({
   cryptocurrency: {
     type: String,
     required: true,
-    enum: ['BTC', 'ETH', 'USDT', 'LTC', 'XRP']
+    enum: NON_LIGHTNING_CRYPTO_SYMBOLS
   },
   address: {
     type: String,

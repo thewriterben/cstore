@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { ALL_SUPPORTED_CRYPTO_SYMBOLS } = require('../config/cryptocurrencies');
 
 /**
  * Milestone schema for milestone-based escrow releases
@@ -156,7 +157,7 @@ const escrowSchema = new mongoose.Schema({
   cryptocurrency: {
     type: String,
     required: true,
-    enum: ['BTC', 'ETH', 'USDT', 'LTC', 'XRP', 'BTC-LN']
+    enum: ALL_SUPPORTED_CRYPTO_SYMBOLS
   },
   amountUSD: {
     type: Number,

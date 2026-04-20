@@ -6,6 +6,11 @@ let products = [];
 let selectedProduct = null;
 let currentOrder = null;
 let currentLanguage = localStorage.getItem('language') || 'en';
+let supportedCryptocurrencies = [
+    { symbol: 'BTC', name: 'Bitcoin' },
+    { symbol: 'ETH', name: 'Ethereum' },
+    { symbol: 'USDT', name: 'Tether' }
+];
 
 // Product icons mapping
 const productIcons = {
@@ -19,7 +24,9 @@ const productIcons = {
 // Initialize app
 document.addEventListener('DOMContentLoaded', async () => {
     initializeLanguage();
+    await loadSupportedCryptocurrencies();
     await loadProducts();
+    setupNavigation();
     setupEventListeners();
 });
 
@@ -45,6 +52,22 @@ function getHeaders() {
         'Content-Type': 'application/json',
         'Accept-Language': currentLanguage
     };
+}
+
+// Load supported cryptocurrencies from API
+async function loadSupportedCryptocurrencies() {
+    try {
+        const response = await fetch(`${API_URL}/cryptocurrencies?lng=${currentLanguage}`, {
+            headers: getHeaders()
+        });
+        const data = await response.json();
+
+        if (data.success && data.data && Array.isArray(data.data.cryptocurrencies)) {
+            supportedCryptocurrencies = data.data.cryptocurrencies;
+        }
+    } catch (error) {
+        console.error('Error loading supported cryptocurrencies:', error);
+    }
 }
 
 // Load products from API
@@ -144,9 +167,9 @@ function showProductModal(product) {
             <div class="form-group">
                 <label for="cryptocurrency">Payment Method:</label>
                 <select id="cryptocurrency" name="cryptocurrency" required>
-                    <option value="BTC">Bitcoin (BTC)</option>
-                    <option value="ETH">Ethereum (ETH)</option>
-                    <option value="USDT">Tether (USDT)</option>
+                    ${supportedCryptocurrencies.map(crypto =>
+                        `<option value="${crypto.symbol}">${crypto.name} (${crypto.symbol})</option>`
+                    ).join('')}
                 </select>
             </div>
             
@@ -310,11 +333,7 @@ function showSuccessMessage() {
 
 // Go back to products
 function goBackToProducts() {
-    // Hide payment section
-    document.getElementById('payment-section').classList.add('hidden');
-    
-    // Show products section
-    document.getElementById('products-section').classList.remove('hidden');
+    showProductsSection();
     
     // Reset state
     currentOrder = null;
@@ -346,4 +365,133 @@ function setupEventListeners() {
             closeModal();
         }
     };
+}
+
+function setupNavigation() {
+    const productsNavButton = document.getElementById('nav-products');
+    const cfvNavButton = document.getElementById('nav-cfv');
+
+    if (productsNavButton) {
+        productsNavButton.onclick = () => {
+            showProductsSection();
+        };
+    }
+
+    if (cfvNavButton) {
+        cfvNavButton.onclick = async () => {
+            showCFVSection();
+            await loadCFVData();
+        };
+    }
+}
+
+function showProductsSection() {
+    document.getElementById('products-section').classList.remove('hidden');
+    document.getElementById('cfv-section').classList.add('hidden');
+    document.getElementById('order-section').classList.add('hidden');
+    document.getElementById('payment-section').classList.add('hidden');
+    toggleActiveNavButton('products');
+}
+
+function showCFVSection() {
+    document.getElementById('products-section').classList.add('hidden');
+    document.getElementById('cfv-section').classList.remove('hidden');
+    document.getElementById('order-section').classList.add('hidden');
+    document.getElementById('payment-section').classList.add('hidden');
+    toggleActiveNavButton('cfv');
+}
+
+function toggleActiveNavButton(section) {
+    const productsNavButton = document.getElementById('nav-products');
+    const cfvNavButton = document.getElementById('nav-cfv');
+    if (!productsNavButton || !cfvNavButton) {
+        return;
+    }
+
+    productsNavButton.classList.toggle('active', section === 'products');
+    cfvNavButton.classList.toggle('active', section === 'cfv');
+}
+
+async function loadCFVData() {
+    const cfvContent = document.getElementById('cfv-content');
+    if (!cfvContent) {
+        return;
+    }
+
+    cfvContent.innerHTML = '<p>Loading CFV data...</p>';
+
+    try {
+        const response = await fetch(`${API_URL}/cfv/summary`, {
+            headers: getHeaders()
+        });
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            throw new Error('CFV endpoint returned non-JSON response');
+        }
+        const data = await response.json();
+
+        if (!data.success || !data.data || !Array.isArray(data.data.coins)) {
+            throw new Error('Invalid CFV summary response');
+        }
+
+        const rows = data.data.coins.map((coin) => {
+            const status = coin.valuationStatus || 'unknown';
+            const statusClass = status.replace(/\s+/g, '-');
+            const currentPrice = formatUsdValue(coin.currentPrice);
+            const fairValue = formatUsdValue(coin.fairValue);
+            const difference = formatPercentage(coin.percentageDifference);
+
+            return `
+                <tr>
+                    <td><strong>${coin.symbol}</strong></td>
+                    <td>${coin.name}</td>
+                    <td>${currentPrice}</td>
+                    <td>${fairValue}</td>
+                    <td class="cfv-status ${statusClass}">${status}</td>
+                    <td>${difference}</td>
+                </tr>
+            `;
+        }).join('');
+
+        cfvContent.innerHTML = `
+            <div class="cfv-table-wrapper">
+                <table class="cfv-table">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Name</th>
+                            <th>Current Price</th>
+                            <th>Fair Value</th>
+                            <th>Valuation Status</th>
+                            <th>% Difference</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error loading CFV data:', error);
+        cfvContent.innerHTML = '<p>CFV data is currently unavailable.</p>';
+    }
+}
+
+function formatUsdValue(value) {
+    if (typeof value !== 'number' || Number.isNaN(value)) {
+        return 'N/A';
+    }
+    if (value >= 1) {
+        return `$${value.toFixed(2)}`;
+    }
+    if (value >= 0.01) {
+        return `$${value.toFixed(4)}`;
+    }
+    return `$${value.toFixed(8)}`;
+}
+
+function formatPercentage(value) {
+    if (typeof value !== 'number' || Number.isNaN(value)) {
+        return 'N/A';
+    }
+    return `${value.toFixed(2)}%`;
 }

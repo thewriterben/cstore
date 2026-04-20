@@ -2,6 +2,8 @@ const request = require('supertest');
 const app = require('../src/app');
 
 describe('Cryptocurrency API', () => {
+  const dgfSymbols = ['DGB', 'DASH', 'XMR', 'XNO', 'ZCL', 'RVN', 'XEC', 'EGLD', 'NEAR', 'ICP', 'XCH', 'DGD'];
+
   describe('GET /api/cryptocurrencies', () => {
     it('should get all supported cryptocurrencies', async () => {
       const res = await request(app)
@@ -24,6 +26,18 @@ describe('Cryptocurrency API', () => {
       expect(symbols).toContain('BTC');
       expect(symbols).toContain('ETH');
       expect(symbols).toContain('USDT');
+    });
+
+    it('should include all 12 DGF CFV coins', async () => {
+      const res = await request(app)
+        .get('/api/cryptocurrencies');
+
+      expect(res.status).toBe(200);
+
+      const symbols = res.body.data.cryptocurrencies.map(c => c.symbol);
+      dgfSymbols.forEach(symbol => {
+        expect(symbols).toContain(symbol);
+      });
     });
 
     it('should include cryptocurrency details', async () => {

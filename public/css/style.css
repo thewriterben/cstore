@@ -85,6 +85,21 @@ h2 {
     font-size: 1.8rem;
 }
 
+.section-nav {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.nav-btn {
+    width: auto;
+    min-width: 180px;
+}
+
+.nav-btn.active {
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.35);
+}
+
 .products-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -257,11 +272,49 @@ h2 {
 }
 
 .order-details,
-.payment-details {
+.payment-details,
+.cfv-content {
     background: white;
     padding: 2rem;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.cfv-table-wrapper {
+    overflow-x: auto;
+}
+
+.cfv-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.cfv-table th,
+.cfv-table td {
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    padding: 0.75rem;
+}
+
+.cfv-status {
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.cfv-status.undervalued {
+    color: #198754;
+}
+
+.cfv-status.overvalued {
+    color: #dc3545;
+}
+
+.cfv-status.fairly-valued {
+    color: #b8860b;
+}
+
+.cfv-status.unknown {
+    color: #6c757d;
 }
 
 .order-summary {

@@ -7,14 +7,26 @@ const { AppError } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
 const currencyService = require('../services/currencyService');
 const escrowService = require('../services/escrowService');
+const { ALL_SUPPORTED_CRYPTOCURRENCIES } = require('../config/cryptocurrencies');
 
 // Supported cryptocurrencies with addresses
-const supportedCryptos = [
-  { symbol: 'BTC', name: 'Bitcoin', address: process.env.BTC_ADDRESS || 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh' },
-  { symbol: 'ETH', name: 'Ethereum', address: process.env.ETH_ADDRESS || '0x742d35Cc6634C0532925a3b844Bc454e4438f44e' },
-  { symbol: 'USDT', name: 'Tether', address: process.env.USDT_ADDRESS || '0x742d35Cc6634C0532925a3b844Bc454e4438f44e' },
-  { symbol: 'BTC-LN', name: 'Bitcoin Lightning Network', address: 'Lightning Network' }
-];
+const cryptoAddressFallbacks = {
+  BTC: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh',
+  ETH: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+  USDT: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+  LTC: 'ltc-address-not-configured',
+  XRP: 'xrp-address-not-configured',
+  'BTC-LN': 'Lightning Network'
+};
+
+const supportedCryptos = ALL_SUPPORTED_CRYPTOCURRENCIES.map((coin) => {
+  const envKey = `${coin.symbol.replace(/-/g, '_')}_ADDRESS`;
+  return {
+    symbol: coin.symbol,
+    name: coin.name,
+    address: process.env[envKey] || cryptoAddressFallbacks[coin.symbol] || 'Not configured'
+  };
+});
 
 const getEscrowDepositAddress = (cryptocurrency, fallbackAddress) => {
   const envKey = `ESCROW_${cryptocurrency.replace(/-/g, '_')}_ADDRESS`;
@@ -81,6 +93,9 @@ const createOrder = asyncHandler(async (req, res, next) => {
   const crypto = supportedCryptos.find(c => c.symbol === cryptocurrency);
   if (!crypto) {
     return next(new AppError('Unsupported cryptocurrency', 400));
+  }
+  if (!crypto.address || crypto.address === 'Not configured') {
+    return next(new AppError(`Payment address not configured for ${cryptocurrency}`, 503));
   }
 
   // Calculate prices
