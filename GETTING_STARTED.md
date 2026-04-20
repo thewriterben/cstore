@@ -10,8 +10,8 @@
 
 Before you begin, ensure you have:
 
-- **Node.js** 16+ and npm
-- **MongoDB** 4.4+ (local or cloud instance)
+- **Node.js** 18+ and npm
+- **MongoDB** 6+ (local or cloud instance)
 - **Git** for version control
 - **Docker** (optional, for containerized development)
 
@@ -228,4 +228,4 @@ Complete configuration options: [docs/getting-started/INSTALLATION.md](docs/gett
 
 **Ready to contribute?** Check out [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-*Last Updated: October 2025*
+*Last Updated: April 2026*

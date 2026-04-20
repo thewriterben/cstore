@@ -2,7 +2,7 @@
 
 **System architecture and technical design documentation for Cryptons.com**
 
-**Version:** 2.2.0 | **Last Updated:** October 2025
+**Version:** 2.2.0 | **Last Updated:** April 2026
 
 ---
 

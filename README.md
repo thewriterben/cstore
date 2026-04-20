@@ -3,11 +3,11 @@
 **Professional Cryptocurrency Trading Platform for Education and Development**
 
 [![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)](CHANGELOG.md)
-[![License](https://img.shields.io/badge/license-ISC-green.svg)](LICENSE)
-[![Node](https://img.shields.io/badge/node-%3E%3D16-brightgreen.svg)](package.json)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](package.json)
 [![Status](https://img.shields.io/badge/status-Development-orange.svg)](README.md)
 
-A full-featured cryptocurrency e-commerce platform with blockchain integration, multi-currency support, admin dashboard, and comprehensive compliance framework. Built with Node.js, Express, MongoDB, and React.
+A full-featured cryptocurrency e-commerce platform with blockchain integration, multi-currency support, admin dashboard, escrow services, print-on-demand, and a comprehensive compliance framework. Built with Node.js, Express, MongoDB, and React.
 
 ---
 
@@ -75,37 +75,50 @@ npm test
 ✅ Product catalog with advanced search (Elasticsearch)  
 ✅ Shopping cart and order management  
 ✅ User authentication (JWT) and role-based access  
-✅ Review & rating system  
+✅ Review & rating system with moderation  
+✅ Product Q&A system  
+✅ Wishlist functionality  
 ✅ Multi-language support (5 languages)  
-✅ Multi-currency pricing (10+ currencies)
+✅ Multi-currency pricing (10+ currencies)  
+✅ Regional payment methods (15+ options)
 
-### Cryptocurrency
+### Cryptocurrency & Finance
 ✅ Bitcoin, Litecoin, XRP integration  
 ✅ Lightning Network for instant payments  
 ✅ Multi-signature wallets (2-of-3, 3-of-5)  
 ✅ Blockchain transaction verification  
-✅ Real-time payment webhooks
+✅ Real-time payment webhooks  
+✅ Escrow service with milestone support and dispute resolution  
+✅ Crypto-to-fiat conversion with exchange integration  
+✅ Crypto Fair Value (CFV) metrics  
+
+### Print-on-Demand (Printify)
+✅ Printify API integration for POD products  
+✅ Automatic order submission to production  
+✅ Product sync and webhook handling  
 
 ### Admin Dashboard
-✅ React-based management interface  
-✅ Real-time analytics and charts  
+✅ React 19 + TypeScript management interface (Vite)  
+✅ Real-time analytics and charts (Recharts)  
 ✅ Product, order, and user management  
 ✅ Export functionality (CSV/PDF)  
-✅ Drag-and-drop interfaces
+✅ Drag-and-drop interfaces (dnd-kit)
 
-### Compliance Framework (NEW v2.2.0)
-✅ KYC/AML integration support  
+### Compliance Framework
+✅ KYC/AML integration support (Jumio, Onfido, Sumsub)  
 ✅ Transaction monitoring with ML-based risk scoring  
+✅ Sanctions screening (OFAC, UN, EU lists)  
 ✅ GDPR compliance (data subject rights)  
-✅ Automated regulatory reporting  
+✅ Consent management and data retention  
+✅ Automated regulatory reporting (CTR/SAR)  
 ✅ Audit trail and compliance dashboard
 
 ### Infrastructure
 ✅ CI/CD pipeline with GitHub Actions  
 ✅ Kubernetes deployment manifests  
-✅ Docker containerization  
+✅ Docker containerization (multi-stage builds)  
 ✅ Prometheus + Grafana monitoring  
-✅ Automated testing (Jest)
+✅ Automated testing (Jest, 45+ test files)
 
 **Complete Feature List**: [FEATURES.md](FEATURES.md)
 
@@ -138,11 +151,13 @@ npm test
 
 ## 🛠 Technology Stack
 
-**Backend**: Node.js 16+, Express.js, MongoDB, Redis, Elasticsearch  
-**Frontend**: React 19, TypeScript, Material-UI, Redux Toolkit  
-**Blockchain**: Bitcoin Core RPC, Lightning Network (LND)  
+**Backend**: Node.js 18+, Express 5, MongoDB (Mongoose 8), Redis (ioredis), Elasticsearch  
+**Frontend**: React 19, TypeScript, Material-UI v6, Redux Toolkit, Vite  
+**Blockchain**: Bitcoin Core RPC, Lightning Network (LND), XRP Ledger, Web3  
+**Integrations**: Printify (POD), Coinbase/Kraken/Binance exchanges, Stripe, PayPal  
 **Infrastructure**: Docker, Kubernetes, GitHub Actions, Prometheus, Grafana  
-**Testing**: Jest, Supertest, K6 (performance)
+**Testing**: Jest 30, Supertest, K6 (performance)  
+**Security**: Helmet, express-rate-limit, express-mongo-sanitize, joi validation
 
 **Details**: [ARCHITECTURE.md](ARCHITECTURE.md)
 
@@ -196,7 +211,7 @@ We welcome contributions! Whether you're fixing bugs, adding features, improving
 
 ## 📄 License
 
-ISC License - see [LICENSE](LICENSE) file for details
+MIT License - see [LICENSE](LICENSE) file for details
 
 ---
 
@@ -227,4 +242,4 @@ ISC License - see [LICENSE](LICENSE) file for details
 
 **Made with ❤️ for the crypto community**
 
-*Version 2.2.0 | Last Updated: October 2025*
+*Version 2.2.0 | Last Updated: April 2026*

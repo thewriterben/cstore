@@ -69,8 +69,8 @@
    - Persistent storage configured
    - HA setup recommended
 
-3. **Node.js 16+**
-   - LTS version recommended
+3. **Node.js 18+**
+   - LTS version recommended (Node.js 20 used in Docker)
    - PM2 or similar process manager
 
 ### Optional Services
@@ -772,7 +772,7 @@ For complete production requirements, see [README.md](README.md#-production-read
 ---
 
 **Version:** 2.2.0  
-**Last Updated:** October 2025  
+**Last Updated:** April 2026  
 **Status:** Development/Educational Platform
 
 *This deployment guide is for educational and development purposes. Professional consultation required for production deployment.*
