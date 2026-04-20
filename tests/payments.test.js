@@ -3,6 +3,7 @@ const app = require('../src/app');
 const Payment = require('../src/models/Payment');
 const Order = require('../src/models/Order');
 const Product = require('../src/models/Product');
+const Escrow = require('../src/models/Escrow');
 const User = require('../src/models/User');
 const { generateToken } = require('../src/utils/jwt');
 
@@ -41,6 +42,7 @@ describe('Payments API', () => {
       description: 'Test product description',
       price: 0.005,
       priceUSD: 250,
+      seller: adminUser._id,
       stock: 10,
       currency: 'BTC',
       isActive: true
@@ -67,6 +69,22 @@ describe('Payments API', () => {
       paymentAddress: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh',
       status: 'pending'
     });
+
+    const escrow = await Escrow.create({
+      buyer: regularUser._id,
+      seller: adminUser._id,
+      order: testOrder._id,
+      title: 'Test payment escrow',
+      amount: testOrder.totalPrice,
+      cryptocurrency: testOrder.cryptocurrency,
+      amountUSD: testOrder.totalPriceUSD,
+      depositAddress: testOrder.paymentAddress,
+      releaseType: 'manual',
+      releaseConditions: [{ type: 'delivery_confirmation' }]
+    });
+
+    testOrder.escrow = escrow._id;
+    await testOrder.save();
   });
 
   describe('POST /api/payments/confirm', () => {
@@ -122,6 +140,21 @@ describe('Payments API', () => {
         paymentAddress: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh',
         status: 'pending'
       });
+
+      const newEscrow = await Escrow.create({
+        buyer: regularUser._id,
+        seller: adminUser._id,
+        order: newOrder._id,
+        title: 'Duplicate hash escrow',
+        amount: newOrder.totalPrice,
+        cryptocurrency: newOrder.cryptocurrency,
+        amountUSD: newOrder.totalPriceUSD,
+        depositAddress: newOrder.paymentAddress,
+        releaseType: 'manual',
+        releaseConditions: [{ type: 'delivery_confirmation' }]
+      });
+      newOrder.escrow = newEscrow._id;
+      await newOrder.save();
 
       // Try to use same transaction hash
       const res = await request(app)

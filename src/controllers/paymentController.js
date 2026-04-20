@@ -1,10 +1,52 @@
 const Payment = require('../models/Payment');
 const Order = require('../models/Order');
-const Product = require('../models/Product');
+const User = require('../models/User');
 const { asyncHandler } = require('../middleware/errorHandler');
 const { AppError } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
 const { verifyTransaction } = require('../services/blockchainService');
+const escrowService = require('../services/escrowService');
+const transactionMonitoring = require('../services/transactionMonitoring');
+const kycService = require('../services/kyc');
+const sanctionsService = require('../services/sanctions');
+
+const runEscrowFundingComplianceChecks = async (order, payment) => {
+  if (!order.user) {
+    logger.warn(`Skipping escrow compliance checks for order ${order._id}: missing order.user`);
+    return {
+      approved: false,
+      checksSkipped: true,
+      reason: 'Order has no associated user for compliance checks'
+    };
+  }
+
+  const user = await User.findById(order.user).select('name country createdAt');
+  if (!user) {
+    throw new Error('Order user not found for compliance checks');
+  }
+
+  const kycStatus = await kycService.checkVerificationStatus(user._id);
+  const sanctionsResult = await sanctionsService.screenUser(user._id, {
+    name: user.name,
+    country: user.country
+  });
+  const monitoringResult = await transactionMonitoring.monitorBeforeTransaction({
+    _id: payment._id,
+    user: user._id,
+    fiatAmount: payment.amountUSD,
+    amount: payment.amount,
+    cryptocurrency: payment.cryptocurrency,
+    transactionHash: payment.transactionHash
+  }, user);
+
+  return {
+    approved: monitoringResult.approved && sanctionsResult.action !== 'block',
+    requiresManualReview: monitoringResult.requiresManualReview || sanctionsResult.action === 'manual_review' || !kycStatus.verified,
+    kycStatus,
+    sanctionsResult,
+    monitoringResult
+  };
+};
 
 // @desc    Confirm payment
 // @route   POST /api/payments/confirm
@@ -86,6 +128,27 @@ const confirmPayment = asyncHandler(async (req, res, next) => {
     lastVerificationAt: new Date()
   });
 
+  if (!order.escrow) {
+    payment.status = 'failed';
+    await payment.save();
+    return next(new AppError('Escrow not found for order', 400));
+  }
+
+  const complianceResult = await runEscrowFundingComplianceChecks(order, payment);
+  if (!complianceResult.approved) {
+    payment.status = 'failed';
+    await payment.save();
+    return next(new AppError(`Payment blocked by compliance checks: ${complianceResult.reason || 'monitoring or sanctions rules'}`, 400));
+  }
+
+  try {
+    await escrowService.fundEscrow(order.escrow, transactionHash, order.user || null);
+  } catch (error) {
+    payment.status = 'failed';
+    await payment.save();
+    return next(new AppError(`Escrow funding failed: ${error.message}`, 400));
+  }
+
   // Update order
   order.status = 'paid';
   order.transactionHash = transactionHash;
@@ -106,6 +169,7 @@ const confirmPayment = asyncHandler(async (req, res, next) => {
     data: {
       payment,
       order,
+      compliance: complianceResult,
       verification: verificationResult.verified ? {
         verified: true,
         confirmations: verificationResult.confirmations,
@@ -209,6 +273,29 @@ const verifyPayment = asyncHandler(async (req, res, next) => {
 
   // Update order if payment is confirmed
   if (verificationResult.verified && payment.order) {
+    if (!payment.order.escrow) {
+      return next(new AppError('Escrow not found for order', 400));
+    }
+
+    const complianceResult = await runEscrowFundingComplianceChecks(payment.order, payment);
+    if (!complianceResult.approved) {
+      payment.status = 'failed';
+      await payment.save();
+      return next(new AppError(`Payment blocked by compliance checks: ${complianceResult.reason || 'monitoring or sanctions rules'}`, 400));
+    }
+
+    try {
+      await escrowService.fundEscrow(
+        payment.order.escrow,
+        payment.transactionHash,
+        payment.order.user || (req.user ? req.user.id : null)
+      );
+    } catch (error) {
+      payment.status = 'failed';
+      await payment.save();
+      return next(new AppError(`Escrow funding failed: ${error.message}`, 400));
+    }
+
     payment.order.status = 'paid';
     await payment.order.save();
   }

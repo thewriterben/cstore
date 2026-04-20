@@ -69,6 +69,10 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  escrow: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Escrow'
+  },
   transactionHash: {
     type: String
   },
