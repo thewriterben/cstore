@@ -480,7 +480,13 @@ function formatUsdValue(value) {
     if (typeof value !== 'number' || Number.isNaN(value)) {
         return 'N/A';
     }
-    return `$${value.toFixed(value >= 1 ? 2 : 6)}`;
+    if (value >= 1) {
+        return `$${value.toFixed(2)}`;
+    }
+    if (value >= 0.01) {
+        return `$${value.toFixed(4)}`;
+    }
+    return `$${value.toFixed(8)}`;
 }
 
 function formatPercentage(value) {

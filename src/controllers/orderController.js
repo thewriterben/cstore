@@ -24,7 +24,7 @@ const supportedCryptos = ALL_SUPPORTED_CRYPTOCURRENCIES.map((coin) => {
   return {
     symbol: coin.symbol,
     name: coin.name,
-    address: process.env[envKey] || cryptoAddressFallbacks[coin.symbol] || `${coin.symbol.toLowerCase()}-address`
+    address: process.env[envKey] || cryptoAddressFallbacks[coin.symbol] || 'Not configured'
   };
 });
 
@@ -93,6 +93,9 @@ const createOrder = asyncHandler(async (req, res, next) => {
   const crypto = supportedCryptos.find(c => c.symbol === cryptocurrency);
   if (!crypto) {
     return next(new AppError('Unsupported cryptocurrency', 400));
+  }
+  if (!crypto.address || crypto.address === 'Not configured') {
+    return next(new AppError(`Payment address not configured for ${cryptocurrency}`, 503));
   }
 
   // Calculate prices
