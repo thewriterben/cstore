@@ -2,6 +2,7 @@ const request = require('supertest');
 const app = require('../src/app');
 const Order = require('../src/models/Order');
 const Product = require('../src/models/Product');
+const Escrow = require('../src/models/Escrow');
 const User = require('../src/models/User');
 const { generateToken } = require('../src/utils/jwt');
 
@@ -42,6 +43,7 @@ describe('Orders API', () => {
       description: 'Test product description',
       price: 0.005,
       priceUSD: 250,
+      seller: adminUser._id,
       stock: 10,
       currency: 'BTC',
       isActive: true
@@ -77,9 +79,15 @@ describe('Orders API', () => {
       expect(res.body.data.order.totalPrice).toBe(0.01);
       expect(res.body.data.order.totalPriceUSD).toBe(500);
       expect(res.body.data.order.cryptocurrency).toBe('BTC');
+      expect(res.body.data.order.escrow).toBeDefined();
+
+      const escrow = await Escrow.findById(res.body.data.order.escrow);
+      expect(escrow).toBeDefined();
+      expect(escrow.order.toString()).toBe(res.body.data.order._id);
+      expect(res.body.data.order.paymentAddress).toBe(escrow.depositAddress);
     });
 
-    it('should create an order without authentication', async () => {
+    it('should require authentication for escrow order creation', async () => {
       if (!global.isConnected()) return;
 
       const orderData = {
@@ -93,10 +101,8 @@ describe('Orders API', () => {
         .post('/api/orders')
         .send(orderData);
 
-      expect(res.status).toBe(201);
-      expect(res.body.success).toBe(true);
-      expect(res.body.data.order).toBeDefined();
-      expect(res.body.data.order.user).toBeNull();
+      expect(res.status).toBe(401);
+      expect(res.body.success).toBe(false);
     });
 
     it('should return error for insufficient stock', async () => {
@@ -470,6 +476,65 @@ describe('Orders API', () => {
 
       expect(res.status).toBe(404);
       expect(res.body.success).toBe(false);
+    });
+  });
+
+  describe('POST /api/orders/:id/confirm-delivery', () => {
+    let deliveredOrder;
+    let escrow;
+
+    beforeEach(async () => {
+      if (!global.isConnected()) return;
+
+      deliveredOrder = await Order.create({
+        user: regularUser._id,
+        customerEmail: 'customer@test.com',
+        items: [{
+          product: testProduct._id,
+          productName: testProduct.name,
+          quantity: 1,
+          price: testProduct.price,
+          priceUSD: testProduct.priceUSD
+        }],
+        totalPrice: testProduct.price,
+        totalPriceUSD: testProduct.priceUSD,
+        cryptocurrency: 'BTC',
+        paymentAddress: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh',
+        status: 'delivered'
+      });
+
+      escrow = await Escrow.create({
+        buyer: regularUser._id,
+        seller: adminUser._id,
+        order: deliveredOrder._id,
+        title: 'Delivery confirmation escrow',
+        amount: deliveredOrder.totalPrice,
+        cryptocurrency: deliveredOrder.cryptocurrency,
+        amountUSD: deliveredOrder.totalPriceUSD,
+        depositAddress: deliveredOrder.paymentAddress,
+        releaseType: 'manual',
+        releaseConditions: [{ type: 'delivery_confirmation' }],
+        status: 'funded'
+      });
+
+      deliveredOrder.escrow = escrow._id;
+      await deliveredOrder.save();
+    });
+
+    it('should release escrow when buyer confirms delivery', async () => {
+      if (!global.isConnected()) return;
+
+      const res = await request(app)
+        .post(`/api/orders/${deliveredOrder._id}/confirm-delivery`)
+        .set('Authorization', `Bearer ${userToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data.releaseStatus).toBe('released');
+
+      const updatedEscrow = await Escrow.findById(escrow._id);
+      expect(updatedEscrow.status).toBe('completed');
+      expect(updatedEscrow.releaseConditions[0].met).toBe(true);
     });
   });
 });

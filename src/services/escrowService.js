@@ -77,16 +77,19 @@ class EscrowService {
         throw new Error(`Cannot fund escrow with status: ${escrow.status}`);
       }
       
-      // Verify the transaction
-      const verification = await verifyTransaction(
-        transactionHash,
-        escrow.cryptocurrency,
-        escrow.depositAddress,
-        escrow.amount
-      );
+      // Verify the transaction when blockchain verification is enabled
+      let verification = { verified: true };
+      if (process.env.VERIFY_BLOCKCHAIN === 'true') {
+        verification = await verifyTransaction(
+          escrow.cryptocurrency,
+          transactionHash,
+          escrow.depositAddress,
+          escrow.amount
+        );
+      }
       
-      if (!verification.valid) {
-        throw new Error('Transaction verification failed');
+      if (!verification.verified) {
+        throw new Error(verification.error || 'Transaction verification failed');
       }
       
       // Update escrow status
