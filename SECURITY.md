@@ -8,7 +8,7 @@ We release patches for security vulnerabilities. Currently supported versions:
 | ------- | ------------------ |
 | 2.2.x   | :white_check_mark: |
 | 2.1.x   | :white_check_mark: |
-| 2.0.x   | :white_check_mark: |
+| 2.0.x   | :x:                |
 | < 2.0   | :x:                |
 
 ## Reporting a Vulnerability
@@ -152,5 +152,5 @@ For security concerns, always use the private reporting methods described above.
 
 ---
 
-**Last Updated**: October 2024  
+**Last Updated**: April 2026  
 **Version**: 2.2.0

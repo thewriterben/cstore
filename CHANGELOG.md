@@ -261,11 +261,11 @@ Payment webhooks lack signature verification, allowing potential webhook spoofin
 - Automated backup and disaster recovery
 
 ### Version 3.0.0 (Future)
-- KYC/AML implementation
-- Advanced compliance features
-- Transaction monitoring and reporting
-- Enhanced multi-currency support
-- Advanced trading features
+- Advanced trading features (limit orders, order books)
+- Multi-chain wallet management
+- Decentralized exchange (DEX) integration
+- Advanced analytics and reporting dashboards
+- Mobile API optimizations
 
 ---
 

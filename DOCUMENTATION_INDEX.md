@@ -1,7 +1,7 @@
 # Cryptons.com Documentation Index
 
 **Version:** 2.2.0  
-**Last Updated:** October 2025
+**Last Updated:** April 2026
 
 Welcome to the Cryptons.com documentation. This comprehensive index provides organized access to all documentation, grouped by topic and audience.
 

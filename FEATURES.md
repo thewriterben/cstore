@@ -15,7 +15,8 @@ Cryptons.com is a full-featured cryptocurrency e-commerce platform with comprehe
 | Category | Features | Status | Documentation |
 |----------|----------|--------|---------------|
 | **Core E-commerce** | 10+ features | ✅ Complete | [Core Features](#core-e-commerce-features) |
-| **Cryptocurrency** | Bitcoin, Lightning, Multi-sig | ✅ Complete | [Crypto Features](#cryptocurrency-features) |
+| **Cryptocurrency** | Bitcoin, Lightning, Multi-sig, Escrow, CFV | ✅ Complete | [Crypto Features](#cryptocurrency-features) |
+| **Print-on-Demand** | Printify integration | ✅ Complete | [POD Features](#-print-on-demand-printify-integration) |
 | **Admin Dashboard** | React UI with analytics | ✅ Complete | [Admin Features](#admin-dashboard) |
 | **Internationalization** | 5 languages, 10+ currencies | ✅ Complete | [i18n Features](#internationalization) |
 | **Compliance** | KYC/AML framework | ✅ Complete | [Compliance](#compliance-features) |
@@ -115,6 +116,20 @@ Cryptons.com is a full-featured cryptocurrency e-commerce platform with comprehe
 - `POST /api/wishlist` - Add item to wishlist
 - `DELETE /api/wishlist/:productId` - Remove from wishlist
 
+### Product Questions & Answers
+
+**Capabilities:**
+- Ask and answer questions on products
+- Question moderation and approval workflow
+- Helpful vote system for questions and answers
+- Admin statistics and management
+
+**API Endpoints:**
+- `GET /api/questions/product/:productId` - Get product questions
+- `POST /api/questions` - Ask a question
+- `POST /api/questions/:id/answers` - Add an answer
+- `POST /api/questions/:id/helpful` - Mark question as helpful
+
 ---
 
 ## 💰 Cryptocurrency Features
@@ -184,6 +199,72 @@ Cryptons.com is a full-featured cryptocurrency e-commerce platform with comprehe
 - `GET /api/multisig/wallets/:id` - Get wallet details
 
 **Documentation:** [docs/api/MULTI_SIG_WALLET.md](docs/api/MULTI_SIG_WALLET.md)
+
+### Escrow Service
+
+**Capabilities:**
+- Create escrow transactions with milestone support
+- Fund, release, and refund escrow funds
+- Dispute filing and resolution workflow
+- Milestone-based payment release
+- Admin statistics and management
+
+**API Endpoints:**
+- `POST /api/escrow` - Create escrow
+- `POST /api/escrow/:id/fund` - Fund escrow
+- `POST /api/escrow/:id/release` - Release funds
+- `POST /api/escrow/:id/refund` - Refund escrow
+- `POST /api/escrow/:id/dispute` - File dispute
+- `POST /api/escrow/:id/resolve` - Resolve dispute (admin)
+
+**Documentation:** [docs/ESCROW_SYSTEM_README.md](docs/ESCROW_SYSTEM_README.md)
+
+### Crypto-to-Fiat Conversion
+
+**Capabilities:**
+- Initiate crypto-to-fiat conversions
+- Multi-exchange rate comparison (Coinbase, Kraken, Binance)
+- Automatic best-rate selection
+- Conversion history and status tracking
+- Admin approval workflows for large amounts
+- Configurable daily limits and slippage protection
+
+**API Endpoints:**
+- `POST /api/conversions/initiate` - Start conversion
+- `GET /api/conversions/:id/status` - Check conversion status
+- `GET /api/conversions/history` - View conversion history
+
+**Documentation:** [docs/CONVERSION_SYSTEM.md](docs/CONVERSION_SYSTEM.md)
+
+### Crypto Fair Value (CFV) Metrics
+
+**Capabilities:**
+- Fair value estimation for cryptocurrencies
+- Summary statistics across tracked coins
+- Per-symbol detailed metrics
+
+**API Endpoints:**
+- `GET /api/cfv/coins` - Get all CFV coin data
+- `GET /api/cfv/coins/:symbol` - Get CFV data for a specific coin
+- `GET /api/cfv/summary` - Get CFV summary
+
+---
+
+## 🖨 Print-on-Demand (Printify Integration)
+
+**Capabilities:**
+- Full Printify API integration for print-on-demand products
+- Product catalog sync from Printify
+- Automatic order submission to production
+- Webhook handling for order status updates
+- Payment method configuration (Stripe/PayPal)
+
+**API Endpoints:**
+- `GET /api/printify/products` - List POD products
+- `POST /api/printify/orders` - Submit POD order
+- `POST /api/printify/webhooks` - Receive Printify webhooks
+
+**Documentation:** [docs/POD_SETUP_GUIDE.md](docs/POD_SETUP_GUIDE.md) | [docs/PRINTIFY_API.md](docs/PRINTIFY_API.md)
 
 ---
 
@@ -550,7 +631,7 @@ SMTP_PASS=your-app-password
 ---
 
 **Version:** 2.2.0  
-**Last Updated:** October 2025  
+**Last Updated:** April 2026  
 **Status:** Development/Educational Platform
 
 *For production deployment requirements, see [README.md](README.md#-critical-production-warning)*

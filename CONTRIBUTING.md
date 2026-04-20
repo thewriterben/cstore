@@ -180,13 +180,14 @@ function getUserById(userId) {
 
 ```
 src/
-├── config/          # Configuration files
-├── controllers/     # Request handlers
-├── middleware/      # Express middleware
-├── models/          # Mongoose models
-├── routes/          # API routes
-├── utils/           # Utility functions
-└── validators/      # Input validation schemas
+├── config/          # Configuration files (database, Redis, CORS, i18n, startup)
+├── controllers/     # Request handlers (27 controllers)
+├── middleware/       # Express middleware (auth, security, validation, webhooks)
+├── models/          # Mongoose models (29 models)
+├── routes/          # API routes (20 route files)
+├── services/        # Business logic services (40 services)
+├── utils/           # Utility functions (logging, encryption, JWT, validation)
+└── validation/      # Input validation schemas (Joi)
 ```
 
 ## Testing Guidelines
