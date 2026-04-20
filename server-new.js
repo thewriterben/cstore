@@ -2,6 +2,7 @@ const app = require('./src/app');
 const logger = require('./src/utils/logger');
 const seedData = require('./src/utils/seedData');
 const secretsManager = require('./src/services/secretsManager');
+const auctionService = require('./src/services/auctionService');
 
 const PORT = process.env.PORT || 3000;
 
@@ -40,6 +41,10 @@ const startServer = async () => {
     if (process.env.SEED_DATA === 'true') {
       await seedData();
     }
+
+    // Start auction closer scheduler (checks every 60s for ended auctions)
+    auctionService.scheduleAuctionCloser();
+    logger.info('Auction closer scheduler started');
   });
 
   return server;

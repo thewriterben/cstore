@@ -47,6 +47,13 @@ const escrowRoutes = require('./routes/escrowRoutes');
 const cfvRoutes = require('./routes/cfvRoutes');
 const { getCryptocurrencies } = require('./controllers/orderController');
 
+// v3.0 Marketplace routes
+const contentModerationRoutes = require('./routes/contentModerationRoutes');
+const sellerRoutes = require('./routes/sellerRoutes');
+const auctionRoutes = require('./routes/auctionRoutes');
+const c2cRoutes = require('./routes/c2cRoutes');
+const messagingRoutes = require('./routes/messagingRoutes');
+
 const app = express();
 
 // Initialize security configuration
@@ -157,6 +164,13 @@ app.use('/api/printify', printifyRoutes);
 app.use('/api/escrow', escrowRoutes);
 app.use('/api/cfv', cfvRoutes);
 app.get('/api/cryptocurrencies', getCryptocurrencies);
+
+// v3.0 Marketplace routes
+app.use('/api/moderation', contentModerationRoutes);
+app.use('/api/sellers', sellerRoutes);
+app.use('/api/auctions', auctionRoutes);
+app.use('/api/c2c', c2cRoutes);
+app.use('/api/messages', messagingRoutes);
 
 // Health check endpoints
 app.get('/api/health', async (req, res) => {
