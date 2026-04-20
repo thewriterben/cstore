@@ -17,7 +17,7 @@ const supportedCryptos = [
 ];
 
 const getEscrowDepositAddress = (cryptocurrency, fallbackAddress) => {
-  const envKey = `ESCROW_${cryptocurrency.replace('-', '_')}_ADDRESS`;
+  const envKey = `ESCROW_${cryptocurrency.replace(/-/g, '_')}_ADDRESS`;
   return process.env[envKey] || process.env.ESCROW_DEPOSIT_ADDRESS || fallbackAddress;
 };
 
@@ -58,7 +58,7 @@ const markDeliveryConditionMet = (escrow) => {
 
 // @desc    Create order
 // @route   POST /api/orders
-// @access  Public
+// @access  Private (required for escrow buyer linkage)
 const createOrder = asyncHandler(async (req, res, next) => {
   const { productId, quantity, customerEmail, cryptocurrency, shippingAddress, displayCurrency } = req.body;
 
@@ -107,6 +107,8 @@ const createOrder = asyncHandler(async (req, res, next) => {
     }
   }
 
+  const depositAddress = getEscrowDepositAddress(cryptocurrency, crypto.address);
+
   // Create order
   const order = await Order.create({
     user: req.user ? req.user.id : null,
@@ -124,7 +126,7 @@ const createOrder = asyncHandler(async (req, res, next) => {
     displayPrice,
     exchangeRate,
     cryptocurrency,
-    paymentAddress: crypto.address,
+    paymentAddress: depositAddress,
     shippingAddress,
     status: 'pending'
   });
@@ -135,7 +137,6 @@ const createOrder = asyncHandler(async (req, res, next) => {
       throw new Error('No seller configured for product');
     }
 
-    const depositAddress = getEscrowDepositAddress(cryptocurrency, crypto.address);
     const escrow = await escrowService.createEscrow({
       buyer: req.user.id,
       seller: sellerId,
@@ -144,7 +145,7 @@ const createOrder = asyncHandler(async (req, res, next) => {
       description: `Escrow for order ${order._id}`,
       amount: order.totalPrice,
       cryptocurrency,
-      amountUSD: totalPriceUSD,
+      amountUSD: order.totalPriceUSD,
       depositAddress,
       releaseType: 'manual',
       releaseConditions: [
@@ -159,7 +160,6 @@ const createOrder = asyncHandler(async (req, res, next) => {
     }, req.user.id);
 
     order.escrow = escrow._id;
-    order.paymentAddress = escrow.depositAddress;
     await order.save();
   } catch (error) {
     await Order.findByIdAndDelete(order._id);
@@ -283,7 +283,11 @@ const confirmDelivery = asyncHandler(async (req, res, next) => {
     return next(new AppError('Order not found', 404));
   }
 
-  if (!order.user || order.user.toString() !== req.user.id) {
+  if (!order.user) {
+    return next(new AppError('This order has no associated user and cannot be confirmed', 400));
+  }
+
+  if (order.user.toString() !== req.user.id) {
     return next(new AppError('Not authorized to confirm this order', 403));
   }
 

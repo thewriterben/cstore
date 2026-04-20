@@ -12,9 +12,11 @@ const sanctionsService = require('../services/sanctions');
 
 const runEscrowFundingComplianceChecks = async (order, payment) => {
   if (!order.user) {
+    logger.warn(`Skipping escrow compliance checks for order ${order._id}: missing order.user`);
     return {
-      approved: true,
-      checksSkipped: true
+      approved: false,
+      checksSkipped: true,
+      reason: 'Order has no associated user for compliance checks'
     };
   }
 
@@ -136,7 +138,7 @@ const confirmPayment = asyncHandler(async (req, res, next) => {
   if (!complianceResult.approved) {
     payment.status = 'failed';
     await payment.save();
-    return next(new AppError('Payment blocked by compliance checks', 400));
+    return next(new AppError(`Payment blocked by compliance checks: ${complianceResult.reason || 'monitoring or sanctions rules'}`, 400));
   }
 
   try {
@@ -279,11 +281,15 @@ const verifyPayment = asyncHandler(async (req, res, next) => {
     if (!complianceResult.approved) {
       payment.status = 'failed';
       await payment.save();
-      return next(new AppError('Payment blocked by compliance checks', 400));
+      return next(new AppError(`Payment blocked by compliance checks: ${complianceResult.reason || 'monitoring or sanctions rules'}`, 400));
     }
 
     try {
-      await escrowService.fundEscrow(payment.order.escrow, payment.transactionHash, payment.order.user || req.user.id);
+      await escrowService.fundEscrow(
+        payment.order.escrow,
+        payment.transactionHash,
+        payment.order.user || (req.user ? req.user.id : null)
+      );
     } catch (error) {
       payment.status = 'failed';
       await payment.save();

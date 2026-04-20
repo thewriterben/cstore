@@ -87,8 +87,11 @@ describe('Orders API', () => {
       expect(res.body.data.order.paymentAddress).toBe(escrow.depositAddress);
     });
 
-    it('should require authentication for escrow order creation', async () => {
+    it('should require authentication for order creation', async () => {
       if (!global.isConnected()) return;
+
+      const orderCountBefore = await Order.countDocuments();
+      const escrowCountBefore = await Escrow.countDocuments();
 
       const orderData = {
         productId: testProduct._id.toString(),
@@ -103,6 +106,12 @@ describe('Orders API', () => {
 
       expect(res.status).toBe(401);
       expect(res.body.success).toBe(false);
+      expect(res.body.message).toContain('Authentication required');
+
+      const orderCountAfter = await Order.countDocuments();
+      const escrowCountAfter = await Escrow.countDocuments();
+      expect(orderCountAfter).toBe(orderCountBefore);
+      expect(escrowCountAfter).toBe(escrowCountBefore);
     });
 
     it('should return error for insufficient stock', async () => {

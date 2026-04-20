@@ -13,7 +13,7 @@ const { validate, schemas } = require('../middleware/validation');
 
 const router = express.Router();
 
-router.post('/', optionalAuth, validate(schemas.createOrder), createOrder);
+router.post('/', protect, validate(schemas.createOrder), createOrder);
 router.get('/my-orders', protect, getMyOrders);
 router.post('/:id/confirm-delivery', protect, confirmDelivery);
 router.get('/', protect, authorize('admin'), getAllOrders);
