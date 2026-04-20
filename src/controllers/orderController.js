@@ -7,14 +7,26 @@ const { AppError } = require('../middleware/errorHandler');
 const logger = require('../utils/logger');
 const currencyService = require('../services/currencyService');
 const escrowService = require('../services/escrowService');
+const { ALL_SUPPORTED_CRYPTOCURRENCIES } = require('../config/cryptocurrencies');
 
 // Supported cryptocurrencies with addresses
-const supportedCryptos = [
-  { symbol: 'BTC', name: 'Bitcoin', address: process.env.BTC_ADDRESS || 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh' },
-  { symbol: 'ETH', name: 'Ethereum', address: process.env.ETH_ADDRESS || '0x742d35Cc6634C0532925a3b844Bc454e4438f44e' },
-  { symbol: 'USDT', name: 'Tether', address: process.env.USDT_ADDRESS || '0x742d35Cc6634C0532925a3b844Bc454e4438f44e' },
-  { symbol: 'BTC-LN', name: 'Bitcoin Lightning Network', address: 'Lightning Network' }
-];
+const cryptoAddressFallbacks = {
+  BTC: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh',
+  ETH: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+  USDT: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+  LTC: 'ltc1qxy2kgdygjrsqtzq2n0yrf2493p83kkf0000000',
+  XRP: 'rN7n7otQDd6FczFgLdlqtyMVrn3HMfXEZv',
+  'BTC-LN': 'Lightning Network'
+};
+
+const supportedCryptos = ALL_SUPPORTED_CRYPTOCURRENCIES.map((coin) => {
+  const envKey = `${coin.symbol.replace(/-/g, '_')}_ADDRESS`;
+  return {
+    symbol: coin.symbol,
+    name: coin.name,
+    address: process.env[envKey] || cryptoAddressFallbacks[coin.symbol] || `${coin.symbol.toLowerCase()}-address`
+  };
+});
 
 const getEscrowDepositAddress = (cryptocurrency, fallbackAddress) => {
   const envKey = `ESCROW_${cryptocurrency.replace(/-/g, '_')}_ADDRESS`;

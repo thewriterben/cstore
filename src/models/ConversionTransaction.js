@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { ALL_SUPPORTED_CRYPTO_SYMBOLS } = require('../config/cryptocurrencies');
 
 /**
  * ConversionTransaction Model
@@ -22,7 +23,7 @@ const conversionTransactionSchema = new mongoose.Schema({
   cryptocurrency: {
     type: String,
     required: true,
-    enum: ['BTC', 'ETH', 'USDT', 'LTC', 'XRP', 'BTC-LN']
+    enum: ALL_SUPPORTED_CRYPTO_SYMBOLS
   },
   
   // Fiat details

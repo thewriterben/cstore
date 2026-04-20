@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { NON_LIGHTNING_CRYPTO_SYMBOLS } = require('../config/cryptocurrencies');
 
 const cartItemSchema = new mongoose.Schema({
   product: {
@@ -22,7 +23,7 @@ const cartItemSchema = new mongoose.Schema({
   },
   currency: {
     type: String,
-    enum: ['BTC', 'ETH', 'USDT', 'LTC', 'XRP'],
+    enum: NON_LIGHTNING_CRYPTO_SYMBOLS,
     required: true
   }
 });

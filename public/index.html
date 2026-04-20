@@ -29,10 +29,22 @@
     </header>
 
     <main class="container">
+        <nav class="section-nav">
+            <button id="nav-products" class="btn nav-btn active">Products</button>
+            <button id="nav-cfv" class="btn nav-btn">CFV Fair Value</button>
+        </nav>
+
         <section id="products-section">
             <h2>Featured Products</h2>
             <div id="products-grid" class="products-grid">
                 <!-- Products will be loaded here -->
+            </div>
+        </section>
+
+        <section id="cfv-section" class="hidden">
+            <h2>CFV Fair Value</h2>
+            <div id="cfv-content" class="cfv-content">
+                <!-- CFV data will be loaded here -->
             </div>
         </section>
 

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { ALL_SUPPORTED_CRYPTO_SYMBOLS } = require('../config/cryptocurrencies');
 
 const orderItemSchema = new mongoose.Schema({
   product: {
@@ -63,7 +64,7 @@ const orderSchema = new mongoose.Schema({
   cryptocurrency: {
     type: String,
     required: true,
-    enum: ['BTC', 'ETH', 'USDT', 'LTC', 'XRP', 'BTC-LN']
+    enum: ALL_SUPPORTED_CRYPTO_SYMBOLS
   },
   paymentAddress: {
     type: String,
