@@ -1,5 +1,6 @@
 const https = require('https');
 const http = require('http');
+const crypto = require('crypto');
 const User = require('../models/User');
 const ContentModerationLog = require('../models/ContentModerationLog');
 const logger = require('../utils/logger');
@@ -188,7 +189,7 @@ class AuthorityReportingService {
     if (!validCrimeTypes.includes(crimeType)) {
       throw new AppError(`Invalid crime type. Must be one of: ${validCrimeTypes.join(', ')}`, 400);
     }
-    const reportId = `IC3-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+    const reportId = `IC3-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
 
     logger.warn('Financial crime report', {
       reportId,

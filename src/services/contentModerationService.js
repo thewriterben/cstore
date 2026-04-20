@@ -224,7 +224,7 @@ class ContentModerationService {
           matched = rule.keywords.some((kw) => {
             try {
               const flags = rule.keywordCaseSensitive ? '' : 'i';
-              return new RegExp(kw, flags).test(text);
+              return new RegExp(kw, flags).test(textToMatch);
             } catch (e) {
               return false;
             }
