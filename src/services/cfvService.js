@@ -6,6 +6,20 @@ const { DGF_CFV_COINS } = require('../config/cryptocurrencies');
 const DEFAULT_CFV_METRICS_API_URL = 'http://localhost:3000';
 const DEFAULT_PRICE_CACHE_TTL_MS = 5 * 60 * 1000;
 const DEFAULT_CALCULATION_CACHE_TTL_MS = 60 * 60 * 1000;
+const CFV_ENDPOINTS_BY_SYMBOL = {
+  DGB: ['/api/metrics/DGB', '/api/collect/DGB'],
+  DASH: ['/api/metrics/DASH', '/api/collect/DASH'],
+  XMR: ['/api/metrics/XMR', '/api/collect/XMR'],
+  XNO: ['/api/metrics/XNO', '/api/collect/XNO'],
+  ZCL: ['/api/metrics/ZCL', '/api/collect/ZCL'],
+  RVN: ['/api/metrics/RVN', '/api/collect/RVN'],
+  XEC: ['/api/metrics/XEC', '/api/collect/XEC'],
+  EGLD: ['/api/metrics/EGLD', '/api/collect/EGLD'],
+  NEAR: ['/api/metrics/NEAR', '/api/collect/NEAR'],
+  ICP: ['/api/metrics/ICP', '/api/collect/ICP'],
+  XCH: ['/api/metrics/XCH', '/api/collect/XCH'],
+  DGD: ['/api/metrics/DGD', '/api/collect/DGD']
+};
 
 const getNestedValue = (obj, path) =>
   path.split('.').reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : undefined), obj);
@@ -136,7 +150,8 @@ class CFVService {
   }
 
   async fetchCoinData(symbol) {
-    const endpoints = [`${this.apiUrl}/api/metrics/${symbol}`, `${this.apiUrl}/api/collect/${symbol}`];
+    const endpointPaths = CFV_ENDPOINTS_BY_SYMBOL[symbol];
+    const endpoints = endpointPaths.map(path => `${this.apiUrl}${path}`);
     let response;
     let lastError;
 
@@ -205,13 +220,13 @@ class CFVService {
     const resolvedFairValue =
       fairValue !== null
         ? fairValue
-        : cfv !== null && circulatingSupply
+        : cfv !== null && circulatingSupply !== null && circulatingSupply !== 0
           ? cfv / circulatingSupply
           : null;
     const resolvedCFV =
       cfv !== null
         ? cfv
-        : resolvedFairValue !== null && circulatingSupply
+        : resolvedFairValue !== null && circulatingSupply !== null && circulatingSupply !== 0
           ? resolvedFairValue * circulatingSupply
           : null;
 
