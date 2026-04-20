@@ -334,10 +334,7 @@ function showSuccessMessage() {
 // Go back to products
 function goBackToProducts() {
     showProductsSection();
-
-    // Hide payment section
-    document.getElementById('payment-section').classList.add('hidden');
-
+    
     // Reset state
     currentOrder = null;
     selectedProduct = null;

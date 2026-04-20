@@ -32,6 +32,9 @@ const toNumber = (value) => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
+const isValidCirculatingSupply = (supply) =>
+  Number.isFinite(supply) && supply > 0;
+
 const pickNumericValue = (obj, paths) => {
   for (const path of paths) {
     const value = toNumber(getNestedValue(obj, path));
@@ -220,13 +223,13 @@ class CFVService {
     const resolvedFairValue =
       fairValue !== null
         ? fairValue
-        : cfv !== null && circulatingSupply !== null && circulatingSupply !== 0
+        : cfv !== null && isValidCirculatingSupply(circulatingSupply)
           ? cfv / circulatingSupply
           : null;
     const resolvedCFV =
       cfv !== null
         ? cfv
-        : resolvedFairValue !== null && circulatingSupply !== null && circulatingSupply !== 0
+        : resolvedFairValue !== null && isValidCirculatingSupply(circulatingSupply)
           ? resolvedFairValue * circulatingSupply
           : null;
 
@@ -255,7 +258,15 @@ class CFVService {
   }
 
   calculateValuationStatus(currentPrice, fairValue) {
-    if (currentPrice === null || fairValue === null || currentPrice === 0) {
+    if (currentPrice === null || fairValue === null) {
+      return 'unknown';
+    }
+
+    if (currentPrice === 0 && fairValue === 0) {
+      return 'fairly valued';
+    }
+
+    if (currentPrice === 0) {
       return 'unknown';
     }
 
